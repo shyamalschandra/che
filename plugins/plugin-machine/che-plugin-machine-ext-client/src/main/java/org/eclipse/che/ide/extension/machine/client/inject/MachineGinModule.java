@@ -59,8 +59,8 @@ import org.eclipse.che.ide.extension.machine.client.perspective.widgets.tab.head
 import org.eclipse.che.ide.extension.machine.client.perspective.widgets.tab.header.TabHeaderImpl;
 import org.eclipse.che.ide.extension.machine.client.processes.ConsolesPanelView;
 import org.eclipse.che.ide.extension.machine.client.processes.ConsolesPanelViewImpl;
-import org.eclipse.che.ide.extension.machine.client.target.TargetsView;
-import org.eclipse.che.ide.extension.machine.client.target.TargetsViewImpl;
+import org.eclipse.che.ide.extension.machine.client.targets.TargetsView;
+import org.eclipse.che.ide.extension.machine.client.targets.TargetsViewImpl;
 import org.eclipse.che.ide.ui.toolbar.ToolbarPresenter;
 
 import static org.eclipse.che.ide.extension.machine.client.perspective.OperationsPerspective.OPERATIONS_PERSPECTIVE_ID;
