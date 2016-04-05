@@ -22,6 +22,7 @@ import com.google.web.bindery.event.shared.EventBus;
 import org.eclipse.che.api.machine.gwt.client.events.WsAgentStateEvent;
 import org.eclipse.che.api.promises.client.Promise;
 import org.eclipse.che.api.promises.client.callback.AsyncPromiseHelper;
+import org.eclipse.che.api.promises.client.js.Promises;
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
 import org.eclipse.che.ide.rest.AsyncRequestFactory;
 import org.eclipse.che.ide.rest.RestServiceInfo;
@@ -66,6 +67,8 @@ public class WsAgentStateController implements ConnectionOpenedHandler, Connecti
     private WsAgentState              state;
     private String                    wsUrl;
     private AsyncCallback<MessageBus> messageBusCallback;
+    private AsyncCallback<WsAgent>    wsAgentCallback;
+    private AsyncCallback<String>     wsUrlCallback;
 
     @Inject
     public WsAgentStateController(EventBus eventBus,
@@ -134,6 +137,9 @@ public class WsAgentStateController implements ConnectionOpenedHandler, Connecti
         if (messageBusCallback != null) {
             messageBusCallback.onSuccess(messageBus);
         }
+        if (wsUrlCallback != null) {
+            wsUrlCallback.onSuccess(wsUrl);
+        }
         eventBus.fireEvent(WsAgentStateEvent.createWsAgentStartedEvent());
     }
 
@@ -150,6 +156,38 @@ public class WsAgentStateController implements ConnectionOpenedHandler, Connecti
                     callback.onSuccess(messageBus);
                 } else {
                     WsAgentStateController.this.messageBusCallback = callback;
+                }
+            }
+        });
+    }
+
+
+    public Promise<WsAgent> getWsAgent() {
+        return AsyncPromiseHelper.createFromAsyncRequest(new AsyncPromiseHelper.RequestCall<WsAgent>() {
+            @Override
+            public void makeCall(AsyncCallback<WsAgent> callback) {
+                if (messageBus != null) {
+                    WsAgent wsAgent = new WsAgent();
+                    wsAgent.setMessageBus(messageBus);
+                    wsAgent.setRestApiEndPoint(urlProvider.get() + '/');
+                    wsAgent.setWebSocketEndPoint(urlProvider.get() + '/');
+                    callback.onSuccess(wsAgent);
+                } else {
+                    WsAgentStateController.this.wsAgentCallback = callback;
+                }
+            }
+        });
+    }
+
+
+    public Promise<String> getWsAgentUrl() {
+        return AsyncPromiseHelper.createFromAsyncRequest(new AsyncPromiseHelper.RequestCall<String>() {
+            @Override
+            public void makeCall(AsyncCallback<String> callback) {
+                if (STARTED.equals(state)) {
+                    callback.onSuccess(wsUrl);
+                } else {
+                    WsAgentStateController.this.wsUrlCallback = callback;
                 }
             }
         });

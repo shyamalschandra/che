@@ -104,6 +104,13 @@ public class WsAgentLauncherImpl implements WsAgentLauncher {
         } catch (BadRequestException wsAgentLaunchingExc) {
             throw new MachineException(wsAgentLaunchingExc.getLocalizedMessage(), wsAgentLaunchingExc);
         }
+        LOG.error(String.format("Fail pinging ws agent. Workspace ID:%s. Url:%s. Timestamp:{}",workspaceId,UriBuilder.fromUri(devMachine.getRuntime()
+                .getServers()
+                .get(Constants.WS_AGENT_PORT)
+                .getUrl())
+                .replacePath(wsAgentPingPath)
+                .build()
+                .toString() ));
         throw new MachineException(pingTimedOutErrorMessage);
     }
 

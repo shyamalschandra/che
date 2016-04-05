@@ -38,25 +38,22 @@ import static org.eclipse.che.api.core.model.machine.MachineStatus.RUNNING;
  * @author Dmitry Shnurenko
  */
 @Singleton
-public class DevMachineLauncher {
+public class DevMachineConnector {
 
     private final MachineServiceClient machineServiceClient;
     private final AppContextImpl       appContext;
     private final MachineManager       machineManager;
-    private final String               wsAgentPath;
 
     @Inject
-    public DevMachineLauncher(@Named("ws.agent.path") String wsAgentPath,
-                              AppContextImpl appContext,
-                              MachineManager machineManager,
-                              MachineServiceClient machineServiceClient) {
-        this.wsAgentPath = wsAgentPath;
+    public DevMachineConnector(AppContextImpl appContext,
+                               MachineManager machineManager,
+                               MachineServiceClient machineServiceClient) {
         this.machineServiceClient = machineServiceClient;
         this.appContext = appContext;
         this.machineManager = machineManager;
     }
 
-    public void startDevMachine(final MachineStartedCallback startedCallback) {
+    public void getDevMachine(final MachineStartedCallback startedCallback) {
         machineServiceClient.getMachines(appContext.getWorkspaceId()).then(new Operation<List<MachineDto>>() {
             @Override
             public void apply(List<MachineDto> machines) throws OperationException {
@@ -103,7 +100,7 @@ public class DevMachineLauncher {
             throw new IllegalArgumentException(errorMessage);
         }
 
-        return url + wsAgentPath;
+        return url;
     }
 
     interface MachineStartedCallback {

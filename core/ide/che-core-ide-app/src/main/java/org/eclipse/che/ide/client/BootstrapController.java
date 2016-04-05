@@ -26,6 +26,7 @@ import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import com.google.web.bindery.event.shared.EventBus;
 
+import org.eclipse.che.api.machine.shared.dto.MachineConfigDto;
 import org.eclipse.che.api.workspace.gwt.client.event.WorkspaceStartedEvent;
 import org.eclipse.che.api.workspace.gwt.client.event.WorkspaceStartedHandler;
 import org.eclipse.che.ide.api.ProductInfoDataProvider;
@@ -55,7 +56,7 @@ public class BootstrapController {
     private final ProductInfoDataProvider      productInfoDataProvider;
     private final Provider<AppStateManager>    appStateManagerProvider;
     private final AppContext                   appContext;
-    private final Provider<DevMachineLauncher> devMachineLauncherProvider;
+    private final Provider<DevMachineConnector> devMachineLauncherProvider;
 
     @Inject
     public BootstrapController(Provider<WorkspacePresenter> workspaceProvider,
@@ -65,7 +66,7 @@ public class BootstrapController {
                                Provider<AppStateManager> appStateManagerProvider,
                                AppContext appContext,
                                DtoRegistrar dtoRegistrar,
-                               Provider<DevMachineLauncher> devMachineLauncherProvider) {
+                               Provider<DevMachineConnector> devMachineLauncherProvider) {
         this.workspaceProvider = workspaceProvider;
         this.extensionInitializer = extensionInitializer;
         this.eventBus = eventBus;
@@ -90,7 +91,9 @@ public class BootstrapController {
         eventBus.addHandler(WorkspaceStartedEvent.TYPE, new WorkspaceStartedHandler() {
             @Override
             public void onWorkspaceStarted(WorkspaceStartedEvent event) {
-                devMachineLauncherProvider.get().startDevMachine(new DevMachineLauncher.MachineStartedCallback() {
+                MachineConfigDto config = event.getWorkspace().getRuntime().getDevMachine().getConfig();
+                Log.info(getClass(), config);
+                devMachineLauncherProvider.get().getDevMachine(new DevMachineConnector.MachineStartedCallback() {
                     @Override
                     public void onStarted() {
                         startWsAgentComponents(components.values().iterator());

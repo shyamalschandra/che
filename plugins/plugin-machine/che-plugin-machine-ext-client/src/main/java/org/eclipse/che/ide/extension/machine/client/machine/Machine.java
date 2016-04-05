@@ -103,7 +103,7 @@ public class Machine {
 
         boolean isSecureConnection = Window.Location.getProtocol().equals("https:");
 
-        return (isSecureConnection ? "wss" : "ws") + extUrl + wsAgentPath + "/ws";
+        return (isSecureConnection ? "wss" : "ws") + extUrl + "/ws";
     }
 
     /**
