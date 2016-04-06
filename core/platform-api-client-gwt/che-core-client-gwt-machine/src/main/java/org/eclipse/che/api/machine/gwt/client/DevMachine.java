@@ -10,28 +10,29 @@
  *******************************************************************************/
 package org.eclipse.che.api.machine.gwt.client;
 
+import org.eclipse.che.api.machine.shared.dto.MachineDto;
 import org.eclipse.che.ide.websocket.MessageBus;
+
+import javax.validation.constraints.NotNull;
 
 /**
  *
  */
-public class WsAgent {
+public class DevMachine {
 
+    private final MachineDto devMachineDescriptor;
 
-    private MessageBus messageBus;
-    private String restApiEndPoint;
-    private String webSocketEndPoint;
+    public DevMachine(@NotNull MachineDto devMachineDescriptor) {
+        this.devMachineDescriptor = devMachineDescriptor;
 
-    public void setMessageBus(MessageBus messageBus) {
-        this.messageBus = messageBus;
+    }
+
+    public String getType() {
+        devMachineDescriptor.getConfig().getType();
     }
 
 
-    public void setRestApiEndPoint(String restApiEndPoint) {
-        this.restApiEndPoint = restApiEndPoint;
-    }
 
-    public void setWebSocketEndPoint(String webSocketEndPoint) {
-        this.webSocketEndPoint = webSocketEndPoint;
-    }
+
+
 }

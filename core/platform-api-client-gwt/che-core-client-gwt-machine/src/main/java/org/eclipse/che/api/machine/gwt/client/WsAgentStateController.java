@@ -22,7 +22,6 @@ import com.google.web.bindery.event.shared.EventBus;
 import org.eclipse.che.api.machine.gwt.client.events.WsAgentStateEvent;
 import org.eclipse.che.api.promises.client.Promise;
 import org.eclipse.che.api.promises.client.callback.AsyncPromiseHelper;
-import org.eclipse.che.api.promises.client.js.Promises;
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
 import org.eclipse.che.ide.rest.AsyncRequestFactory;
 import org.eclipse.che.ide.rest.RestServiceInfo;
@@ -67,7 +66,7 @@ public class WsAgentStateController implements ConnectionOpenedHandler, Connecti
     private WsAgentState              state;
     private String                    wsUrl;
     private AsyncCallback<MessageBus> messageBusCallback;
-    private AsyncCallback<WsAgent>    wsAgentCallback;
+    private AsyncCallback<DevMachine> wsAgentCallback;
     private AsyncCallback<String>     wsUrlCallback;
 
     @Inject
@@ -162,12 +161,12 @@ public class WsAgentStateController implements ConnectionOpenedHandler, Connecti
     }
 
 
-    public Promise<WsAgent> getWsAgent() {
-        return AsyncPromiseHelper.createFromAsyncRequest(new AsyncPromiseHelper.RequestCall<WsAgent>() {
+    public Promise<DevMachine> getWsAgent() {
+        return AsyncPromiseHelper.createFromAsyncRequest(new AsyncPromiseHelper.RequestCall<DevMachine>() {
             @Override
-            public void makeCall(AsyncCallback<WsAgent> callback) {
+            public void makeCall(AsyncCallback<DevMachine> callback) {
                 if (messageBus != null) {
-                    WsAgent wsAgent = new WsAgent();
+                    DevMachine wsAgent = new DevMachine();
                     wsAgent.setMessageBus(messageBus);
                     wsAgent.setRestApiEndPoint(urlProvider.get() + '/');
                     wsAgent.setWebSocketEndPoint(urlProvider.get() + '/');
