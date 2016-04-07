@@ -88,7 +88,7 @@ public class DevMachineHostNameProvider implements CommandPropertyValueProvider,
     }
 
     private void updateValue() {
-        final String devMachineId = appContext.getDevMachineId();
+        final String devMachineId = appContext.getDevMachine().getId();
         if (devMachineId == null) {
             return;
         }

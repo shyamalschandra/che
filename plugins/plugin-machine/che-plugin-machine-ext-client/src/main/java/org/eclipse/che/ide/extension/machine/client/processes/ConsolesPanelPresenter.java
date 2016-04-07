@@ -309,8 +309,8 @@ public class ConsolesPanelPresenter extends BasePresenter implements ConsolesPan
         workspaceAgent.setActivePart(this);
 
         if (selectedTreeNode == null) {
-            if (appContext.getDevMachineId() != null) {
-                onAddTerminal(appContext.getDevMachineId());
+            if (appContext.getDevMachine() != null) {
+                onAddTerminal(appContext.getDevMachine().getId());
             }
             return;
         }

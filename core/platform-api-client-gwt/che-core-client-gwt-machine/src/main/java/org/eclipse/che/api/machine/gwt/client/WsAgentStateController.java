@@ -57,36 +57,32 @@ public class WsAgentStateController implements ConnectionOpenedHandler, Connecti
     private final InitialLoadingInfo  initialLoadingInfo;
     private final LoaderPresenter     loader;
     private final AsyncRequestFactory asyncRequestFactory;
-    private final WsAgentUrlProvider  urlProvider;
+    private       DevMachine          devMachine;
 
     //not used now added it for future if it we will have possibility check that service available for client call
     private final List<RestServiceInfo> availableServices;
 
     private MessageBus                messageBus;
     private WsAgentState              state;
-    private String                    wsUrl;
     private AsyncCallback<MessageBus> messageBusCallback;
-    private AsyncCallback<DevMachine> wsAgentCallback;
-    private AsyncCallback<String>     wsUrlCallback;
+    private AsyncCallback<DevMachine> devMachineCallback;
 
     @Inject
     public WsAgentStateController(EventBus eventBus,
                                   LoaderPresenter loader,
                                   MessageBusProvider messageBusProvider,
                                   AsyncRequestFactory asyncRequestFactory,
-                                  InitialLoadingInfo initialLoadingInfo,
-                                  WsAgentUrlProvider urlProvider) {
+                                  InitialLoadingInfo initialLoadingInfo) {
         this.loader = loader;
         this.eventBus = eventBus;
         this.messageBusProvider = messageBusProvider;
         this.asyncRequestFactory = asyncRequestFactory;
         this.initialLoadingInfo = initialLoadingInfo;
         this.availableServices = new ArrayList<>();
-        this.urlProvider = urlProvider;
     }
 
-    public void initialize(String wsUrl, String wsId) {
-        this.wsUrl = wsUrl + "/" + wsId;
+    public void initialize(DevMachine devMachine) {
+        this.devMachine = devMachine;
         this.state = STOPPED;
         initialLoadingInfo.setOperationStatus(WS_AGENT_BOOTING.getValue(), IN_PROGRESS);
         checkHttpConnection();
@@ -136,12 +132,11 @@ public class WsAgentStateController implements ConnectionOpenedHandler, Connecti
         if (messageBusCallback != null) {
             messageBusCallback.onSuccess(messageBus);
         }
-        if (wsUrlCallback != null) {
-            wsUrlCallback.onSuccess(wsUrl);
+        if (devMachineCallback != null) {
+            devMachineCallback.onSuccess(devMachine);
         }
         eventBus.fireEvent(WsAgentStateEvent.createWsAgentStartedEvent());
     }
-
 
     public WsAgentState getState() {
         return state;
@@ -161,42 +156,25 @@ public class WsAgentStateController implements ConnectionOpenedHandler, Connecti
     }
 
 
-    public Promise<DevMachine> getWsAgent() {
+    public Promise<DevMachine> getDevMachine() {
         return AsyncPromiseHelper.createFromAsyncRequest(new AsyncPromiseHelper.RequestCall<DevMachine>() {
             @Override
             public void makeCall(AsyncCallback<DevMachine> callback) {
                 if (messageBus != null) {
-                    DevMachine wsAgent = new DevMachine();
-                    wsAgent.setMessageBus(messageBus);
-                    wsAgent.setRestApiEndPoint(urlProvider.get() + '/');
-                    wsAgent.setWebSocketEndPoint(urlProvider.get() + '/');
-                    callback.onSuccess(wsAgent);
+                    callback.onSuccess(devMachine);
                 } else {
-                    WsAgentStateController.this.wsAgentCallback = callback;
+                    WsAgentStateController.this.devMachineCallback = callback;
                 }
             }
         });
     }
 
-
-    public Promise<String> getWsAgentUrl() {
-        return AsyncPromiseHelper.createFromAsyncRequest(new AsyncPromiseHelper.RequestCall<String>() {
-            @Override
-            public void makeCall(AsyncCallback<String> callback) {
-                if (STARTED.equals(state)) {
-                    callback.onSuccess(wsUrl);
-                } else {
-                    WsAgentStateController.this.wsUrlCallback = callback;
-                }
-            }
-        });
-    }
 
     /**
      * Goto checking HTTP connection via getting all registered REST Services
      */
     private void checkHttpConnection() {
-        String url = urlProvider.get() + '/';
+        String url = devMachine.getWsAgentBaseUrl() + '/';
         asyncRequestFactory.createGetRequest(url).send(new AsyncRequestCallback<String>(new StringUnmarshaller()) {
             @Override
             protected void onSuccess(String result) {
@@ -241,8 +219,7 @@ public class WsAgentStateController implements ConnectionOpenedHandler, Connecti
         if (messageBus != null) {
             messageBus.cancelReconnection();
         }
-        messageBus = messageBusProvider.createMachineMessageBus(wsUrl);
-
+        messageBus = messageBusProvider.createMachineMessageBus(devMachine.getWsAgentWebSocketUrl());
         messageBus.addOnCloseHandler(this);
         messageBus.addOnCloseHandler(this);
         messageBus.addOnOpenHandler(this);

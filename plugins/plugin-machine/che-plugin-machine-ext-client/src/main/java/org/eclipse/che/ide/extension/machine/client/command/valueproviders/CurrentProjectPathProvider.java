@@ -101,7 +101,7 @@ public class CurrentProjectPathProvider implements CommandPropertyValueProvider,
     }
 
     private void updateValue() {
-        final String devMachineId = appContext.getDevMachineId();
+        final String devMachineId = appContext.getDevMachine().getId();
         final CurrentProject currentProject = appContext.getCurrentProject();
         if (devMachineId == null || currentProject == null) {
             return;

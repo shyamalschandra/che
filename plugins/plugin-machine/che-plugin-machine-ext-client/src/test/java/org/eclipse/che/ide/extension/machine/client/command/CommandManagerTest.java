@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.che.ide.extension.machine.client.command;
 
+import org.eclipse.che.api.machine.gwt.client.DevMachine;
 import org.eclipse.che.api.machine.gwt.client.MachineServiceClient;
 import org.eclipse.che.api.machine.shared.dto.CommandDto;
 import org.eclipse.che.api.machine.shared.dto.MachineProcessDto;
@@ -89,7 +90,8 @@ public class CommandManagerTest {
     @Test
     public void shouldExecuteCommand() throws Exception {
         String devMachineId = "devMachineId";
-        when(appContext.getDevMachineId()).thenReturn(devMachineId);
+        DevMachine devMachine = mock(DevMachine.class);
+        when(appContext.getDevMachine()).thenReturn(devMachine);
         CommandOutputConsole outputConsole = mock(CommandOutputConsole.class);
         when(commandConsoleFactory.create(any(CommandConfiguration.class), anyString())).thenReturn(outputConsole);
         when(machineServiceClient.executeCommand(anyString(), anyObject(), anyString())).thenReturn(processPromise);
@@ -114,7 +116,7 @@ public class CommandManagerTest {
 
         commandManager.execute(command);
 
-        verify(appContext).getDevMachineId();
+        verify(appContext).getDevMachine();
         verify(commandConsoleFactory).create(eq(command), eq(devMachineId));
         verify(outputConsole).listenToOutput(anyString());
         verify(consolesPanelPresenter).addCommandOutput(eq(devMachineId), eq(outputConsole));

@@ -14,6 +14,7 @@ import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 
 import org.eclipse.che.api.factory.shared.dto.Factory;
+import org.eclipse.che.api.machine.gwt.client.DevMachine;
 import org.eclipse.che.api.machine.gwt.client.events.WsAgentStateEvent;
 import org.eclipse.che.api.machine.gwt.client.events.WsAgentStateHandler;
 import org.eclipse.che.api.workspace.shared.dto.ProjectConfigDto;
@@ -53,7 +54,7 @@ public class AppContextImpl implements AppContext, SelectionChangedHandler, WsAg
     private CurrentProject      currentProject;
     private CurrentUser         currentUser;
     private Factory             factory;
-    private String              devMachineId;
+    private DevMachine          devMachine;
     private String              projectsRoot;
     private String              wsAgentURL;
     /**
@@ -156,13 +157,13 @@ public class AppContextImpl implements AppContext, SelectionChangedHandler, WsAg
     }
 
     @Override
-    public String getDevMachineId() {
-        return devMachineId;
+    public DevMachine getDevMachine() {
+        return devMachine;
     }
 
     @Override
-    public void setDevMachineId(String id) {
-        this.devMachineId = id;
+    public void setDevMachine(DevMachine devMachine) {
+        this.devMachine = devMachine;
     }
 
     @Override

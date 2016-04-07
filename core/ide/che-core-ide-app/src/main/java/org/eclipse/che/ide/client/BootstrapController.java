@@ -20,17 +20,24 @@ import com.google.gwt.event.logical.shared.CloseEvent;
 import com.google.gwt.event.logical.shared.CloseHandler;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.RootLayoutPanel;
-import com.google.gwt.user.client.ui.SimpleLayoutPanel;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import com.google.web.bindery.event.shared.EventBus;
 
-import org.eclipse.che.api.machine.shared.dto.MachineConfigDto;
+import org.eclipse.che.api.machine.gwt.client.DevMachine;
+import org.eclipse.che.api.machine.gwt.client.WsAgentStateController;
+import org.eclipse.che.api.machine.shared.dto.MachineDto;
+import org.eclipse.che.api.promises.client.Operation;
+import org.eclipse.che.api.promises.client.OperationException;
+import org.eclipse.che.api.promises.client.PromiseError;
+import org.eclipse.che.api.workspace.gwt.client.WorkspaceServiceClient;
 import org.eclipse.che.api.workspace.gwt.client.event.WorkspaceStartedEvent;
 import org.eclipse.che.api.workspace.gwt.client.event.WorkspaceStartedHandler;
+import org.eclipse.che.api.workspace.shared.dto.WorkspaceDto;
 import org.eclipse.che.ide.api.ProductInfoDataProvider;
 import org.eclipse.che.ide.api.app.AppContext;
+import com.google.gwt.user.client.ui.SimpleLayoutPanel;
 import org.eclipse.che.ide.api.component.Component;
 import org.eclipse.che.ide.api.component.WsAgentComponent;
 import org.eclipse.che.ide.api.event.WindowActionEvent;
@@ -56,7 +63,8 @@ public class BootstrapController {
     private final ProductInfoDataProvider      productInfoDataProvider;
     private final Provider<AppStateManager>    appStateManagerProvider;
     private final AppContext                   appContext;
-    private final Provider<DevMachineConnector> devMachineLauncherProvider;
+    private final WorkspaceServiceClient       workspaceService;
+    private final Provider<WsAgentStateController> wsAgentStateControllerProvider;
 
     @Inject
     public BootstrapController(Provider<WorkspacePresenter> workspaceProvider,
@@ -66,15 +74,16 @@ public class BootstrapController {
                                Provider<AppStateManager> appStateManagerProvider,
                                AppContext appContext,
                                DtoRegistrar dtoRegistrar,
-                               Provider<DevMachineConnector> devMachineLauncherProvider) {
+                               WorkspaceServiceClient workspaceService,
+                               Provider<WsAgentStateController> wsAgentStateControllerProvider) {
         this.workspaceProvider = workspaceProvider;
         this.extensionInitializer = extensionInitializer;
         this.eventBus = eventBus;
         this.productInfoDataProvider = productInfoDataProvider;
         this.appStateManagerProvider = appStateManagerProvider;
         this.appContext = appContext;
-        this.devMachineLauncherProvider = devMachineLauncherProvider;
-
+        this.workspaceService = workspaceService;
+        this.wsAgentStateControllerProvider = wsAgentStateControllerProvider;
         appContext.setStartUpActions(StartUpActionsParser.getStartUpActions());
         dtoRegistrar.registerDtoProviders();
 
@@ -91,12 +100,19 @@ public class BootstrapController {
         eventBus.addHandler(WorkspaceStartedEvent.TYPE, new WorkspaceStartedHandler() {
             @Override
             public void onWorkspaceStarted(WorkspaceStartedEvent event) {
-                MachineConfigDto config = event.getWorkspace().getRuntime().getDevMachine().getConfig();
-                Log.info(getClass(), config);
-                devMachineLauncherProvider.get().getDevMachine(new DevMachineConnector.MachineStartedCallback() {
+                workspaceService.getWorkspace(event.getWorkspace().getId()).then(new Operation<WorkspaceDto>() {
                     @Override
-                    public void onStarted() {
+                    public void apply(WorkspaceDto ws) throws OperationException {
+                        MachineDto devMachineDto = ws.getRuntime().getDevMachine();
+                        DevMachine devMachine = new DevMachine(devMachineDto);
+                        appContext.setDevMachine(devMachine);
+                        wsAgentStateControllerProvider.get().initialize(devMachine);
                         startWsAgentComponents(components.values().iterator());
+                    }
+                }).catchError(new Operation<PromiseError>() {
+                    @Override
+                    public void apply(PromiseError err) throws OperationException {
+                        Log.error(getClass(), err.getCause());
                     }
                 });
             }

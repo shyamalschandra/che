@@ -145,7 +145,7 @@ public class CheckoutReferencePresenter implements CheckoutReferenceView.ActionD
                                                              : constant.checkoutFailed();
                                  GitOutputConsole console = gitOutputConsoleFactory.create(CHECKOUT_COMMAND_NAME);
                                  console.printError(errorMessage);
-                                 consolesPanelPresenter.addCommandOutput(appContext.getDevMachineId(), console);
+                                 consolesPanelPresenter.addCommandOutput(appContext.getDevMachine().getId(), console);
                                  notificationManager.notify(constant.checkoutFailed(), FAIL, true, project);
                              }
                          }

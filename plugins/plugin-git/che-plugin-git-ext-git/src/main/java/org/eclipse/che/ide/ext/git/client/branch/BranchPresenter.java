@@ -400,7 +400,7 @@ public class BranchPresenter implements BranchView.ActionDelegate {
 
         GitOutputConsole console = gitOutputConsoleFactory.create(commandName);
         printGitMessage(errorMessage, console);
-        consolesPanelPresenter.addCommandOutput(appContext.getDevMachineId(), console);
+        consolesPanelPresenter.addCommandOutput(appContext.getDevMachine().getId(), console);
         notificationManager.notify(errorMessage, FAIL, true, project.getRootProject());
     }
 

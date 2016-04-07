@@ -11,6 +11,7 @@
 package org.eclipse.che.ide.api.app;
 
 import org.eclipse.che.api.factory.shared.dto.Factory;
+import org.eclipse.che.api.machine.gwt.client.DevMachine;
 import org.eclipse.che.api.workspace.shared.dto.WorkspaceDto;
 
 import java.util.List;
@@ -93,9 +94,9 @@ public interface AppContext {
     void setFactory(Factory factory);
 
     /** Returns ID of the developer machine (where workspace is bound). */
-    String getDevMachineId();
+    DevMachine getDevMachine();
 
-    void setDevMachineId(String id);
+    void setDevMachine(DevMachine devMachine);
 
     String getProjectsRoot();
 
