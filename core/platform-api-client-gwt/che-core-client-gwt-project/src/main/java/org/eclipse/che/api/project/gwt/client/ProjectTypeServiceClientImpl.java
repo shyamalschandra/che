@@ -13,10 +13,14 @@ package org.eclipse.che.api.project.gwt.client;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
 
+import org.eclipse.che.api.machine.gwt.client.DevMachine;
+import org.eclipse.che.api.machine.gwt.client.WsAgentStateController;
 import org.eclipse.che.api.machine.gwt.client.WsAgentUrlProvider;
 import org.eclipse.che.api.project.shared.dto.ProjectTypeDto;
 import org.eclipse.che.api.promises.client.Function;
 import org.eclipse.che.api.promises.client.FunctionException;
+import org.eclipse.che.api.promises.client.Operation;
+import org.eclipse.che.api.promises.client.OperationException;
 import org.eclipse.che.api.promises.client.Promise;
 import org.eclipse.che.api.promises.client.callback.AsyncPromiseHelper.RequestCall;
 import org.eclipse.che.ide.rest.AsyncRequestFactory;
@@ -41,17 +45,22 @@ public class ProjectTypeServiceClientImpl implements ProjectTypeServiceClient {
     private final LoaderFactory          loaderFactory;
     private final AsyncRequestFactory    asyncRequestFactory;
     private final DtoUnmarshallerFactory dtoUnmarshallerFactory;
-    private final WsAgentUrlProvider     urlProvider;
+    private       String                 wsAgentBaseUrl;
 
     @Inject
     protected ProjectTypeServiceClientImpl(LoaderFactory loaderFactory,
                                            AsyncRequestFactory asyncRequestFactory,
                                            DtoUnmarshallerFactory dtoUnmarshallerFactory,
-                                           WsAgentUrlProvider urlProvider) {
+                                           WsAgentStateController wsAgentStateController) {
         this.loaderFactory = loaderFactory;
         this.asyncRequestFactory = asyncRequestFactory;
         this.dtoUnmarshallerFactory = dtoUnmarshallerFactory;
-        this.urlProvider = urlProvider;
+        wsAgentStateController.getDevMachine().then(new Operation<DevMachine>() {
+            @Override
+            public void apply(DevMachine devMachine) throws OperationException {
+                wsAgentBaseUrl = devMachine.getWsAgentBaseUrl();
+            }
+        });
     }
 
     @Override
