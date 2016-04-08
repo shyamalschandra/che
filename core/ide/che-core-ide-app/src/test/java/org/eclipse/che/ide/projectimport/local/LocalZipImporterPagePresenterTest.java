@@ -14,7 +14,6 @@ import com.google.gwt.user.client.ui.FormPanel;
 import com.google.web.bindery.event.shared.Event;
 import com.google.web.bindery.event.shared.EventBus;
 
-import org.eclipse.che.api.machine.gwt.client.WsAgentUrlProvider;
 import org.eclipse.che.api.project.gwt.client.ProjectServiceClient;
 import org.eclipse.che.api.workspace.shared.dto.ProjectConfigDto;
 import org.eclipse.che.api.workspace.shared.dto.WorkspaceDto;
@@ -80,8 +79,7 @@ public class LocalZipImporterPagePresenterTest {
     private LocalZipImporterPageView      view;
     @Mock
     private WorkspaceDto                  workspace;
-    @Mock
-    private WsAgentUrlProvider            urlProvider;
+
 
     private LocalZipImporterPagePresenter presenter;
 
@@ -95,8 +93,7 @@ public class LocalZipImporterPagePresenterTest {
                                                       appContext,
                                                       eventBus,
                                                       projectServiceClient,
-                                                      projectNotificationSubscriber,
-                                                      urlProvider);
+                                                      projectNotificationSubscriber);
     }
 
     @Test

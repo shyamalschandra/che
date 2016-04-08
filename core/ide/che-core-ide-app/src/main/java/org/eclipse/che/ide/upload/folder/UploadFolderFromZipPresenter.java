@@ -4,9 +4,9 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *
+ * <p>
  * Contributors:
- *   Codenvy, S.A. - initial API and implementation
+ * Codenvy, S.A. - initial API and implementation
  *******************************************************************************/
 package org.eclipse.che.ide.upload.folder;
 
@@ -14,7 +14,6 @@ import com.google.gwt.user.client.ui.FormPanel;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 
-import org.eclipse.che.api.machine.gwt.client.WsAgentUrlProvider;
 import org.eclipse.che.commons.annotation.Nullable;
 import org.eclipse.che.ide.CoreLocalizationConstant;
 import org.eclipse.che.ide.api.app.AppContext;
@@ -42,10 +41,9 @@ public class UploadFolderFromZipPresenter implements UploadFolderFromZipView.Act
     private final ProjectExplorerPresenter projectExplorer;
     private final CoreLocalizationConstant locale;
     private final EditorAgent              editorAgent;
-    private final String                   workspaceId;
     private final EventBus                 eventBus;
     private final NotificationManager      notificationManager;
-    private final WsAgentUrlProvider       urlProvider;
+    private final AppContext               appContext;
 
     @Inject
     public UploadFolderFromZipPresenter(UploadFolderFromZipView view,
@@ -54,9 +52,8 @@ public class UploadFolderFromZipPresenter implements UploadFolderFromZipView.Act
                                         EventBus eventBus,
                                         NotificationManager notificationManager,
                                         ProjectExplorerPresenter projectExplorer,
-                                        CoreLocalizationConstant locale,
-                                        WsAgentUrlProvider urlProvider) {
-        this.workspaceId = appContext.getWorkspaceId();
+                                        CoreLocalizationConstant locale) {
+        this.appContext = appContext;
         this.editorAgent = editorAgent;
         this.eventBus = eventBus;
         this.view = view;
@@ -65,7 +62,6 @@ public class UploadFolderFromZipPresenter implements UploadFolderFromZipView.Act
         this.projectExplorer = projectExplorer;
         this.locale = locale;
         this.notificationManager = notificationManager;
-        this.urlProvider = urlProvider;
     }
 
     /** Show dialog. */
@@ -102,7 +98,7 @@ public class UploadFolderFromZipPresenter implements UploadFolderFromZipView.Act
     public void onUploadClicked() {
         view.setLoaderVisibility(true);
         view.setEncoding(FormPanel.ENCODING_MULTIPART);
-        view.setAction(urlProvider.get() + "/project/" + workspaceId + "/upload/zipfolder/" +
+        view.setAction(appContext.getDevMachine().getWsAgentBaseUrl() + "/project/" + appContext.getDevMachine().getWorkspace() + "/upload/zipfolder/" +
                        ((HasStorablePath)getResourceBasedNode()).getStorablePath());
         view.submit();
     }

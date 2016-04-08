@@ -13,7 +13,6 @@ package org.eclipse.che.ide.actions;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
-import org.eclipse.che.api.machine.gwt.client.WsAgentUrlProvider;
 import org.eclipse.che.ide.CoreLocalizationConstant;
 import org.eclipse.che.ide.Resources;
 import org.eclipse.che.ide.api.action.AbstractPerspectiveAction;
@@ -43,15 +42,13 @@ public class DownloadAsZipAction extends AbstractPerspectiveAction {
     private final AppContext               appContext;
     private final DownloadContainer        downloadContainer;
     private final ProjectExplorerPresenter projectExplorer;
-    private final WsAgentUrlProvider       urlProvider;
 
     @Inject
     public DownloadAsZipAction(AppContext appContext,
                                CoreLocalizationConstant locale,
                                Resources resources,
                                DownloadContainer downloadContainer,
-                               ProjectExplorerPresenter projectExplorer,
-                               WsAgentUrlProvider urlProvider) {
+                               ProjectExplorerPresenter projectExplorer) {
         super(Arrays.asList(PROJECT_PERSPECTIVE_ID),
               locale.downloadProjectAsZipName(),
               locale.downloadProjectAsZipDescription(),
@@ -60,19 +57,19 @@ public class DownloadAsZipAction extends AbstractPerspectiveAction {
         this.appContext = appContext;
         this.downloadContainer = downloadContainer;
         this.projectExplorer = projectExplorer;
-        this.urlProvider = urlProvider;
     }
 
     /** {@inheritDoc} */
     @Override
     public void actionPerformed(ActionEvent e) {
-        String url = urlProvider.get() + "/project/" + appContext.getWorkspaceId() + "/export/" + getPath();
+        String url = appContext.getDevMachine().getWsAgentBaseUrl() + "/project/" + appContext.getWorkspaceId() + "/export/" + getPath();
         downloadContainer.setUrl(url);
     }
 
     /** {@inheritDoc} */
     @Override
     public void updateInPerspective(@NotNull ActionEvent event) {
+
         Selection<?> selection = projectExplorer.getSelection();
         boolean enabled = appContext.getCurrentProject() != null || (selection != null &&
                                                                      (!selection.isEmpty() &&

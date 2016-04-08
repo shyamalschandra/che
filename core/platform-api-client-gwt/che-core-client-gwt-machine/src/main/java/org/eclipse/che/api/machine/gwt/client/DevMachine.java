@@ -31,14 +31,30 @@ public class DevMachine {
 
     private final Map<String, DevMachineServer> servers;
 
+    private final Map<String, String> runtimeProperties;
+
+    private final Map<String, String> envVariables;
 
     public DevMachine(@NotNull MachineDto devMachineDescriptor) {
         this.devMachineDescriptor = devMachineDescriptor;
-        Map<String, ServerDto> dtoMap = devMachineDescriptor.getRuntime().getServers();
-        servers = new HashMap<>(dtoMap.size());
-        for (String s : dtoMap.keySet()) {
-            servers.put(s, new DevMachineServer(dtoMap.get(s)));
+
+        Map<String, ServerDto> serverDtoMap = devMachineDescriptor.getRuntime().getServers();
+        servers = new HashMap<>(serverDtoMap.size());
+        for (String s : serverDtoMap.keySet()) {
+            servers.put(s, new DevMachineServer(serverDtoMap.get(s)));
         }
+        runtimeProperties = devMachineDescriptor.getRuntime().getProperties();
+        envVariables = devMachineDescriptor.getRuntime().getEnvVariables();
+
+    }
+
+    public Map<String, String> getEnvVariables() {
+        return envVariables;
+    }
+
+
+    public Map<String, String> getRuntimeProperties() {
+        return runtimeProperties;
     }
 
     public String getType() {
@@ -53,7 +69,7 @@ public class DevMachine {
             boolean isSecureConnection = Window.Location.getProtocol().equals("https:");
             return (isSecureConnection ? "wss" : "ws") + extUrl + "/ws/" + getWorkspace();
         } else {
-            return  null; //should not be
+            return null; //should not be
         }
     }
 
@@ -69,6 +85,8 @@ public class DevMachine {
     public Map<String, DevMachineServer> getServers() {
         return servers;
     }
+
+
 
 
     public DevMachineServer getServer(String reference) {

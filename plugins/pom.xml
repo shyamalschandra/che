@@ -29,7 +29,9 @@
         <module>plugin-docker</module>
         <module>plugin-web</module>
         <module>plugin-machine</module>
+        <module>plugin-debugger</module>
         <module>plugin-java</module>
+        <module>plugin-gdb</module>
         <module>plugin-sdk</module>
         <module>plugin-orion</module>
         <module>plugin-git</module>
@@ -37,7 +39,6 @@
         <module>plugin-dashboard</module>
         <module>plugin-gwt</module>
         <module>plugin-python</module>
-        <module>plugin-svn</module>
         <module>plugin-cpp</module>
         <module>plugin-nodejs</module>
     </modules>

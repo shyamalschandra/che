@@ -15,7 +15,6 @@ import com.google.inject.Inject;
 
 import org.eclipse.che.api.machine.gwt.client.DevMachine;
 import org.eclipse.che.api.machine.gwt.client.WsAgentStateController;
-import org.eclipse.che.api.machine.gwt.client.WsAgentUrlProvider;
 import org.eclipse.che.api.project.shared.dto.ProjectTypeDto;
 import org.eclipse.che.api.promises.client.Function;
 import org.eclipse.che.api.promises.client.FunctionException;
@@ -64,11 +63,11 @@ public class ProjectTypeServiceClientImpl implements ProjectTypeServiceClient {
     }
 
     @Override
-    public Promise<List<ProjectTypeDto>> getProjectTypes(@NotNull final String workspaceId) {
+    public Promise<List<ProjectTypeDto>> getProjectTypes(@NotNull final DevMachine devMachine) {
         return newPromise(new RequestCall<List<ProjectTypeDto>>() {
             @Override
             public void makeCall(AsyncCallback<List<ProjectTypeDto>> callback) {
-                getProjectTypes(workspaceId, callback);
+                getProjectTypes(devMachine, callback);
             }
         }).then(new Function<List<ProjectTypeDto>, List<ProjectTypeDto>>() {
             @Override
@@ -82,8 +81,8 @@ public class ProjectTypeServiceClientImpl implements ProjectTypeServiceClient {
         });
     }
 
-    private void getProjectTypes(String workspaceId, @NotNull AsyncCallback<List<ProjectTypeDto>> callback) {
-        final String url = urlProvider.get() + "/project-type/" + workspaceId;
+    private void getProjectTypes(DevMachine devMachine, @NotNull AsyncCallback<List<ProjectTypeDto>> callback) {
+        final String url = devMachine.getWsAgentBaseUrl() + "/project-type/" + devMachine.getWorkspace();
         asyncRequestFactory.createGetRequest(url)
                            .header(ACCEPT, APPLICATION_JSON)
                            .loader(loaderFactory.newLoader("Getting info about registered project types..."))
@@ -101,7 +100,7 @@ public class ProjectTypeServiceClientImpl implements ProjectTypeServiceClient {
     }
 
     private void getProjectType(@NotNull String workspaceId, @NotNull String id, @NotNull AsyncCallback<ProjectTypeDto> callback) {
-        final String url = urlProvider.get() + "/project-type/" + workspaceId + '/' + id;
+        final String url = wsAgentBaseUrl + "/project-type/" + workspaceId + '/' + id;
         asyncRequestFactory.createGetRequest(url)
                            .header(ACCEPT, APPLICATION_JSON)
                            .loader(loaderFactory.newLoader("Getting info about project type..."))

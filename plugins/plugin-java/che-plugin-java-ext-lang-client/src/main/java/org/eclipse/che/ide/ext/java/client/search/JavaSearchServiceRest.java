@@ -14,7 +14,6 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
-import org.eclipse.che.api.machine.gwt.client.WsAgentUrlProvider;
 import org.eclipse.che.api.promises.client.Promise;
 import org.eclipse.che.api.promises.client.callback.AsyncPromiseHelper;
 import org.eclipse.che.ide.api.app.AppContext;
@@ -40,21 +39,20 @@ public class JavaSearchServiceRest implements JavaSearchService {
 
     private final AsyncRequestFactory    asyncRequestFactory;
     private final DtoUnmarshallerFactory unmarshallerFactory;
-    private final MessageLoader          loader;
-    private final String                 pathToService;
-    private final WsAgentUrlProvider     urlProvider;
+    private final AppContext appContext;
+    private final MessageLoader      loader;
+    private final String             pathToService;
 
     @Inject
     public JavaSearchServiceRest(AsyncRequestFactory asyncRequestFactory,
                                  DtoUnmarshallerFactory unmarshallerFactory,
                                  LoaderFactory loaderFactory,
-                                 AppContext appContext,
-                                 WsAgentUrlProvider urlProvider) {
+                                 AppContext appContext) {
         this.asyncRequestFactory = asyncRequestFactory;
         this.unmarshallerFactory = unmarshallerFactory;
+        this.appContext = appContext;
         this.loader = loaderFactory.newLoader();
-        this.urlProvider = urlProvider;
-        this.pathToService = "/jdt/" + appContext.getWorkspace().getId() + "/search/";
+        this.pathToService = "/jdt/" + appContext.getWorkspaceId() + "/search/";
     }
 
     @Override
@@ -63,7 +61,7 @@ public class JavaSearchServiceRest implements JavaSearchService {
             @Override
             public void makeCall(AsyncCallback<FindUsagesResponse> callback) {
 
-                asyncRequestFactory.createPostRequest(urlProvider.get() + pathToService + "find/usages", request)
+                asyncRequestFactory.createPostRequest(appContext.getDevMachine().getWsAgentBaseUrl() + pathToService + "find/usages", request)
                                    .header(CONTENT_TYPE, APPLICATION_JSON)
                                    .loader(loader)
                                    .send(newCallback(callback, unmarshallerFactory.newUnmarshaller(FindUsagesResponse.class)));

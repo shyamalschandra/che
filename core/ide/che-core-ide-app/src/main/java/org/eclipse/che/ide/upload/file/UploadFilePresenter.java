@@ -4,9 +4,9 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *
+ * <p>
  * Contributors:
- *   Codenvy, S.A. - initial API and implementation
+ * Codenvy, S.A. - initial API and implementation
  *******************************************************************************/
 package org.eclipse.che.ide.upload.file;
 
@@ -14,7 +14,6 @@ import com.google.gwt.user.client.ui.FormPanel;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 
-import org.eclipse.che.api.machine.gwt.client.WsAgentUrlProvider;
 import org.eclipse.che.commons.annotation.Nullable;
 import org.eclipse.che.ide.CoreLocalizationConstant;
 import org.eclipse.che.ide.api.app.AppContext;
@@ -41,7 +40,7 @@ public class UploadFilePresenter implements UploadFileView.ActionDelegate {
     private final NotificationManager      notificationManager;
     private final ProjectExplorerPresenter projectExplorer;
     private final CoreLocalizationConstant locale;
-    private final WsAgentUrlProvider       urlProvider;
+    private final AppContext               appContext;
 
     @Inject
     public UploadFilePresenter(UploadFileView view,
@@ -49,8 +48,8 @@ public class UploadFilePresenter implements UploadFileView.ActionDelegate {
                                EventBus eventBus,
                                NotificationManager notificationManager,
                                ProjectExplorerPresenter projectExplorer,
-                               CoreLocalizationConstant locale,
-                               WsAgentUrlProvider urlProvider) {
+                               CoreLocalizationConstant locale) {
+        this.appContext = appContext;
         this.workspaceId = appContext.getWorkspace().getId();
         this.eventBus = eventBus;
         this.view = view;
@@ -59,7 +58,6 @@ public class UploadFilePresenter implements UploadFileView.ActionDelegate {
         this.view.setDelegate(this);
         this.view.setEnabledUploadButton(false);
         this.notificationManager = notificationManager;
-        this.urlProvider = urlProvider;
     }
 
     /** Show dialog. */
@@ -94,7 +92,7 @@ public class UploadFilePresenter implements UploadFileView.ActionDelegate {
     @Override
     public void onUploadClicked() {
         view.setEncoding(FormPanel.ENCODING_MULTIPART);
-        view.setAction(urlProvider.get() + "/project/" + workspaceId + "/uploadfile"
+        view.setAction(appContext.getDevMachine().getWsAgentBaseUrl() +"/project/" + workspaceId + "/uploadfile"
                        + ((HasStorablePath)getResourceBasedNode()).getStorablePath());
         view.submit();
     }

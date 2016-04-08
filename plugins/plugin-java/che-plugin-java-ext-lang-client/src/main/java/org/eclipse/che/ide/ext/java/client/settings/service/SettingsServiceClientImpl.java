@@ -4,15 +4,14 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *
+ * <p>
  * Contributors:
- *   Codenvy, S.A. - initial API and implementation
+ * Codenvy, S.A. - initial API and implementation
  *******************************************************************************/
 package org.eclipse.che.ide.ext.java.client.settings.service;
 
 import com.google.inject.Inject;
 
-import org.eclipse.che.api.machine.gwt.client.WsAgentUrlProvider;
 import org.eclipse.che.api.promises.client.Promise;
 import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.dto.JsonSerializable;
@@ -33,22 +32,19 @@ import static org.eclipse.che.ide.rest.HTTPHeader.CONTENT_TYPE;
 public class SettingsServiceClientImpl implements SettingsServiceClient {
 
     private final AsyncRequestFactory asyncRequestFactory;
-    private final String              workspaceId;
-    private final WsAgentUrlProvider  urlProvider;
+    private final AppContext          appContext;
 
     @Inject
     public SettingsServiceClientImpl(AppContext appContext,
-                                     AsyncRequestFactory asyncRequestFactory,
-                                     WsAgentUrlProvider urlProvider) {
-        this.workspaceId = appContext.getWorkspaceId();
+                                     AsyncRequestFactory asyncRequestFactory) {
+        this.appContext = appContext;
         this.asyncRequestFactory = asyncRequestFactory;
-        this.urlProvider = urlProvider;
     }
 
     /** {@inheritDoc} */
     @Override
     public Promise<Void> applyCompileParameters(@NotNull final Map<String, String> parameters) {
-        String url = urlProvider.get() + "/jdt/" + workspaceId + "/compiler-settings/set";
+        String url = appContext.getDevMachine().getWsAgentBaseUrl() + "/jdt/" + appContext.getWorkspaceId() + "/compiler-settings/set";
 
         JsonSerializable data = new JsonSerializable() {
             @Override
@@ -66,7 +62,7 @@ public class SettingsServiceClientImpl implements SettingsServiceClient {
     /** {@inheritDoc} */
     @Override
     public Promise<Map<String, String>> getCompileParameters() {
-        String url = urlProvider.get() + "/jdt/" + workspaceId + "/compiler-settings/all";
+        String url = appContext.getDevMachine().getWsAgentBaseUrl() + "/jdt/" + appContext.getWorkspaceId() + "/compiler-settings/all";
 
         return asyncRequestFactory.createGetRequest(url)
                                   .header(ACCEPT, APPLICATION_JSON)

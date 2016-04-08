@@ -14,7 +14,6 @@ import com.google.gwt.user.client.ui.FormPanel;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 
-import org.eclipse.che.api.machine.gwt.client.WsAgentUrlProvider;
 import org.eclipse.che.api.project.gwt.client.ProjectServiceClient;
 import org.eclipse.che.api.workspace.shared.dto.ProjectConfigDto;
 import org.eclipse.che.ide.CoreLocalizationConstant;
@@ -43,7 +42,6 @@ public class LocalZipImporterPagePresenter implements LocalZipImporterPageView.A
     private final EventBus                      eventBus;
     private final ProjectServiceClient          projectServiceClient;
     private final ProjectNotificationSubscriber projectNotificationSubscriber;
-    private final WsAgentUrlProvider            urlProvider;
 
     @Inject
     public LocalZipImporterPagePresenter(LocalZipImporterPageView view,
@@ -52,8 +50,7 @@ public class LocalZipImporterPagePresenter implements LocalZipImporterPageView.A
                                          AppContext appContext,
                                          EventBus eventBus,
                                          ProjectServiceClient projectServiceClient,
-                                         ProjectNotificationSubscriber projectNotificationSubscriber,
-                                         WsAgentUrlProvider urlProvider) {
+                                         ProjectNotificationSubscriber projectNotificationSubscriber) {
         this.view = view;
         this.view.setDelegate(this);
         this.locale = locale;
@@ -63,7 +60,6 @@ public class LocalZipImporterPagePresenter implements LocalZipImporterPageView.A
         this.appContext = appContext;
         this.projectServiceClient = projectServiceClient;
         this.projectNotificationSubscriber = projectNotificationSubscriber;
-        this.urlProvider = urlProvider;
     }
 
     public void show() {
@@ -129,7 +125,7 @@ public class LocalZipImporterPagePresenter implements LocalZipImporterPageView.A
         projectNotificationSubscriber.subscribe(projectName);
 
         view.setEncoding(FormPanel.ENCODING_MULTIPART);
-        view.setAction(urlProvider.get() + "/project/" + workspaceId + "/upload/zipproject/" + projectName + "?force=false");
+        view.setAction(appContext.getDevMachine().getWsAgentBaseUrl() + "/project/" + workspaceId + "/upload/zipproject/" + projectName + "?force=false");
         view.submit();
         showProcessing(true);
     }

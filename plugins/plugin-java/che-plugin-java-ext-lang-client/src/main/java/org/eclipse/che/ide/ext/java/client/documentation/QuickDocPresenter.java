@@ -13,7 +13,6 @@ package org.eclipse.che.ide.ext.java.client.documentation;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
-import org.eclipse.che.api.machine.gwt.client.WsAgentUrlProvider;
 import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.editor.EditorAgent;
 import org.eclipse.che.ide.api.editor.EditorPartPresenter;
@@ -31,20 +30,15 @@ public class QuickDocPresenter implements QuickDocumentation, QuickDocView.Actio
 
     private final QuickDocView       view;
     private final AppContext         appContext;
-    private final String             workspaceId;
     private final EditorAgent        editorAgent;
-    private final WsAgentUrlProvider urlProvider;
 
     @Inject
     public QuickDocPresenter(QuickDocView view,
                              AppContext appContext,
-                             EditorAgent editorAgent,
-                             WsAgentUrlProvider urlProvider) {
+                             EditorAgent editorAgent) {
         this.view = view;
         this.appContext = appContext;
-        this.workspaceId = appContext.getWorkspaceId();
         this.editorAgent = editorAgent;
-        this.urlProvider = urlProvider;
     }
 
     @Override
@@ -62,7 +56,7 @@ public class QuickDocPresenter implements QuickDocumentation, QuickDocView.Actio
         EmbeddedTextEditorPresenter editor = ((EmbeddedTextEditorPresenter)activeEditor);
         int offset = editor.getCursorOffset();
         final PositionConverter.PixelCoordinates coordinates = editor.getPositionConverter().offsetToPixel(offset);
-        view.show(urlProvider.get() + "/jdt/" + workspaceId + "/javadoc/find?fqn=" +
+        view.show(appContext.getDevMachine().getWsAgentBaseUrl() + "/jdt/" + appContext.getDevMachine().getWorkspace() + "/javadoc/find?fqn=" +
                   JavaSourceFolderUtil.getFQNForFile(editor.getEditorInput().getFile()) + "&projectpath=" +
                   appContext.getCurrentProject().getProjectConfig().getPath() + "&offset=" + offset, coordinates.getX(),
                   coordinates.getY());

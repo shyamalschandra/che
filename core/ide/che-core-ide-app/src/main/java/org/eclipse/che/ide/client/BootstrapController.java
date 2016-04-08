@@ -4,9 +4,9 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *
+ * <p>
  * Contributors:
- *   Codenvy, S.A. - initial API and implementation
+ * Codenvy, S.A. - initial API and implementation
  *******************************************************************************/
 package org.eclipse.che.ide.client;
 
@@ -20,6 +20,7 @@ import com.google.gwt.event.logical.shared.CloseEvent;
 import com.google.gwt.event.logical.shared.CloseHandler;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.RootLayoutPanel;
+import com.google.gwt.user.client.ui.SimpleLayoutPanel;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
@@ -37,7 +38,6 @@ import org.eclipse.che.api.workspace.gwt.client.event.WorkspaceStartedHandler;
 import org.eclipse.che.api.workspace.shared.dto.WorkspaceDto;
 import org.eclipse.che.ide.api.ProductInfoDataProvider;
 import org.eclipse.che.ide.api.app.AppContext;
-import com.google.gwt.user.client.ui.SimpleLayoutPanel;
 import org.eclipse.che.ide.api.component.Component;
 import org.eclipse.che.ide.api.component.WsAgentComponent;
 import org.eclipse.che.ide.api.event.WindowActionEvent;
@@ -57,13 +57,13 @@ import java.util.Map;
 @Singleton
 public class BootstrapController {
 
-    private final Provider<WorkspacePresenter> workspaceProvider;
-    private final ExtensionInitializer         extensionInitializer;
-    private final EventBus                     eventBus;
-    private final ProductInfoDataProvider      productInfoDataProvider;
-    private final Provider<AppStateManager>    appStateManagerProvider;
-    private final AppContext                   appContext;
-    private final WorkspaceServiceClient       workspaceService;
+    private final Provider<WorkspacePresenter>     workspaceProvider;
+    private final ExtensionInitializer             extensionInitializer;
+    private final EventBus                         eventBus;
+    private final ProductInfoDataProvider          productInfoDataProvider;
+    private final Provider<AppStateManager>        appStateManagerProvider;
+    private final AppContext                       appContext;
+    private final WorkspaceServiceClient           workspaceService;
     private final Provider<WsAgentStateController> wsAgentStateControllerProvider;
 
     @Inject
