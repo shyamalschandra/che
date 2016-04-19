@@ -11,21 +11,24 @@
 package org.eclipse.che.api.project.server;
 
 import org.eclipse.che.api.core.model.project.ProjectConfig;
+import org.eclipse.che.api.core.model.project.type.Value;
 import org.eclipse.che.api.project.server.handlers.ProjectHandlerRegistry;
 import org.eclipse.che.api.project.server.type.BaseProjectType;
 import org.eclipse.che.api.project.server.type.ProjectTypeRegistry;
+import org.eclipse.che.api.project.server.type.ProjectTypeResolution;
 import org.eclipse.che.api.workspace.shared.dto.ProjectConfigDto;
+import org.eclipse.che.commons.lang.NameGenerator;
 import org.eclipse.che.dto.server.DtoFactory;
 import org.junit.Before;
 import org.junit.Test;
+import org.testng.Assert;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.*;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 import static org.testng.Assert.assertTrue;
 
 
@@ -33,6 +36,8 @@ import static org.testng.Assert.assertTrue;
  * @author gazarenkov
  */
 public class ProjectManagerReadTest extends WsAgentTestBase {
+
+    final String value = NameGenerator.generate("value", 10);
 
 
 
@@ -46,6 +51,12 @@ public class ProjectManagerReadTest extends WsAgentTestBase {
         new File(root, "/normal").mkdir();
         new File(root, "/normal/module").mkdir();
 
+        File prjWithAttr = new File(root, "/" + PROJECT_TYPE_WITH_ATTRIBUTE);
+        prjWithAttr.mkdir();
+        File file = new File(root, "/" + PROJECT_TYPE_WITH_ATTRIBUTE + "/.conf");
+        file.createNewFile();
+
+        Files.write(file.toPath(),value.getBytes());
 
         List<ProjectConfigDto> projects = new ArrayList<>();
         projects.add(DtoFactory.newDto(ProjectConfigDto.class)
@@ -65,10 +76,17 @@ public class ProjectManagerReadTest extends WsAgentTestBase {
                               .withType("primary1"));
 
 
+        projects.add(DtoFactory.newDto(ProjectConfigDto.class)
+                                .withPath("/" + PROJECT_TYPE_WITH_ATTRIBUTE)
+                                .withName("project1Name")
+                                .withType(PROJECT_TYPE_WITH_ATTRIBUTE));
+
+
         workspaceHolder = new TestWorkspaceHolder(projects);
         ProjectTypeRegistry projectTypeRegistry = new ProjectTypeRegistry(new HashSet<>());
         projectTypeRegistry.registerProjectType(new PT1());
         projectTypeRegistry.registerProjectType(new PT3());
+        projectTypeRegistry.registerProjectType(new ProjectTypeWitAttribute());
 
         ProjectHandlerRegistry projectHandlerRegistry = new ProjectHandlerRegistry(new HashSet<>());
 
@@ -177,14 +195,59 @@ public class ProjectManagerReadTest extends WsAgentTestBase {
 
     }
 
-//    @Test
-//    public void testEstimateProject() throws Exception {
-//
-//        //pm.getProject("/normal").getBaseFolder().createFolder("file1");
-//
-//        System.out.println (">>>> "+pm.estimateProject("/normal", "pt3").get("pt2-provided1").getString());
-//
-//    }
+    @Test
+    public void testEstimateProject() throws Exception {
+        //getting project and check initial attribute
+        String projectPath = "/" + PROJECT_TYPE_WITH_ATTRIBUTE;
+        RegisteredProject project = pm.getProject(projectPath);
+        assertNotNull(project);
+        assertEquals(PROJECT_TYPE_WITH_ATTRIBUTE, project.getType());
+        Map<String, List<String>> attributes = project.getAttributes();
+        assertNotNull(attributes);
+        assertEquals(1, attributes.size());
+        assertTrue(attributes.containsKey(PROVIDED_ATTRIBUTE));
+        assertEquals(value, attributes.get(PROVIDED_ATTRIBUTE).get(0));
+
+
+        //update content file
+        //value provider should read new value during estimate project
+        File file = new File(root, "/" + PROJECT_TYPE_WITH_ATTRIBUTE + "/.conf");
+        String newValue = NameGenerator.generate("new value", 12);
+        Files.write(file.toPath(), newValue.getBytes());
+        ProjectTypeResolution projectTypeResolution = pm.estimateProject(projectPath, PROJECT_TYPE_WITH_ATTRIBUTE);
+        assertNotNull(projectTypeResolution);
+        Map<String, Value> providedAttributes = projectTypeResolution.getProvidedAttributes();
+        assertNotNull(providedAttributes);
+        Value providedValue = providedAttributes.get(PROVIDED_ATTRIBUTE);
+        assertNotNull(providedValue);
+        assertFalse(providedValue.isEmpty());
+        assertEquals(newValue, providedValue.getString());
+
+
+        //create new project config and update project with it
+        Map<String, List<String>> map = new HashMap<>();
+        for (String key : attributes.keySet()) {
+            if (providedAttributes.containsKey(key)) {
+                map.put(key, providedAttributes.get(key).getList());
+            } else {
+                map.put(key, attributes.get(key));
+            }
+        }
+
+        ProjectConfig projectConfig = new NewProjectConfig(project.getPath(), project.getType(), project.getMixins(),
+                project.getName(), project.getDescription(),map, project.getSource());
+        pm.updateProject(projectConfig);
+
+        //re-get project again and check on new attribute
+        RegisteredProject reFreshedProject = pm.getProject(projectPath);
+        assertNotNull(reFreshedProject);
+        assertEquals(PROJECT_TYPE_WITH_ATTRIBUTE, reFreshedProject.getType());
+        Map<String, List<String>> refreshedAttributes = reFreshedProject.getAttributes();
+        assertNotNull(refreshedAttributes);
+        assertEquals(1, refreshedAttributes.size());
+        assertTrue(refreshedAttributes.containsKey(PROVIDED_ATTRIBUTE));
+        assertEquals(newValue, refreshedAttributes.get(PROVIDED_ATTRIBUTE).get(0));
+    }
 
     @Test
     public void testResolveSources() throws Exception {

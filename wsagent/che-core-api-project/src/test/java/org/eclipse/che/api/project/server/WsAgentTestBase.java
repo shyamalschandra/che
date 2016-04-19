@@ -17,12 +17,7 @@ import org.eclipse.che.api.core.notification.EventService;
 import org.eclipse.che.api.project.server.handlers.CreateProjectHandler;
 import org.eclipse.che.api.project.server.handlers.ProjectHandlerRegistry;
 import org.eclipse.che.api.project.server.importer.ProjectImporterRegistry;
-import org.eclipse.che.api.project.server.type.AttributeValue;
-import org.eclipse.che.api.project.server.type.ProjectTypeDef;
-import org.eclipse.che.api.project.server.type.ProjectTypeRegistry;
-import org.eclipse.che.api.project.server.type.ValueProvider;
-import org.eclipse.che.api.project.server.type.ValueProviderFactory;
-import org.eclipse.che.api.project.server.type.ValueStorageException;
+import org.eclipse.che.api.project.server.type.*;
 import org.eclipse.che.api.vfs.impl.file.DefaultFileWatcherNotificationHandler;
 import org.eclipse.che.api.vfs.impl.file.FileTreeWatcher;
 import org.eclipse.che.api.vfs.impl.file.FileWatcherNotificationHandler;
@@ -36,14 +31,7 @@ import org.eclipse.che.dto.server.DtoFactory;
 
 import java.io.File;
 import java.nio.file.PathMatcher;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import static java.util.stream.Collectors.toList;
+import java.util.*;
 
 /**
  * @author gazarenkov
@@ -52,6 +40,9 @@ public class WsAgentTestBase {
 
     protected final static String FS_PATH    = "target/fs";
     protected final static String INDEX_PATH = "target/fs_index";
+
+    protected final static String PROJECT_TYPE_WITH_ATTRIBUTE = "ProjectTypeWithAttribute";
+    protected final static String PROVIDED_ATTRIBUTE = "providedAttribute";
 
     protected TestWorkspaceHolder workspaceHolder;
 
@@ -300,6 +291,45 @@ public class WsAgentTestBase {
             }
         }
 
+    }
+
+    protected static class ProjectTypeWitAttribute extends ProjectTypeDef {
+
+        protected ProjectTypeWitAttribute() {
+            super(PROJECT_TYPE_WITH_ATTRIBUTE, PROJECT_TYPE_WITH_ATTRIBUTE, true, false);
+
+            addVariableDefinition(PROVIDED_ATTRIBUTE, "", true, new F());
+
+        }
+
+        protected class F implements ValueProviderFactory {
+
+            FolderEntry project;
+
+            @Override
+            public ValueProvider newInstance(final FolderEntry projectFolder) {
+
+                return new ValueProvider() {
+
+                    @Override
+                    public List<String> getValues(String attributeName) throws ValueStorageException {
+                        List<String> values = new ArrayList<>();
+                        String config;
+                        try {
+                            VirtualFileEntry conf = projectFolder.getChild("/.conf");
+                            config = conf.getVirtualFile().getContentAsString();
+                        } catch (Exception e) {
+                            throw new ValueStorageException(e.getMessage());
+                        }
+
+                        if (config != null) {
+                           values.add(config);
+                        }
+                        return values;
+                    }
+                };
+            }
+        }
     }
 
 }
