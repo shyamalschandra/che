@@ -21,15 +21,20 @@ import org.eclipse.che.commons.lang.NameGenerator;
 import org.eclipse.che.dto.server.DtoFactory;
 import org.junit.Before;
 import org.junit.Test;
-import org.testng.Assert;
 
 import java.io.File;
 import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 
-import static org.junit.Assert.*;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertNull;
 import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.assertFalse;
 
 
 /**
@@ -43,10 +48,7 @@ public class ProjectManagerReadTest extends WsAgentTestBase {
 
     @Before
     public void setUp() throws Exception {
-
         super.setUp();
-
-
         new File(root, "/fromFolder").mkdir();
         new File(root, "/normal").mkdir();
         new File(root, "/normal/module").mkdir();
@@ -101,7 +103,6 @@ public class ProjectManagerReadTest extends WsAgentTestBase {
 
     @Test
     public void testInit() throws Exception {
-
         assertEquals(4, projectRegistry.getProjects().size());
         assertEquals(0, projectRegistry.getProject("/normal").getProblems().size());
         assertEquals(1, projectRegistry.getProject("/fromConfig").getProblems().size());
@@ -158,30 +159,17 @@ public class ProjectManagerReadTest extends WsAgentTestBase {
 
     @Test
     public void testParentProject() throws Exception {
-
-//        try {
         assertEquals("/normal", projectRegistry.getParentProject("/normal").getPath());
-//            fail("NotFoundException expected");
-//        } catch (NotFoundException e) {}
-
         assertEquals("/normal", projectRegistry.getParentProject("/normal/some/path").getPath());
         assertEquals("/normal/module", projectRegistry.getParentProject("/normal/module/some/path").getPath());
-
-//        try {
         assertNull(projectRegistry.getParentProject("/some/path"));
-//            fail("NotFoundException expected");
-//        } catch (NotFoundException e) {}
-
-
     }
 
     @Test
     public void testSerializeProject() throws Exception {
         ProjectConfig config = DtoConverter.asDto(pm.getProject("/fromConfig"));
-
         assertEquals("/fromConfig", config.getPath());
         assertEquals("primary1", config.getType());
-
     }
 
 
@@ -207,8 +195,6 @@ public class ProjectManagerReadTest extends WsAgentTestBase {
         assertEquals(1, attributes.size());
         assertTrue(attributes.containsKey(PROVIDED_ATTRIBUTE));
         assertEquals(value, attributes.get(PROVIDED_ATTRIBUTE).get(0));
-
-
         //update content file
         //value provider should read new value during estimate project
         File file = new File(root, "/" + PROJECT_TYPE_WITH_ATTRIBUTE + "/.conf");
@@ -222,8 +208,6 @@ public class ProjectManagerReadTest extends WsAgentTestBase {
         assertNotNull(providedValue);
         assertFalse(providedValue.isEmpty());
         assertEquals(newValue, providedValue.getString());
-
-
         //create new project config and update project with it
         Map<String, List<String>> map = new HashMap<>();
         for (String key : attributes.keySet()) {
