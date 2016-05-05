@@ -10,10 +10,10 @@
  *******************************************************************************/
 package org.eclipse.che.ide.extension.machine.client.processes;
 
-import com.google.gwt.core.client.Scheduler;
 import elemental.events.KeyboardEvent;
 import elemental.events.MouseEvent;
 
+import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.Element;
@@ -41,7 +41,6 @@ import org.eclipse.che.ide.ui.tree.TreeNodeElement;
 import org.eclipse.che.ide.util.input.SignalEvent;
 
 import javax.validation.constraints.NotNull;
-
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;

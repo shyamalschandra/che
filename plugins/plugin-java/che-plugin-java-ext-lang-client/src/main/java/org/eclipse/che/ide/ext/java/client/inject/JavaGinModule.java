@@ -41,6 +41,15 @@ import org.eclipse.che.ide.ext.java.client.newsourcefile.NewJavaSourceFileView;
 import org.eclipse.che.ide.ext.java.client.newsourcefile.NewJavaSourceFileViewImpl;
 import org.eclipse.che.ide.ext.java.client.resource.JavaClassInterceptor;
 import org.eclipse.che.ide.ext.java.client.tree.JavaNodeFactory;
+import org.eclipse.che.ide.ext.java.client.project.classpath.valueproviders.pages.ClasspathPagePresenter;
+import org.eclipse.che.ide.ext.java.client.project.classpath.valueproviders.pages.libraries.LibEntryPresenter;
+import org.eclipse.che.ide.ext.java.client.project.classpath.valueproviders.pages.sources.SourceEntryPresenter;
+import org.eclipse.che.ide.ext.java.client.project.interceptor.JavaClassInterceptor;
+import org.eclipse.che.ide.ext.java.client.project.interceptor.JavaContentRootInterceptor;
+import org.eclipse.che.ide.ext.java.client.project.interceptor.TestContentRootDecorator;
+import org.eclipse.che.ide.ext.java.client.project.node.JavaNodeFactory;
+import org.eclipse.che.ide.ext.java.client.project.node.JavaNodeManager;
+import org.eclipse.che.ide.ext.java.client.project.settings.JavaNodeSettingsProvider;
 import org.eclipse.che.ide.ext.java.client.reference.JavaFqnProvider;
 import org.eclipse.che.ide.ext.java.client.search.JavaSearchService;
 import org.eclipse.che.ide.ext.java.client.search.JavaSearchServiceWS;
@@ -83,6 +92,14 @@ public class JavaGinModule extends AbstractGinModule {
 
         GinMultibinder.newSetBinder(binder(), ResourceInterceptor.class).addBinding().to(JavaClassInterceptor.class);
 
+        GinMapBinder<String, SettingsProvider> mapBinder =
+                GinMapBinder.newMapBinder(binder(), String.class, SettingsProvider.class);
+        mapBinder.addBinding("java").to(JavaNodeSettingsProvider.class);
+
+        GinMultibinder.newSetBinder(binder(), NodeInterceptor.class).addBinding().to(JavaContentRootInterceptor.class);
+        GinMultibinder.newSetBinder(binder(), NodeInterceptor.class).addBinding().to(JavaClassInterceptor.class);
+        GinMultibinder.newSetBinder(binder(), NodeInterceptor.class).addBinding().to(TestContentRootDecorator.class);
+
         GinMapBinder<String, FqnProvider> fqnProviders = GinMapBinder.newMapBinder(binder(), String.class, FqnProvider.class);
         fqnProviders.addBinding("maven").to(JavaFqnProvider.class);
 
@@ -100,6 +117,8 @@ public class JavaGinModule extends AbstractGinModule {
         GinMultibinder.newSetBinder(binder(), PreferencesManager.class).addBinding().to(ErrorsWarningsPreferenceManager.class);
 
         GinMultibinder.newSetBinder(binder(), CommandPropertyValueProvider.class).addBinding().to(CurrentClassFQNProvider.class);
+        GinMultibinder.newSetBinder(binder(), ClasspathPagePresenter.class).addBinding().to(LibEntryPresenter.class);
+        GinMultibinder.newSetBinder(binder(), ClasspathPagePresenter.class).addBinding().to(SourceEntryPresenter.class);
     }
 
     @Provides

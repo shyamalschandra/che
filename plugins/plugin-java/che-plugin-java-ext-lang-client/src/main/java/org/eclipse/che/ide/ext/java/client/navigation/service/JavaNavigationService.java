@@ -14,6 +14,7 @@ import org.eclipse.che.api.promises.client.Promise;
 import org.eclipse.che.ide.ext.java.shared.Jar;
 import org.eclipse.che.ide.ext.java.shared.JarEntry;
 import org.eclipse.che.ide.ext.java.shared.OpenDeclarationDescriptor;
+import org.eclipse.che.ide.ext.java.shared.dto.ClassContent;
 import org.eclipse.che.ide.ext.java.shared.dto.ImplementationsDescriptorDTO;
 import org.eclipse.che.ide.ext.java.shared.dto.model.CompilationUnit;
 import org.eclipse.che.ide.ext.java.shared.dto.model.JavaProject;
@@ -65,11 +66,11 @@ public interface JavaNavigationService {
 
     Promise<JarEntry> getEntry(Path project, int libId, String path);
 
-    void getContent(String projectPath, int libId, String path, AsyncRequestCallback<String> callback);
+    void getContent(String projectPath, int libId, String path, AsyncRequestCallback<ClassContent> callback);
 
-    Promise<String> getContent(Path project, int libId, Path path);
+    Promise<ClassContent> getContent(Path project, int libId, Path path);
 
-    void getContent(String projectPath, String fqn, AsyncRequestCallback<String> callback);
+    void getContent(String projectPath, String fqn, AsyncRequestCallback<ClassContent> callback);
 
     Promise<String> getContent(Path project, String fqn);
 
