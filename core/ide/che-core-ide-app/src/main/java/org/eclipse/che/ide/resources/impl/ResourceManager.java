@@ -620,14 +620,7 @@ public final class ResourceManager {
     protected Promise<Void> write(final File file, String content) {
         checkArgument(content != null, "Null content occurred");
 
-        return ps.writeFile(devMachine, file.getLocation(), content).then(new Function<Void, Void>() {
-            @Override
-            public Void apply(Void ignored) throws FunctionException {
-                eventBus.fireEvent(new ResourceChangedEvent(new ResourceDeltaImpl(file, UPDATED | CONTENT)));
-
-                return null;
-            }
-        });
+        return ps.writeFile(devMachine, file.getLocation(), content);
     }
 
     protected Promise<String> read(File file) {
