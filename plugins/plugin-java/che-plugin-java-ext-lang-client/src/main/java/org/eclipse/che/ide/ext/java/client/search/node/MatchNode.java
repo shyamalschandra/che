@@ -36,6 +36,7 @@ import org.eclipse.che.ide.api.resources.VirtualFile;
 import org.eclipse.che.ide.api.workspace.Workspace;
 import org.eclipse.che.ide.ext.java.client.JavaResources;
 import org.eclipse.che.ide.ext.java.client.navigation.service.JavaNavigationService;
+import org.eclipse.che.ide.ext.java.shared.dto.ClassContent;
 import org.eclipse.che.ide.ext.java.shared.dto.Region;
 import org.eclipse.che.ide.ext.java.shared.dto.model.ClassFile;
 import org.eclipse.che.ide.ext.java.shared.dto.model.CompilationUnit;
@@ -174,10 +175,10 @@ public class MatchNode extends AbstractPresentationNode implements HasAction {
             final Project project = resource.getRelatedProject();
 
             service.getContent(project.getLocation(), className)
-                   .then(new Operation<String>() {
+                   .then(new Operation<ClassContent>() {
                        @Override
-                       public void apply(String content) throws OperationException {
-                           VirtualFile file = new SyntheticFile(Path.valueOf(className.replace('.', '/')).lastSegment(), content, promises);
+                       public void apply(ClassContent content) throws OperationException {
+                           VirtualFile file = new SyntheticFile(Path.valueOf(className.replace('.', '/')).lastSegment(), content.getContent(), promises);
                            editorAgent.openEditor(file, new OpenEditorCallbackImpl() {
                                @Override
                                public void onEditorOpened(EditorPartPresenter editor) {

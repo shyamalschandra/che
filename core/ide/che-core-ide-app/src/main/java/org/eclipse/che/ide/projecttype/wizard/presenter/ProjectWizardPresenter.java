@@ -27,9 +27,9 @@ import org.eclipse.che.ide.api.wizard.WizardPage;
 import org.eclipse.che.ide.projecttype.wizard.ProjectWizard;
 import org.eclipse.che.ide.projecttype.wizard.ProjectWizardFactory;
 import org.eclipse.che.ide.projecttype.wizard.categoriespage.CategoriesPagePresenter;
+import org.eclipse.che.ide.resource.Path;
 
 import javax.validation.constraints.NotNull;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -124,36 +124,24 @@ public class ProjectWizardPresenter implements Wizard.UpdateDelegate,
 
     /** Open the project wizard for creating a new project. */
     public void show() {
-        resetState();
-        wizardMode = CREATE;
-        showDialog(null);
+        show(Path.ROOT);
     }
 
     /** Open the project wizard with given mode. */
-    public void show(@NotNull MutableProjectConfig project, ProjectWizardMode wizardMode) {
+    public void show(Path parent) {
         resetState();
-        this.wizardMode = wizardMode;
-        showDialog(project);
+        this.wizardMode = CREATE;
+        MutableProjectConfig config = new MutableProjectConfig();
+        config.setPath(parent.toString());
+        showDialog(config);
     }
 
     /** Open the project wizard for updating the given {@code project}. */
     public void show(@NotNull MutableProjectConfig project) {
         resetState();
         wizardMode = UPDATE;
-//        projectPath = project.getPath();
         showDialog(project);
     }
-
-    /** Open the project wizard for creating module from the given {@code folder}. */
-//    public void show(@NotNull ItemReference folder) {
-//        resetState();
-//        wizardMode = CREATE_MODULE;
-//        projectPath = folder.getPath();
-//        final ProjectConfigDto dataObject = dtoFactory.createDto(ProjectConfigDto.class)
-//                                                      .withName(folder.getName());
-//
-//        showDialog(dataObject);
-//    }
 
     private void resetState() {
         wizardsCache.clear();
@@ -161,7 +149,6 @@ public class ProjectWizardPresenter implements Wizard.UpdateDelegate,
         wizardMode = null;
         categoriesPage.setProjectTypeSelectionListener(this);
         categoriesPage.setProjectTemplateSelectionListener(this);
-//        projectPath = null;
         importWizard = null;
     }
 
@@ -202,7 +189,6 @@ public class ProjectWizardPresenter implements Wizard.UpdateDelegate,
 
         // set dataObject's values from projectType
         newProject.setType(projectType.getId());
-//        newProject.setRecipe(projectType.getDefaultRecipe());
     }
 
     @Override
@@ -245,11 +231,7 @@ public class ProjectWizardPresenter implements Wizard.UpdateDelegate,
 
     /** Creates and returns 'default' project wizard with pre-defined pages only. */
     private ProjectWizard createDefaultWizard(@Nullable MutableProjectConfig dataObject, @NotNull ProjectWizardMode mode) {
-        if (dataObject == null) {
-            dataObject = new MutableProjectConfig();
-        }
-
-        final ProjectWizard projectWizard = projectWizardFactory.newWizard(dataObject, mode/*, projectPath*/);
+        final ProjectWizard projectWizard = projectWizardFactory.newWizard(dataObject, mode);
         projectWizard.setUpdateDelegate(this);
 
         // add pre-defined pages - first and last

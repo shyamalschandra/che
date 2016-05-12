@@ -39,17 +39,12 @@ import org.eclipse.che.ide.ext.java.client.navigation.service.JavaNavigationServ
 import org.eclipse.che.ide.ext.java.client.navigation.service.JavaNavigationServiceImpl;
 import org.eclipse.che.ide.ext.java.client.newsourcefile.NewJavaSourceFileView;
 import org.eclipse.che.ide.ext.java.client.newsourcefile.NewJavaSourceFileViewImpl;
-import org.eclipse.che.ide.ext.java.client.resource.JavaClassInterceptor;
+import org.eclipse.che.ide.ext.java.client.resource.ClassInterceptor;
+import org.eclipse.che.ide.ext.java.client.resource.SourceFolderInterceptor;
 import org.eclipse.che.ide.ext.java.client.tree.JavaNodeFactory;
 import org.eclipse.che.ide.ext.java.client.project.classpath.valueproviders.pages.ClasspathPagePresenter;
 import org.eclipse.che.ide.ext.java.client.project.classpath.valueproviders.pages.libraries.LibEntryPresenter;
 import org.eclipse.che.ide.ext.java.client.project.classpath.valueproviders.pages.sources.SourceEntryPresenter;
-import org.eclipse.che.ide.ext.java.client.project.interceptor.JavaClassInterceptor;
-import org.eclipse.che.ide.ext.java.client.project.interceptor.JavaContentRootInterceptor;
-import org.eclipse.che.ide.ext.java.client.project.interceptor.TestContentRootDecorator;
-import org.eclipse.che.ide.ext.java.client.project.node.JavaNodeFactory;
-import org.eclipse.che.ide.ext.java.client.project.node.JavaNodeManager;
-import org.eclipse.che.ide.ext.java.client.project.settings.JavaNodeSettingsProvider;
 import org.eclipse.che.ide.ext.java.client.reference.JavaFqnProvider;
 import org.eclipse.che.ide.ext.java.client.search.JavaSearchService;
 import org.eclipse.che.ide.ext.java.client.search.JavaSearchServiceWS;
@@ -60,6 +55,7 @@ import org.eclipse.che.ide.ext.java.client.settings.compiler.JavaCompilerPrefere
 import org.eclipse.che.ide.ext.java.client.settings.property.PropertyWidget;
 import org.eclipse.che.ide.ext.java.client.settings.property.PropertyWidgetImpl;
 import org.eclipse.che.ide.ext.java.client.tree.JavaPackageConnector;
+import org.eclipse.che.ide.ext.java.client.tree.LibraryNodeProvider;
 import org.eclipse.che.ide.ext.java.client.tree.SourceFolderDecorator;
 import org.eclipse.che.ide.ext.java.client.tree.TestFolderDecorator;
 import org.eclipse.che.ide.extension.machine.client.command.valueproviders.CommandPropertyValueProvider;
@@ -90,15 +86,11 @@ public class JavaGinModule extends AbstractGinModule {
         GinMultibinder.newSetBinder(binder(), NodeInterceptor.class).addBinding().to(JavaPackageConnector.class);
         GinMultibinder.newSetBinder(binder(), NodeIconProvider.class).addBinding().to(SourceFolderDecorator.class);
 
-        GinMultibinder.newSetBinder(binder(), ResourceInterceptor.class).addBinding().to(JavaClassInterceptor.class);
+        GinMultibinder.newSetBinder(binder(), NodeInterceptor.class).addBinding().to(LibraryNodeProvider.class);
 
-        GinMapBinder<String, SettingsProvider> mapBinder =
-                GinMapBinder.newMapBinder(binder(), String.class, SettingsProvider.class);
-        mapBinder.addBinding("java").to(JavaNodeSettingsProvider.class);
+        GinMultibinder.newSetBinder(binder(), ResourceInterceptor.class).addBinding().to(SourceFolderInterceptor.class);
+        GinMultibinder.newSetBinder(binder(), ResourceInterceptor.class).addBinding().to(ClassInterceptor.class);
 
-        GinMultibinder.newSetBinder(binder(), NodeInterceptor.class).addBinding().to(JavaContentRootInterceptor.class);
-        GinMultibinder.newSetBinder(binder(), NodeInterceptor.class).addBinding().to(JavaClassInterceptor.class);
-        GinMultibinder.newSetBinder(binder(), NodeInterceptor.class).addBinding().to(TestContentRootDecorator.class);
 
         GinMapBinder<String, FqnProvider> fqnProviders = GinMapBinder.newMapBinder(binder(), String.class, FqnProvider.class);
         fqnProviders.addBinding("maven").to(JavaFqnProvider.class);

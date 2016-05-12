@@ -15,6 +15,7 @@ import com.google.inject.ImplementedBy;
 import org.eclipse.che.api.project.shared.dto.ProjectTemplateDescriptor;
 import org.eclipse.che.api.project.shared.dto.ProjectTypeDto;
 import org.eclipse.che.ide.api.mvp.View;
+import org.eclipse.che.ide.resource.Path;
 
 import java.util.List;
 import java.util.Map;
@@ -51,6 +52,8 @@ public interface CategoriesPageView extends View<CategoriesPageView.ActionDelega
 
     void setNameFieldReadOnly(boolean readOnly);
 
+    void setParentPath(Path path);
+
     interface ActionDelegate {
         void projectNameChanged(String name);
 
@@ -59,5 +62,7 @@ public interface CategoriesPageView extends View<CategoriesPageView.ActionDelega
         void projectTemplateSelected(ProjectTemplateDescriptor template);
 
         void projectTypeSelected(ProjectTypeDto typeDescriptor);
+
+        void selectPathClicked();
     }
 }

@@ -84,12 +84,6 @@ public class ProjectWizard extends AbstractWizard<MutableProjectConfig> {
                                             .send()
                                             .then(onComplete(callback))
                                             .catchError(onFailure(callback));
-                    } else if (container.getResourceType() == FOLDER) {
-                        ((Folder)container).toProject()
-                                           .withBody(dataObject)
-                                           .send()
-                                           .then(onComplete(callback))
-                                           .catchError(onFailure(callback));
                     }
                 }
             });

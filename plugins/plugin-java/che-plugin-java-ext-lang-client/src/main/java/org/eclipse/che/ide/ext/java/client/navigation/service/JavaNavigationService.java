@@ -72,7 +72,7 @@ public interface JavaNavigationService {
 
     void getContent(String projectPath, String fqn, AsyncRequestCallback<ClassContent> callback);
 
-    Promise<String> getContent(Path project, String fqn);
+    Promise<ClassContent> getContent(Path project, String fqn);
 
     /**
      * Get the compilation unit representation of the java file.

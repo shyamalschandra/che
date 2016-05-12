@@ -163,17 +163,6 @@ public class NodeLoader implements LoaderHandler.HasLoaderHandlers {
 
             tree.getView().onLoadChange(requested, false);
             requested.setLoading(false);
-
-            if (node instanceof HasPresentation) {
-                tree.getView().getInfoTextContainer(requested).setAttribute("warning", "");
-
-                new DelayedTask() {
-                    @Override
-                    public void onExecute() {
-                        tree.getView().getInfoTextContainer(requested).removeAttribute("warning");
-                    }
-                }.delay(3000);
-            }
         }
 
         @Override

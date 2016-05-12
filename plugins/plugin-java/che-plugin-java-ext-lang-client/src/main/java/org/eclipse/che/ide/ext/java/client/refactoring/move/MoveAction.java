@@ -27,7 +27,7 @@ import org.eclipse.che.ide.api.resources.VirtualFile;
 import org.eclipse.che.ide.ext.java.client.JavaLocalizationConstant;
 import org.eclipse.che.ide.ext.java.client.refactoring.RefactorInfo;
 import org.eclipse.che.ide.ext.java.client.refactoring.move.wizard.MovePresenter;
-import org.eclipse.che.ide.ext.java.client.resource.JavaSourceFolderMarker;
+import org.eclipse.che.ide.ext.java.client.resource.SourceFolderMarker;
 import org.eclipse.che.ide.ext.java.client.util.JavaUtil;
 
 import static org.eclipse.che.ide.api.resources.Resource.FILE;
@@ -73,7 +73,7 @@ public class MoveAction extends Action {
         final Resource resource = resources[0];
 
         final Project project = resource.getRelatedProject();
-        final Optional<Resource> srcFolder = resource.getParentWithMarker(JavaSourceFolderMarker.ID);
+        final Optional<Resource> srcFolder = resource.getParentWithMarker(SourceFolderMarker.ID);
 
         if (resource.getResourceType() == FILE) {
             event.getPresentation().setEnabled(JavaUtil.isJavaProject(project) && srcFolder.isPresent() && isJavaFile((File)resource));
@@ -99,7 +99,7 @@ public class MoveAction extends Action {
             return;
         }
 
-        final Optional<Resource> srcFolder = resource.getParentWithMarker(JavaSourceFolderMarker.ID);
+        final Optional<Resource> srcFolder = resource.getParentWithMarker(SourceFolderMarker.ID);
 
         if (!srcFolder.isPresent() || resource.getLocation().equals(srcFolder.get().getLocation())) {
             return;

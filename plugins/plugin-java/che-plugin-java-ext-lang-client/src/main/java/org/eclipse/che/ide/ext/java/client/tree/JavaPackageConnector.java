@@ -27,7 +27,7 @@ import org.eclipse.che.ide.api.data.tree.NodeInterceptor;
 import org.eclipse.che.ide.api.data.tree.settings.SettingsProvider;
 import org.eclipse.che.ide.api.resources.Container;
 import org.eclipse.che.ide.api.resources.Resource;
-import org.eclipse.che.ide.ext.java.client.resource.JavaSourceFolderMarker;
+import org.eclipse.che.ide.ext.java.client.resource.SourceFolderMarker;
 import org.eclipse.che.ide.resources.tree.ContainerNode;
 import org.eclipse.che.ide.resources.tree.ResourceNode;
 
@@ -127,7 +127,7 @@ public class JavaPackageConnector implements NodeInterceptor {
     }
 
     protected boolean isSourceOrPackage(ResourceNode node) {
-        return node.getData().getParentWithMarker(JavaSourceFolderMarker.ID).isPresent();
+        return node.getData().getParentWithMarker(SourceFolderMarker.ID).isPresent();
     }
 
     protected Promise<Container> getNonEmptyPackage(final Container source) {

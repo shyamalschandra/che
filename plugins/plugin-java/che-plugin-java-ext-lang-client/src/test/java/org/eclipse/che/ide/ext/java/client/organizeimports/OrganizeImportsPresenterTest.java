@@ -24,7 +24,7 @@ import org.eclipse.che.ide.api.resources.Resource;
 import org.eclipse.che.ide.dto.DtoFactory;
 import org.eclipse.che.ide.ext.java.client.JavaLocalizationConstant;
 import org.eclipse.che.ide.ext.java.client.editor.JavaCodeAssistClient;
-import org.eclipse.che.ide.ext.java.client.resource.JavaSourceFolderMarker;
+import org.eclipse.che.ide.ext.java.client.resource.SourceFolderMarker;
 import org.eclipse.che.ide.ext.java.shared.dto.ConflictImportDTO;
 import org.eclipse.che.ide.jseditor.client.document.Document;
 import org.eclipse.che.ide.jseditor.client.texteditor.TextEditor;
@@ -106,7 +106,7 @@ public class OrganizeImportsPresenterTest {
         when(editor.getDocument()).thenReturn(document);
         when(document.getContents()).thenReturn("content");
         when(file.getRelatedProject()).thenReturn(relatedProject);
-        when(file.getParentWithMarker(eq(JavaSourceFolderMarker.ID))).thenReturn(Optional.of(srcFolder));
+        when(file.getParentWithMarker(eq(SourceFolderMarker.ID))).thenReturn(Optional.of(srcFolder));
         when(file.getName()).thenReturn("A.java");
         when(file.getLocation()).thenReturn(Path.valueOf("/project/src/a/b/A.java"));
         when(file.getFileExtension()).thenReturn("java");

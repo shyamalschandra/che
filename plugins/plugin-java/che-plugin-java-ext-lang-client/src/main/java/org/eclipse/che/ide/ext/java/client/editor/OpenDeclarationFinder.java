@@ -30,10 +30,11 @@ import org.eclipse.che.ide.api.resources.SyntheticFile;
 import org.eclipse.che.ide.api.resources.VirtualFile;
 import org.eclipse.che.ide.api.workspace.Workspace;
 import org.eclipse.che.ide.ext.java.client.navigation.service.JavaNavigationService;
-import org.eclipse.che.ide.ext.java.client.resource.JavaSourceFolderMarker;
+import org.eclipse.che.ide.ext.java.client.resource.SourceFolderMarker;
 import org.eclipse.che.ide.ext.java.client.util.JavaUtil;
 import org.eclipse.che.ide.ext.java.shared.JarEntry;
 import org.eclipse.che.ide.ext.java.shared.OpenDeclarationDescriptor;
+import org.eclipse.che.ide.ext.java.shared.dto.ClassContent;
 import org.eclipse.che.ide.jseditor.client.text.LinearRange;
 import org.eclipse.che.ide.jseditor.client.texteditor.EmbeddedTextEditorPresenter;
 import org.eclipse.che.ide.resource.Path;
@@ -85,7 +86,7 @@ public class OpenDeclarationFinder {
         if (file instanceof Resource) {
             final Project project = ((Resource)file).getRelatedProject();
 
-            final Optional<Resource> srcFolder = ((Resource)file).getParentWithMarker(JavaSourceFolderMarker.ID);
+            final Optional<Resource> srcFolder = ((Resource)file).getParentWithMarker(SourceFolderMarker.ID);
 
             if (!srcFolder.isPresent()) {
                 return;
@@ -120,10 +121,10 @@ public class OpenDeclarationFinder {
                                  public void apply(final JarEntry entry) throws OperationException {
                                      navigationService
                                              .getContent(project.getLocation(), descriptor.getLibId(), Path.valueOf(entry.getPath()))
-                                             .then(new Operation<String>() {
+                                             .then(new Operation<ClassContent>() {
                                                  @Override
-                                                 public void apply(String content) throws OperationException {
-                                                     VirtualFile file = new SyntheticFile(entry.getName(), content, promises);
+                                                 public void apply(ClassContent content) throws OperationException {
+                                                     VirtualFile file = new SyntheticFile(entry.getName(), content.getContent(), promises);
                                                      eventBus.fireEvent(new FileEvent(file, OPEN));
                                                  }
                                              });

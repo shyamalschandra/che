@@ -20,10 +20,15 @@ import org.eclipse.che.ide.api.project.type.ProjectTypeRegistry;
 import org.eclipse.che.ide.api.project.type.wizard.PreSelectedProjectTypeManager;
 import org.eclipse.che.ide.api.project.type.wizard.ProjectWizardMode;
 import org.eclipse.che.ide.api.project.type.wizard.ProjectWizardRegistry;
+import org.eclipse.che.ide.api.resources.Resource;
 import org.eclipse.che.ide.api.wizard.AbstractWizardPage;
 import org.eclipse.che.ide.api.project.MutableProjectConfig;
+import org.eclipse.che.ide.api.workspace.Workspace;
 import org.eclipse.che.ide.resource.Path;
+import org.eclipse.che.ide.resources.selector.SelectPathPresenter;
+import org.eclipse.che.ide.resources.selector.SelectionPathHandler;
 import org.eclipse.che.ide.util.NameUtils;
+import org.eclipse.che.ide.util.loging.Log;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -31,7 +36,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static com.google.common.base.Strings.isNullOrEmpty;
 import static org.eclipse.che.ide.api.project.type.wizard.ProjectWizardMode.CREATE;
 import static org.eclipse.che.ide.api.project.type.wizard.ProjectWizardMode.UPDATE;
 import static org.eclipse.che.ide.api.project.type.wizard.ProjectWizardRegistrar.WIZARD_MODE_KEY;
@@ -52,6 +56,8 @@ public class CategoriesPagePresenter extends AbstractWizardPage<MutableProjectCo
     private final ProjectTemplateRegistry          projectTemplateRegistry;
     private final ProjectWizardRegistry            wizardRegistry;
     private final PreSelectedProjectTypeManager    preSelectedProjectTypeManager;
+    private final SelectPathPresenter selectPathPresenter;
+    private final Workspace workspace;
     private       ProjectTypeDto                   selectedProjectType;
     private       ProjectTemplateDescriptor        selectedProjectTemplate;
     private       ProjectTypeSelectionListener     projectTypeSelectionListener;
@@ -63,13 +69,17 @@ public class CategoriesPagePresenter extends AbstractWizardPage<MutableProjectCo
                                    ProjectTypeRegistry projectTypeRegistry,
                                    ProjectTemplateRegistry projectTemplateRegistry,
                                    ProjectWizardRegistry wizardRegistry,
-                                   PreSelectedProjectTypeManager preSelectedProjectTypeManager) {
+                                   PreSelectedProjectTypeManager preSelectedProjectTypeManager,
+                                   SelectPathPresenter selectPathPresenter,
+                                   Workspace workspace) {
         super();
         this.view = view;
         this.projectTypeRegistry = projectTypeRegistry;
         this.projectTemplateRegistry = projectTemplateRegistry;
         this.wizardRegistry = wizardRegistry;
         this.preSelectedProjectTypeManager = preSelectedProjectTypeManager;
+        this.selectPathPresenter = selectPathPresenter;
+        this.workspace = workspace;
 
         view.setDelegate(this);
         loadProjectTypesAndTemplates();
@@ -85,6 +95,9 @@ public class CategoriesPagePresenter extends AbstractWizardPage<MutableProjectCo
         initialized = true;
 
         final ProjectWizardMode wizardMode = ProjectWizardMode.parse(context.get(WIZARD_MODE_KEY));
+
+        view.setParentPath(Path.valueOf(dataObject.getPath()));
+
         if (CREATE == wizardMode) {
             // set pre-selected project type
             final String preSelectedProjectTypeId;
@@ -120,9 +133,7 @@ public class CategoriesPagePresenter extends AbstractWizardPage<MutableProjectCo
             && (selectedProjectType == null || !selectedProjectType.getId().equals(dataObject.getType()))) {
             view.selectProjectType(dataObject.getType());
         }
-        view.setName(!isNullOrEmpty(dataObject.getName())
-                     ? dataObject.getName()
-                     : dataObject.getPath() != null ? Path.valueOf(dataObject.getPath()).lastSegment() : null);
+        view.setName(dataObject.getName());
         view.setDescription(dataObject.getDescription());
 
         final ProjectWizardMode wizardMode = ProjectWizardMode.parse(context.get(WIZARD_MODE_KEY));
@@ -154,11 +165,6 @@ public class CategoriesPagePresenter extends AbstractWizardPage<MutableProjectCo
 
     @Override
     public void projectNameChanged(String name) {
-        final ProjectWizardMode wizardMode = ProjectWizardMode.parse(context.get(WIZARD_MODE_KEY));
-
-        if (wizardMode != UPDATE) {
-            dataObject.setPath(name);
-        }
         dataObject.setName(name);
         updateDelegate.updateControls();
 
@@ -173,6 +179,21 @@ public class CategoriesPagePresenter extends AbstractWizardPage<MutableProjectCo
     public void projectDescriptionChanged(String projectDescription) {
         dataObject.setDescription(projectDescription);
         updateDelegate.updateControls();
+    }
+
+    @Override
+    public void selectPathClicked() {
+        selectPathPresenter.show(new Resource[]{workspace.getWorkspaceRoot()}, false, new SelectionPathHandler() {
+            @Override
+            public void onPathSelected(Path path) {
+                dataObject.setPath(path.toString());
+                view.setParentPath(path);
+            }
+
+            @Override
+            public void onSelectionCancelled() {
+            }
+        });
     }
 
     public void setProjectTypeSelectionListener(ProjectTypeSelectionListener listener) {

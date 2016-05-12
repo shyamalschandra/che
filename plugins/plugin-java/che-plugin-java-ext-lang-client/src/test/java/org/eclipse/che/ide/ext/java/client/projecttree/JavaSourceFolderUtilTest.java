@@ -26,26 +26,26 @@ import static org.junit.Assert.assertEquals;
  */
 public class JavaSourceFolderUtilTest {
 
-    private CurrentProject project;
-
-    @Before
-    public void setUp() throws Exception {
-        ProjectConfigDto projectConfig = new org.eclipse.che.api.workspace.server.dto.DtoServerImpls.ProjectConfigDtoImpl();
-        projectConfig.setPath("/test");
-        projectConfig.setType("maven");
-        projectConfig.setAttributes(new HashMap<String, List<String>>() {{
-            put("maven.source.folder", Collections.singletonList("src/main/java"));
-        }});
-
-        project = new CurrentProject();
-        project.setProjectConfig(projectConfig);
-    }
-
-    @Test
-    public void testGetSourceFolders() throws Exception {
-//        List<String> sourceFolders = JavaSourceFolderUtil.getSourceFolders(project);
-
-//        assertEquals(sourceFolders.size(), 1);
-//        assertEquals(sourceFolders.get(0), "/test/src/main/java/");
-    }
+//    private CurrentProject project;
+//
+//    @Before
+//    public void setUp() throws Exception {
+//        ProjectConfigDto projectConfig = new org.eclipse.che.api.workspace.server.dto.DtoServerImpls.ProjectConfigDtoImpl();
+//        projectConfig.setPath("/test");
+//        projectConfig.setType("maven");
+//        projectConfig.setAttributes(new HashMap<String, List<String>>() {{
+//            put("maven.source.folder", Collections.singletonList("src/main/java"));
+//        }});
+//
+//        project = new CurrentProject();
+//        project.setProjectConfig(projectConfig);
+//    }
+//
+//    @Test
+//    public void testGetSourceFolders() throws Exception {
+////        List<String> sourceFolders = JavaSourceFolderUtil.getSourceFolders(project);
+//
+////        assertEquals(sourceFolders.size(), 1);
+////        assertEquals(sourceFolders.get(0), "/test/src/main/java/");
+//    }
 }

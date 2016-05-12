@@ -10,11 +10,14 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.java.client.project.classpath.valueproviders.pages.sources;
 
+import com.google.common.base.Preconditions;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 import org.eclipse.che.ide.api.app.AppContext;
+import org.eclipse.che.ide.api.resources.Project;
+import org.eclipse.che.ide.api.resources.Resource;
 import org.eclipse.che.ide.ext.java.client.JavaLocalizationConstant;
 import org.eclipse.che.ide.ext.java.client.JavaResources;
 import org.eclipse.che.ide.ext.java.client.project.classpath.ClasspathResolver;
@@ -81,7 +84,13 @@ public class SourceEntryPresenter extends AbstractClasspathPagePresenter impleme
     public void go(AcceptsOneWidget container) {
         view.clear();
 
-        isMaven = "maven".equals(appContext.getCurrentProject().getProjectConfig().getType());
+        final Resource resource = appContext.getResource();
+
+        Preconditions.checkState(resource != null);
+
+        final Project project = resource.getRelatedProject();
+
+        isMaven = "maven".equals(project.getType());
 
         setReadOnlyMod();
 

@@ -22,7 +22,7 @@ import org.eclipse.che.ide.api.data.tree.NodeInterceptor;
 import org.eclipse.che.ide.api.resources.Resource;
 import org.eclipse.che.ide.api.resources.marker.Marker;
 import org.eclipse.che.ide.api.theme.Style;
-import org.eclipse.che.ide.ext.java.client.resource.JavaSourceFolderMarker;
+import org.eclipse.che.ide.ext.java.client.resource.SourceFolderMarker;
 import org.eclipse.che.ide.ext.java.shared.ContentRoot;
 import org.eclipse.che.ide.resources.tree.ResourceNode;
 
@@ -74,15 +74,15 @@ public class TestFolderDecorator implements NodeInterceptor {
     }
 
     protected Node transform(ResourceNode resourceNode) {
-        final Optional<Resource> srcFolder = resourceNode.getData().getParentWithMarker(JavaSourceFolderMarker.ID);
+        final Optional<Resource> srcFolder = resourceNode.getData().getParentWithMarker(SourceFolderMarker.ID);
 
         if (!srcFolder.isPresent()) {
             return resourceNode;
         }
 
-        final Optional<Marker> marker = srcFolder.get().getMarker(JavaSourceFolderMarker.ID);
+        final Optional<Marker> marker = srcFolder.get().getMarker(SourceFolderMarker.ID);
 
-        final ContentRoot contentRoot = ((JavaSourceFolderMarker)marker.get()).getContentRoot();
+        final ContentRoot contentRoot = ((SourceFolderMarker)marker.get()).getContentRoot();
 
         if (contentRoot == ContentRoot.TEST_SOURCE && !resourceNode.getData().getLocation().equals(srcFolder.get().getLocation())) {
             resourceNode.getAttributes().put(CUSTOM_BACKGROUND_FILL, singletonList(Style.theme.projectExplorerTestItemBackground()));

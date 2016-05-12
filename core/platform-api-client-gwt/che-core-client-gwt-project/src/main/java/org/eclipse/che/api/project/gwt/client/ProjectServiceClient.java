@@ -106,7 +106,10 @@ public interface ProjectServiceClient {
      * @param callback
      *         the callback to use for the response
      */
+    @Deprecated
     void estimateProject(DevMachine devMachine, String path, String projectType, AsyncRequestCallback<SourceEstimation> callback);
+
+    Promise<SourceEstimation> estimate(DevMachine devMachine, Path path, String projectType);
 
     Promise<ProjectConfigDto> updateProject(DevMachine devMachine, ProjectConfigDto descriptor);
 

@@ -8,34 +8,33 @@
  * Contributors:
  *   Codenvy, S.A. - initial API and implementation
  *******************************************************************************/
-package org.eclipse.che.ide.ext.java.client.resource;
+package org.eclipse.che.plugin.maven.client.resource;
 
 import com.google.common.annotations.Beta;
+import com.google.inject.Singleton;
 
-import org.eclipse.che.ide.api.resources.marker.Marker;
+import org.eclipse.che.ide.ext.java.client.resource.SourceFolderInterceptor;
 import org.eclipse.che.ide.ext.java.shared.ContentRoot;
+import org.eclipse.che.plugin.maven.shared.MavenAttributes;
+
 
 /**
  * @author Vlad Zhukovskiy
  */
 @Beta
-public class JavaSourceFolderMarker implements Marker {
+@Singleton
+public class MavenSourceFolderInterceptor extends SourceFolderInterceptor {
 
-    public static final String ID = "javaSourceFolderMarker";
-
-    private final ContentRoot contentRoot;
-
-    public JavaSourceFolderMarker(ContentRoot contentRoot) {
-
-        this.contentRoot = contentRoot;
+    public MavenSourceFolderInterceptor() {
     }
 
     @Override
-    public String getType() {
-        return ID;
+    protected ContentRoot getContentRoot() {
+        return ContentRoot.TEST_SOURCE;
     }
 
-    public ContentRoot getContentRoot() {
-        return contentRoot;
+    @Override
+    protected String getAttribute() {
+        return MavenAttributes.TEST_SOURCE_FOLDER;
     }
 }

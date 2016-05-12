@@ -28,8 +28,6 @@ import javax.validation.constraints.NotNull;
 
 import static com.google.common.base.Preconditions.checkState;
 import static java.util.Collections.singletonList;
-import static org.eclipse.che.ide.api.project.type.wizard.ProjectWizardMode.UPDATE;
-import static org.eclipse.che.ide.api.resources.Resource.FOLDER;
 import static org.eclipse.che.ide.api.resources.Resource.PROJECT;
 import static org.eclipse.che.ide.workspace.perspectives.project.ProjectPerspective.PROJECT_PERSPECTIVE_ID;
 
@@ -70,15 +68,10 @@ public class ProjectConfigurationAction extends AbstractPerspectiveAction {
 
         checkState(resource instanceof Container);
 
-        if (resource.getResourceType() == FOLDER) {
-            final MutableProjectConfig config = new MutableProjectConfig();
-            config.setPath(resource.getLocation().toString());
-
-            projectWizard.show(config, UPDATE);
-        } else if (resource.getResourceType() == PROJECT) {
+        if (resource.getResourceType() == PROJECT) {
             final MutableProjectConfig config = new MutableProjectConfig((Project)resource);
 
-            projectWizard.show(config, UPDATE);
+            projectWizard.show(config);
         }
     }
 
@@ -92,9 +85,6 @@ public class ProjectConfigurationAction extends AbstractPerspectiveAction {
             if (resource.getResourceType() == PROJECT) {
                 event.getPresentation().setEnabledAndVisible(true);
                 event.getPresentation().setText("Update Project Configuration...");
-            } else if (resource.getResourceType() == FOLDER) {
-                event.getPresentation().setEnabledAndVisible(true);
-                event.getPresentation().setText("Create Project Configuration...");
             } else {
                 event.getPresentation().setEnabledAndVisible(false);
             }

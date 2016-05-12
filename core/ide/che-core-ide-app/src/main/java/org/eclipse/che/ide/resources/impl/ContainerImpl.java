@@ -14,6 +14,7 @@ import com.google.common.annotations.Beta;
 import com.google.common.base.Optional;
 
 import org.eclipse.che.api.core.model.project.ProjectConfig;
+import org.eclipse.che.api.project.shared.dto.SourceEstimation;
 import org.eclipse.che.api.promises.client.Function;
 import org.eclipse.che.api.promises.client.FunctionException;
 import org.eclipse.che.api.promises.client.Promise;
@@ -184,5 +185,10 @@ abstract class ContainerImpl extends ResourceImpl implements Container {
     @Override
     public Promise<Resource[]> getTree(int depth) {
         return resourceManager.getRemoteResources(this, depth, true);
+    }
+
+    @Override
+    public Promise<SourceEstimation> estimate(String projectType) {
+        return resourceManager.estimate(this, projectType);
     }
 }

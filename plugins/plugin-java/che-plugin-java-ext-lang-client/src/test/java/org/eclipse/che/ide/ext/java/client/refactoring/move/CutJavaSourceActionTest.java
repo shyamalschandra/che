@@ -25,7 +25,7 @@ import org.eclipse.che.ide.api.resources.File;
 import org.eclipse.che.ide.api.resources.Project;
 import org.eclipse.che.ide.api.resources.Resource;
 import org.eclipse.che.ide.ext.java.client.JavaLocalizationConstant;
-import org.eclipse.che.ide.ext.java.client.resource.JavaSourceFolderMarker;
+import org.eclipse.che.ide.ext.java.client.resource.SourceFolderMarker;
 import org.eclipse.che.ide.ext.java.shared.Constants;
 import org.junit.Before;
 import org.junit.Test;
@@ -85,7 +85,7 @@ public class CutJavaSourceActionTest {
         when(updateActionEvent.getPresentation()).thenReturn(presentation);
         when(appContext.getResources()).thenReturn(new Resource[]{resource});
         when(resource.getRelatedProject()).thenReturn(project);
-        when(resource.getParentWithMarker(eq(JavaSourceFolderMarker.ID))).thenReturn(Optional.of(srcFolder));
+        when(resource.getParentWithMarker(eq(SourceFolderMarker.ID))).thenReturn(Optional.of(srcFolder));
 
         final Map<String, List<String>> attributes = new HashMap<>();
         attributes.put(Constants.LANGUAGE, Collections.singletonList("java"));
@@ -109,7 +109,7 @@ public class CutJavaSourceActionTest {
         when(updateActionEvent.getPresentation()).thenReturn(presentation);
         when(appContext.getResources()).thenReturn(new Resource[]{container});
         when(container.getRelatedProject()).thenReturn(project);
-        when(container.getParentWithMarker(eq(JavaSourceFolderMarker.ID))).thenReturn(Optional.of(srcFolder));
+        when(container.getParentWithMarker(eq(SourceFolderMarker.ID))).thenReturn(Optional.of(srcFolder));
 
         final Map<String, List<String>> attributes = new HashMap<>();
         attributes.put(Constants.LANGUAGE, Collections.singletonList("java"));

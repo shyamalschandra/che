@@ -31,9 +31,10 @@ import org.eclipse.che.ide.api.resources.SyntheticFile;
 import org.eclipse.che.ide.api.resources.VirtualFile;
 import org.eclipse.che.ide.api.workspace.Workspace;
 import org.eclipse.che.ide.ext.java.client.navigation.service.JavaNavigationService;
-import org.eclipse.che.ide.ext.java.client.resource.JavaSourceFolderMarker;
+import org.eclipse.che.ide.ext.java.client.resource.SourceFolderMarker;
 import org.eclipse.che.ide.ext.java.client.util.JavaUtil;
 import org.eclipse.che.ide.ext.java.shared.JarEntry;
+import org.eclipse.che.ide.ext.java.shared.dto.ClassContent;
 import org.eclipse.che.ide.ext.java.shared.dto.Region;
 import org.eclipse.che.ide.ext.java.shared.dto.model.CompilationUnit;
 import org.eclipse.che.ide.ext.java.shared.dto.model.Member;
@@ -103,7 +104,7 @@ public class FileStructurePresenter implements FileStructure.ActionDelegate {
         if (file instanceof Resource) {
             final Project project = ((Resource)file).getRelatedProject();
 
-            final Optional<Resource> srcFolder = ((Resource)file).getParentWithMarker(JavaSourceFolderMarker.ID);
+            final Optional<Resource> srcFolder = ((Resource)file).getParentWithMarker(SourceFolderMarker.ID);
 
             if (!srcFolder.isPresent()) {
                 return;
@@ -149,10 +150,10 @@ public class FileStructurePresenter implements FileStructure.ActionDelegate {
                                      public void apply(final JarEntry entry) throws OperationException {
                                          javaNavigationService
                                                  .getContent(project.getLocation(), member.getLibId(), Path.valueOf(entry.getPath()))
-                                                 .then(new Operation<String>() {
+                                                 .then(new Operation<ClassContent>() {
                                                      @Override
-                                                     public void apply(String content) throws OperationException {
-                                                         VirtualFile file = new SyntheticFile(entry.getName(), content, promises);
+                                                     public void apply(ClassContent content) throws OperationException {
+                                                         VirtualFile file = new SyntheticFile(entry.getName(), content.getContent(), promises);
                                                          editorAgent.openEditor(file, new OpenEditorCallbackImpl() {
                                                              @Override
                                                              public void onEditorOpened(EditorPartPresenter editor) {

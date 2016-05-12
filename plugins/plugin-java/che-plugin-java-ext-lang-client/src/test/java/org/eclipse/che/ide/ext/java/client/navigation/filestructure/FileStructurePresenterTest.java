@@ -27,7 +27,7 @@ import org.eclipse.che.ide.api.resources.Project;
 import org.eclipse.che.ide.api.resources.Resource;
 import org.eclipse.che.ide.api.workspace.Workspace;
 import org.eclipse.che.ide.ext.java.client.navigation.service.JavaNavigationService;
-import org.eclipse.che.ide.ext.java.client.resource.JavaSourceFolderMarker;
+import org.eclipse.che.ide.ext.java.client.resource.SourceFolderMarker;
 import org.eclipse.che.ide.ext.java.shared.dto.Region;
 import org.eclipse.che.ide.ext.java.shared.dto.model.CompilationUnit;
 import org.eclipse.che.ide.ext.java.shared.dto.model.Member;
@@ -121,7 +121,7 @@ public class FileStructurePresenterTest {
         when(editorInput.getFile()).thenReturn(file);
         when(editorPartPresenter.getCursorOffset()).thenReturn(0);
         when(file.getRelatedProject()).thenReturn(relatedProject);
-        when(file.getParentWithMarker(eq(JavaSourceFolderMarker.ID))).thenReturn(Optional.of(srcFolder));
+        when(file.getParentWithMarker(eq(SourceFolderMarker.ID))).thenReturn(Optional.of(srcFolder));
         when(file.getName()).thenReturn("A.java");
         when(file.getFileExtension()).thenReturn("java");
         when(file.getResourceType()).thenReturn(Resource.FILE);

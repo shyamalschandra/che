@@ -22,7 +22,7 @@ import org.eclipse.che.ide.api.resources.Resource;
 import org.eclipse.che.ide.ext.java.client.JavaLocalizationConstant;
 import org.eclipse.che.ide.ext.java.client.JavaResources;
 import org.eclipse.che.ide.ext.java.client.newsourcefile.NewJavaSourceFilePresenter;
-import org.eclipse.che.ide.ext.java.client.resource.JavaSourceFolderMarker;
+import org.eclipse.che.ide.ext.java.client.resource.SourceFolderMarker;
 
 import static com.google.common.base.Preconditions.checkState;
 import static org.eclipse.che.ide.ext.java.client.util.JavaUtil.isJavaProject;
@@ -54,7 +54,7 @@ public class NewJavaSourceFileAction extends ProjectAction {
         final Resource[] resources = appContext.getResources();
         final boolean inJavaProject = resources != null && resources.length == 1 && isJavaProject(resources[0].getRelatedProject());
 
-        checkState(inJavaProject && resources[0].getParentWithMarker(JavaSourceFolderMarker.ID).isPresent());
+        checkState(inJavaProject && resources[0].getParentWithMarker(SourceFolderMarker.ID).isPresent());
 
         final Resource resource = resources[0];
 
@@ -76,6 +76,6 @@ public class NewJavaSourceFileAction extends ProjectAction {
         final Resource[] resources = appContext.getResources();
         final boolean inJavaProject = resources != null && resources.length == 1 && isJavaProject(resources[0].getRelatedProject());
 
-        e.getPresentation().setEnabledAndVisible(inJavaProject && resources[0].getParentWithMarker(JavaSourceFolderMarker.ID).isPresent());
+        e.getPresentation().setEnabledAndVisible(inJavaProject && resources[0].getParentWithMarker(SourceFolderMarker.ID).isPresent());
     }
 }

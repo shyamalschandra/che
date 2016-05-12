@@ -18,7 +18,7 @@ import org.eclipse.che.ide.api.resources.File;
 import org.eclipse.che.ide.api.resources.Project;
 import org.eclipse.che.ide.api.resources.Resource;
 import org.eclipse.che.ide.api.resources.VirtualFile;
-import org.eclipse.che.ide.ext.java.client.resource.JavaSourceFolderMarker;
+import org.eclipse.che.ide.ext.java.client.resource.SourceFolderMarker;
 import org.eclipse.che.ide.ext.java.shared.Constants;
 import org.eclipse.che.ide.resource.Path;
 
@@ -134,7 +134,7 @@ public class JavaUtil {
     }
 
     public static String resolveFQN(Resource resource) {
-        final Optional<Resource> srcFolder = resource.getParentWithMarker(JavaSourceFolderMarker.ID);
+        final Optional<Resource> srcFolder = resource.getParentWithMarker(SourceFolderMarker.ID);
 
         if (!srcFolder.isPresent()) {
             throw new IllegalStateException("Fully qualified name can not be resolved for '" + resource.getLocation() + "'");

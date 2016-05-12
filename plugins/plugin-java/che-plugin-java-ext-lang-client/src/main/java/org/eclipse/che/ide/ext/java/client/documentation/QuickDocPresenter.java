@@ -20,7 +20,7 @@ import org.eclipse.che.ide.api.editor.EditorPartPresenter;
 import org.eclipse.che.ide.api.resources.Container;
 import org.eclipse.che.ide.api.resources.Project;
 import org.eclipse.che.ide.api.resources.Resource;
-import org.eclipse.che.ide.ext.java.client.resource.JavaSourceFolderMarker;
+import org.eclipse.che.ide.ext.java.client.resource.SourceFolderMarker;
 import org.eclipse.che.ide.ext.java.client.util.JavaUtil;
 import org.eclipse.che.ide.jseditor.client.position.PositionConverter;
 import org.eclipse.che.ide.jseditor.client.texteditor.EmbeddedTextEditorPresenter;
@@ -67,7 +67,7 @@ public class QuickDocPresenter implements QuickDocumentation, QuickDocView.Actio
         if (resource != null) {
             final Project project = resource.getRelatedProject();
 
-            final Optional<Resource> srcFolder = resource.getParentWithMarker(JavaSourceFolderMarker.ID);
+            final Optional<Resource> srcFolder = resource.getParentWithMarker(SourceFolderMarker.ID);
 
             if (!srcFolder.isPresent()) {
                 return;

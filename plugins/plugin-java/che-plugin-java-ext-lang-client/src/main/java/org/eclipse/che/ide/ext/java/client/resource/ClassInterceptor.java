@@ -8,22 +8,17 @@
  * Contributors:
  *   Codenvy, S.A. - initial API and implementation
  *******************************************************************************/
-package org.eclipse.che.ide.extension.maven.client.resource;
+package org.eclipse.che.ide.ext.java.client.resource;
 
 import com.google.inject.Singleton;
 
-import org.eclipse.che.ide.api.resources.Project;
+import org.eclipse.che.ide.api.resources.File;
 import org.eclipse.che.ide.api.resources.Resource;
 import org.eclipse.che.ide.api.resources.ResourceInterceptor;
 import org.eclipse.che.ide.api.resources.marker.PresentableTextMarker;
-import org.eclipse.che.ide.extension.maven.shared.MavenAttributes;
-
-import java.util.List;
-import java.util.Map;
 
 import static org.eclipse.che.ide.api.resources.Resource.FILE;
-import static org.eclipse.che.ide.extension.maven.shared.MavenAttributes.ARTIFACT_ID;
-import static org.eclipse.che.ide.extension.maven.shared.MavenAttributes.POM_XML;
+import static org.eclipse.che.ide.ext.java.client.util.JavaUtil.isJavaFile;
 
 /**
  * Intercept java based files (.java), cut extension and adds the marker which is responsible for displaying presentable text
@@ -33,7 +28,7 @@ import static org.eclipse.che.ide.extension.maven.shared.MavenAttributes.POM_XML
  * @since 4.1.0-RC1
  */
 @Singleton
-public class PomInterceptor implements ResourceInterceptor {
+public class ClassInterceptor implements ResourceInterceptor {
 
     /** {@inheritDoc} */
     @Override
@@ -42,27 +37,12 @@ public class PomInterceptor implements ResourceInterceptor {
             return resource;
         }
 
-        if (!POM_XML.equals(resource.getName())) {
-            return resource;
+        if (isJavaFile(resource)) {
+            final String name = resource.getName();
+            final String extension = ((File)resource).getFileExtension();
+
+            resource.addMarker(new PresentableTextMarker(name.substring(0, name.length() - extension.length() - 1)));
         }
-
-        final Project project = resource.getRelatedProject();
-
-        if (!project.getType().equals(MavenAttributes.MAVEN_ID)) {
-            return resource;
-        }
-
-        final Map<String, List<String>> attributes = project.getAttributes();
-
-        final String displayName;
-
-        if (attributes != null && attributes.containsKey(ARTIFACT_ID)) {
-            displayName = attributes.get(ARTIFACT_ID).get(0);
-        } else {
-            displayName = project.getName() + "/" + resource.getName();
-        }
-
-        resource.addMarker(new PresentableTextMarker(displayName));
 
         return resource;
     }

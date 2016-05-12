@@ -13,7 +13,7 @@ package org.eclipse.che.plugin.java.plain.client.wizard;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 
-import org.eclipse.che.api.workspace.shared.dto.ProjectConfigDto;
+import org.eclipse.che.ide.api.project.MutableProjectConfig;
 import org.eclipse.che.ide.api.project.type.wizard.ProjectWizardRegistrar;
 import org.eclipse.che.ide.api.wizard.WizardPage;
 
@@ -46,7 +46,7 @@ public class PlainJavaProjectWizardRegistrar implements ProjectWizardRegistrar {
     }
 
     @NotNull
-    public List<Provider<? extends WizardPage<ProjectConfigDto>>> getWizardPages() {
+    public List<Provider<? extends WizardPage<MutableProjectConfig>>> getWizardPages() {
         return new ArrayList<>();
     }
 }

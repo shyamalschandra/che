@@ -15,6 +15,8 @@ import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
 import com.google.web.bindery.event.shared.EventBus;
 
+import org.eclipse.che.api.promises.client.Function;
+import org.eclipse.che.api.promises.client.FunctionException;
 import org.eclipse.che.api.promises.client.Promise;
 import org.eclipse.che.api.promises.client.js.Promises;
 import org.eclipse.che.commons.annotation.Nullable;
@@ -28,6 +30,7 @@ import org.eclipse.che.ide.api.theme.Style;
 import org.eclipse.che.ide.ext.java.client.JavaResources;
 import org.eclipse.che.ide.ext.java.client.navigation.service.JavaNavigationService;
 import org.eclipse.che.ide.ext.java.shared.JarEntry;
+import org.eclipse.che.ide.ext.java.shared.dto.ClassContent;
 import org.eclipse.che.ide.project.node.SyntheticNode;
 import org.eclipse.che.ide.project.shared.NodesResources;
 import org.eclipse.che.ide.resource.Path;
@@ -153,9 +156,19 @@ public class JarFileNode extends SyntheticNode<JarEntry> implements VirtualFile,
     @Override
     public Promise<String> getContent() {
         if (libId != -1) {
-            return service.getContent(project, libId, Path.valueOf(getData().getPath()));
+            return service.getContent(project, libId, Path.valueOf(getData().getPath())).then(new Function<ClassContent, String>() {
+                @Override
+                public String apply(ClassContent arg) throws FunctionException {
+                    return arg.getContent();
+                }
+            });
         } else {
-            return service.getContent(project, getData().getPath());
+            return service.getContent(project, getData().getPath()).then(new Function<ClassContent, String>() {
+                @Override
+                public String apply(ClassContent arg) throws FunctionException {
+                    return arg.getContent();
+                }
+            });
         }
     }
 

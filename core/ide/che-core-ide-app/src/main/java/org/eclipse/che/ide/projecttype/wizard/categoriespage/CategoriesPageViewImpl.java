@@ -14,6 +14,8 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.SpanElement;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.resources.client.CssResource;
@@ -29,6 +31,7 @@ import org.eclipse.che.ide.Resources;
 import org.eclipse.che.ide.api.icon.Icon;
 import org.eclipse.che.ide.api.icon.IconRegistry;
 import org.eclipse.che.ide.projecttype.wizard.ProjectWizardResources;
+import org.eclipse.che.ide.resource.Path;
 import org.eclipse.che.ide.ui.list.CategoriesList;
 import org.eclipse.che.ide.ui.list.Category;
 import org.eclipse.che.ide.ui.list.CategoryRenderer;
@@ -104,6 +107,10 @@ public class CategoriesPageViewImpl implements CategoriesPageView {
     TextBox     projectName;
     @UiField
     TextArea    projectDescription;
+    @UiField
+    Button selectPath;
+    @UiField
+    TextBox parentPath;
 
     private ActionDelegate delegate;
     private Map<String, Set<ProjectTypeDto>>     typesByCategory;
@@ -135,6 +142,13 @@ public class CategoriesPageViewImpl implements CategoriesPageView {
         projectDescription.getElement().setAttribute("placeholder", "Add a description to your project...");
         projectDescription.getElement().setAttribute("maxlength", "256");
         setConfigOptions(null);
+
+        selectPath.addClickHandler(new ClickHandler() {
+            @Override
+            public void onClick(ClickEvent event) {
+                delegate.selectPathClicked();
+            }
+        });
     }
 
     @UiHandler("projectName")
@@ -314,6 +328,11 @@ public class CategoriesPageViewImpl implements CategoriesPageView {
     @Override
     public void setNameFieldReadOnly(boolean readOnly) {
         projectName.setReadOnly(readOnly);
+    }
+
+    @Override
+    public void setParentPath(Path path) {
+        parentPath.setText(path.toString());
     }
 
     @Override

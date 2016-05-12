@@ -111,7 +111,8 @@ abstract class ResourceImpl implements Resource {
         Optional<Container> optionalParent = getParent();
 
         if (!optionalParent.isPresent()) {
-            throw new IllegalStateException("Related project wasn't found");
+            return null; //TODO need to return an optional
+//            throw new IllegalStateException("Related project wasn't found");
         }
 
         Container parent = optionalParent.get();
@@ -139,7 +140,7 @@ abstract class ResourceImpl implements Resource {
     /** {@inheritDoc} */
     @Override
     public String getName() {
-        return path.lastSegment();
+        return path.isRoot() ? "Workspace" : path.lastSegment();
     }
 
     /** {@inheritDoc} */

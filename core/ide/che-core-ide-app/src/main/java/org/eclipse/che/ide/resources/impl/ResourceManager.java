@@ -69,7 +69,6 @@ import static java.util.Arrays.copyOf;
 import static org.eclipse.che.ide.api.resources.Resource.FILE;
 import static org.eclipse.che.ide.api.resources.Resource.PROJECT;
 import static org.eclipse.che.ide.api.resources.ResourceDelta.ADDED;
-import static org.eclipse.che.ide.api.resources.ResourceDelta.CONTENT;
 import static org.eclipse.che.ide.api.resources.ResourceDelta.COPIED_FROM;
 import static org.eclipse.che.ide.api.resources.ResourceDelta.DERIVED;
 import static org.eclipse.che.ide.api.resources.ResourceDelta.MOVED_FROM;
@@ -409,7 +408,7 @@ public final class ResourceManager {
         checkArgument(checkProjectName(createRequest.getBody().getName()), "Invalid project name");
         checkArgument(typeRegistry.getProjectType(createRequest.getBody().getType()) != null, "Invalid project type");
 
-        final Path path = Path.valueOf(createRequest.getBody().getName()).makeAbsolute();
+        final Path path = Path.valueOf(createRequest.getBody().getPath()).append(createRequest.getBody().getName());
 
         return findResource(path, true).thenPromise(new Function<Optional<Resource>, Promise<Project>>() {
             @Override
@@ -918,7 +917,7 @@ public final class ResourceManager {
                     }
                 }
 
-                return getRemoteResources(container, maxDepth - 1, true);
+                return getRemoteResources(container, maxDepth, true);
             }
         });
     }
@@ -1115,6 +1114,13 @@ public final class ResourceManager {
                 });
             }
         });
+    }
+
+    protected Promise<SourceEstimation> estimate(Container container, String projectType) {
+        checkArgument(projectType != null, "Null project type");
+        checkArgument(!projectType.isEmpty(), "Empty project type");
+
+        return ps.estimate(devMachine, container.getLocation(), projectType);
     }
 
     protected void notifyMarkerChanged(Resource resource, Marker marker, int status) {

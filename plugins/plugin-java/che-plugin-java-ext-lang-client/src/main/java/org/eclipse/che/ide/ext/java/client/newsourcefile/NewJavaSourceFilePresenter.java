@@ -22,7 +22,7 @@ import org.eclipse.che.ide.api.resources.Container;
 import org.eclipse.che.ide.api.resources.File;
 import org.eclipse.che.ide.api.resources.Folder;
 import org.eclipse.che.ide.api.resources.Resource;
-import org.eclipse.che.ide.ext.java.client.resource.JavaSourceFolderMarker;
+import org.eclipse.che.ide.ext.java.client.resource.SourceFolderMarker;
 import org.eclipse.che.ide.resource.Path;
 
 import java.util.Arrays;
@@ -167,7 +167,7 @@ public class NewJavaSourceFilePresenter implements NewJavaSourceFileView.ActionD
     }
 
     private String getPackageQualifier(String packageFragment) {
-        final Optional<Resource> srcFolder = parent.getParentWithMarker(JavaSourceFolderMarker.ID);
+        final Optional<Resource> srcFolder = parent.getParentWithMarker(SourceFolderMarker.ID);
 
         if (!srcFolder.isPresent() || isNullOrEmpty(packageFragment)) {
             return "\n";

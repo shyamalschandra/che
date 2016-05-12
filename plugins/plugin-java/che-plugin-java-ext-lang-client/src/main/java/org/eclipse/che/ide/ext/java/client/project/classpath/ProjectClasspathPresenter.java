@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.java.client.project.classpath;
 
+import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -17,9 +18,9 @@ import org.eclipse.che.api.promises.client.Operation;
 import org.eclipse.che.api.promises.client.OperationException;
 import org.eclipse.che.api.promises.client.PromiseError;
 import org.eclipse.che.ide.api.app.AppContext;
-import org.eclipse.che.ide.api.app.CurrentProject;
 import org.eclipse.che.ide.api.notification.NotificationManager;
-import org.eclipse.che.ide.api.notification.StatusNotification;
+import org.eclipse.che.ide.api.resources.Project;
+import org.eclipse.che.ide.api.resources.Resource;
 import org.eclipse.che.ide.ext.java.client.JavaLocalizationConstant;
 import org.eclipse.che.ide.ext.java.client.project.classpath.service.ClasspathServiceClient;
 import org.eclipse.che.ide.ext.java.client.project.classpath.valueproviders.pages.ClasspathPagePresenter;
@@ -36,6 +37,7 @@ import java.util.Set;
 
 import static org.eclipse.che.ide.api.notification.StatusNotification.DisplayMode.EMERGE_MODE;
 import static org.eclipse.che.ide.api.notification.StatusNotification.Status.FAIL;
+import static org.eclipse.che.ide.ext.java.client.util.JavaUtil.isJavaProject;
 
 /**
  * Presenter for managing classpath.
@@ -139,13 +141,16 @@ public class ProjectClasspathPresenter implements ProjectClasspathView.ActionDel
 
     /** Show dialog. */
     public void show() {
-        CurrentProject currentProject = appContext.getCurrentProject();
-        if (currentProject == null) {
-            return;
-        }
 
-        String projectPath = currentProject.getProjectConfig().getPath();
-        service.getClasspath(projectPath).then(new Operation<List<ClasspathEntryDTO>>() {
+        final Resource[] resources = appContext.getResources();
+
+        Preconditions.checkState(resources != null && resources.length == 1);
+
+        final Project project = resources[0].getRelatedProject();
+
+        Preconditions.checkState(isJavaProject(project));
+
+        service.getClasspath(project.getLocation().toString()).then(new Operation<List<ClasspathEntryDTO>>() {
             @Override
             public void apply(List<ClasspathEntryDTO> arg) throws OperationException {
                 classpathResolver.resolveClasspathEntries(arg);

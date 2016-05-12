@@ -30,8 +30,8 @@ import org.eclipse.che.ide.api.editor.EditorPartPresenter;
 import org.eclipse.che.ide.api.event.FileContentUpdateEvent;
 import org.eclipse.che.ide.api.notification.NotificationManager;
 import org.eclipse.che.ide.api.notification.StatusNotification;
-import org.eclipse.che.ide.api.project.tree.VirtualFile;
-import org.eclipse.che.ide.ext.java.client.project.node.jar.JarFileNode;
+import org.eclipse.che.ide.api.resources.VirtualFile;
+import org.eclipse.che.ide.ext.java.client.tree.library.JarFileNode;
 import org.eclipse.che.plugin.maven.client.MavenLocalizationConstant;
 import org.eclipse.che.plugin.maven.client.MavenResources;
 import org.eclipse.che.plugin.maven.client.service.MavenServerServiceClient;
@@ -77,31 +77,29 @@ public class ClassFileSourcesDownloader implements EditorOpenedEventHandler {
         VirtualFile file = editor.getEditorInput().getFile();
         if (file instanceof JarFileNode) {
             final JarFileNode jarFileNode = (JarFileNode)file;
-            if (jarFileNode.isContentGenerated()) {
-                if (editor instanceof EmbeddedTextEditorPresenter) {
-                    final EmbeddedTextEditorPresenter presenter = (EmbeddedTextEditorPresenter)editor;
-                    EmbeddedTextEditorPartView view = presenter.getView();
-                    final DivElement divElement = Elements.createDivElement();
-                    divElement.setClassName(resources.css().editorInfoPanel());
-                    Text textNode = Elements.createTextNode(constant.mavenClassDecompiled());
-                    DivElement decompiledElement = Elements.createDivElement();
-                    decompiledElement.appendChild(textNode);
-                    decompiledElement.setClassName(resources.css().editorMessage());
-                    divElement.appendChild(decompiledElement);
-                    AnchorElement anchorElement = Elements.createAnchorElement();
-                    anchorElement.appendChild(Elements.createTextNode(constant.mavenDownloadSources()));
-                    anchorElement.setHref("#");
-                    anchorElement.setClassName(resources.css().downloadLink());
+            if (editor instanceof EmbeddedTextEditorPresenter) {
+                final EmbeddedTextEditorPresenter presenter = (EmbeddedTextEditorPresenter)editor;
+                EmbeddedTextEditorPartView view = presenter.getView();
+                final DivElement divElement = Elements.createDivElement();
+                divElement.setClassName(resources.css().editorInfoPanel());
+                Text textNode = Elements.createTextNode(constant.mavenClassDecompiled());
+                DivElement decompiledElement = Elements.createDivElement();
+                decompiledElement.appendChild(textNode);
+                decompiledElement.setClassName(resources.css().editorMessage());
+                divElement.appendChild(decompiledElement);
+                AnchorElement anchorElement = Elements.createAnchorElement();
+                anchorElement.appendChild(Elements.createTextNode(constant.mavenDownloadSources()));
+                anchorElement.setHref("#");
+                anchorElement.setClassName(resources.css().downloadLink());
 
-                    divElement.appendChild(anchorElement);
-                    final HasNotificationPanel.NotificationRemover remover = view.addNotification((Element)divElement);
-                    anchorElement.setOnclick(new EventListener() {
-                        @Override
-                        public void handleEvent(Event evt) {
-                            downloadSources(jarFileNode, remover);
-                        }
-                    });
-                }
+                divElement.appendChild(anchorElement);
+                final HasNotificationPanel.NotificationRemover remover = view.addNotification((Element)divElement);
+                anchorElement.setOnclick(new EventListener() {
+                    @Override
+                    public void handleEvent(Event evt) {
+                        downloadSources(jarFileNode, remover);
+                    }
+                });
             }
         }
     }
@@ -113,7 +111,7 @@ public class ClassFileSourcesDownloader implements EditorOpenedEventHandler {
         promise.then(new Operation<Boolean>() {
             @Override
             public void apply(Boolean arg) throws OperationException {
-                if(arg){
+                if (arg) {
                     eventBus.fireEvent(new FileContentUpdateEvent(path));
                 } else {
                     notificationManager.notify(constant.mavenClassDownloadFailed(path), StatusNotification.Status.FAIL, EMERGE_MODE);

@@ -13,6 +13,8 @@ package org.eclipse.che.ide.api.resources;
 import com.google.common.annotations.Beta;
 import com.google.common.base.Optional;
 
+import org.eclipse.che.api.core.model.project.type.ProjectType;
+import org.eclipse.che.api.project.shared.dto.SourceEstimation;
 import org.eclipse.che.api.promises.client.Promise;
 import org.eclipse.che.ide.api.resources.Project.ProjectRequest;
 import org.eclipse.che.ide.api.workspace.Workspace;
@@ -436,5 +438,52 @@ public interface Container extends Resource {
      */
     Promise<Resource[]> search(String fileMask, String contentMask);
 
+    /**
+     * Returns the plain list of file tree with given {@code depth}.
+     * <p/>
+     * Input {@code depth} should be within the range from -1 to {@link Integer#MAX_VALUE}.
+     * <p/>
+     * In case if {@code depth} equals to 0, then empty resource is returned.
+     * In case if {@code depth} equals to -1, then whole file tree is loaded and returned.
+     * <p/>
+     * Method doesn't guarantee that resources will be sorted by their {@link #getLocation()} in any order.
+     * <p/>
+     * Fires {@link ResourceChangedEvent} with the following {@link ResourceDelta}:
+     * Delta kind: {@link ResourceDelta#ADDED}.
+     * Cached and loaded resource provided by {@link ResourceDelta#getResource()}.
+     * <p/>
+     * Or
+     * <p/>
+     * Delta kind: {@link ResourceDelta#UPDATED}. When resource was cached previously.
+     * Updated resource provided by {@link ResourceDelta#getResource()}.
+     *
+     * @param depth
+     *         the depth
+     * @return plain array of loaded resources
+     * @throws IllegalArgumentException
+     *         in case if invalid depth passed as argument. i.e. depth equals -2, -3 and so on. Reasons include:
+     *         <ul>
+     *         <li>Invalid depth</li>
+     *         </ul>
+     * @since 4.3.0
+     */
     Promise<Resource[]> getTree(int depth);
+
+    /**
+     * Estimates if the current container supposed to be a project within certain {@code projectType}.
+     *
+     * @param projectType
+     *         the project type to estimate for
+     * @return the {@link SourceEstimation} with estimated attributes
+     * @throws IllegalArgumentException
+     *         in case if project type is {@code null} or empty. Reasons include:
+     *         <ul>
+     *         <li>Null project type</li>
+     *         <li>Empty project type</li>
+     *         </ul>
+     * @see SourceEstimation
+     * @see ProjectType#getId()
+     * @since 4.3.0
+     */
+    Promise<SourceEstimation> estimate(String projectType);
 }

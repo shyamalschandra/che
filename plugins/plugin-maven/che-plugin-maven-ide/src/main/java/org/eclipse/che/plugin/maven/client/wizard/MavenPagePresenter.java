@@ -10,20 +10,21 @@
  *******************************************************************************/
 package org.eclipse.che.plugin.maven.client.wizard;
 
+import com.google.common.base.Optional;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 
-import org.eclipse.che.api.project.gwt.client.ProjectServiceClient;
 import org.eclipse.che.api.project.shared.dto.SourceEstimation;
-import org.eclipse.che.ide.api.app.AppContext;
+import org.eclipse.che.api.promises.client.Operation;
+import org.eclipse.che.api.promises.client.OperationException;
 import org.eclipse.che.ide.api.project.MutableProjectConfig;
 import org.eclipse.che.ide.api.project.type.wizard.ProjectWizardMode;
+import org.eclipse.che.ide.api.resources.Container;
 import org.eclipse.che.ide.api.wizard.AbstractWizardPage;
+import org.eclipse.che.ide.api.workspace.Workspace;
 import org.eclipse.che.plugin.maven.client.MavenArchetype;
 import org.eclipse.che.plugin.maven.client.MavenExtension;
-import org.eclipse.che.ide.rest.AsyncRequestCallback;
-import org.eclipse.che.ide.rest.DtoUnmarshallerFactory;
 
 import javax.validation.constraints.NotNull;
 import java.util.Arrays;
@@ -31,6 +32,7 @@ import java.util.List;
 import java.util.Map;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
+import static java.util.Collections.singletonList;
 import static org.eclipse.che.ide.api.project.type.wizard.ProjectWizardMode.CREATE;
 import static org.eclipse.che.ide.api.project.type.wizard.ProjectWizardMode.UPDATE;
 import static org.eclipse.che.ide.api.project.type.wizard.ProjectWizardRegistrar.WIZARD_MODE_KEY;
@@ -56,24 +58,17 @@ public class MavenPagePresenter extends AbstractWizardPage<MutableProjectConfig>
 
     protected final MavenPageView          view;
     protected final EventBus               eventBus;
-    private final   ProjectServiceClient   projectServiceClient;
-    private final   DtoUnmarshallerFactory dtoUnmarshallerFactory;
-    private final   AppContext             appContext;
+    private final   Workspace              workspace;
 
     @Inject
     public MavenPagePresenter(MavenPageView view,
                               EventBus eventBus,
-                              AppContext appContext,
-                              ProjectServiceClient projectServiceClient,
-                              DtoUnmarshallerFactory dtoUnmarshallerFactory) {
+                              Workspace workspace) {
         super();
         this.view = view;
         this.eventBus = eventBus;
-        this.projectServiceClient = projectServiceClient;
-        this.dtoUnmarshallerFactory = dtoUnmarshallerFactory;
+        this.workspace = workspace;
         view.setDelegate(this);
-
-        this.appContext = appContext;
     }
 
     @Override
@@ -93,12 +88,18 @@ public class MavenPagePresenter extends AbstractWizardPage<MutableProjectConfig>
     }
 
     private void estimateAndSetAttributes() {
-        projectServiceClient.estimateProject(appContext.getDevMachine(),
-                                             dataObject.getPath(), MAVEN_ID,
-                new AsyncRequestCallback<SourceEstimation>(dtoUnmarshallerFactory.newUnmarshaller(SourceEstimation.class)) {
+
+        workspace.getWorkspaceRoot().getContainer(dataObject.getPath()).then(new Operation<Optional<Container>>() {
+            @Override
+            public void apply(Optional<Container> container) throws OperationException {
+                if (!container.isPresent()) {
+                    return;
+                }
+
+                container.get().estimate(MAVEN_ID).then(new Operation<SourceEstimation>() {
                     @Override
-                    protected void onSuccess(SourceEstimation result) {
-                        Map<String, List<String>> estimatedAttributes = result.getAttributes();
+                    public void apply(SourceEstimation estimation) throws OperationException {
+                        Map<String, List<String>> estimatedAttributes = estimation.getAttributes();
                         List<String> artifactIdValues = estimatedAttributes.get(ARTIFACT_ID);
                         if (artifactIdValues != null && !artifactIdValues.isEmpty()) {
                             setAttribute(ARTIFACT_ID, artifactIdValues.get(0));
@@ -127,14 +128,9 @@ public class MavenPagePresenter extends AbstractWizardPage<MutableProjectConfig>
 
                         updateDelegate.updateControls();
                     }
-
-                    @Override
-                    protected void onFailure(Throwable exception) {
-//                        final String message = dtoFactory.createDtoFromJson(exception.getMessage(), ServiceError.class).getMessage();
-//                        dialogFactory.createMessageDialog("Not valid Maven project", message, null).show();
-//                        Log.error(MavenPagePresenter.class, exception);
-                    }
                 });
+            }
+        });
     }
 
     @Override
@@ -235,12 +231,6 @@ public class MavenPagePresenter extends AbstractWizardPage<MutableProjectConfig>
             view.setArchetypes(MavenExtension.getAvailableArchetypes());
         }
 
-//        final GeneratorDescription generatorDescription = dtoFactory.createDto(GeneratorDescription.class);
-//        if (isGenerateFromArchetype) {
-//            fillGeneratorDescription(generatorDescription);
-//        }
-//        dataObject.setGeneratorDescription(generatorDescription);
-
         updateDelegate.updateControls();
     }
 
@@ -248,19 +238,6 @@ public class MavenPagePresenter extends AbstractWizardPage<MutableProjectConfig>
     public void archetypeChanged(MavenArchetype archetype) {
         updateDelegate.updateControls();
     }
-
-//    private void fillGeneratorDescription(GeneratorDescription generatorDescription) {
-//        MavenArchetype archetype = view.getArchetype();
-//        HashMap<String, String> options = new HashMap<>();
-//        options.put(GENERATION_STRATEGY_OPTION, ARCHETYPE_GENERATION_STRATEGY);
-//        options.put(ARCHETYPE_GROUP_ID_OPTION, archetype.getGroupId());
-//        options.put(ARCHETYPE_ARTIFACT_ID_OPTION, archetype.getArtifactId());
-//        options.put(ARCHETYPE_VERSION_OPTION, archetype.getVersion());
-//        if (archetype.getRepository() != null) {
-//            options.put(ARCHETYPE_REPOSITORY_OPTION, archetype.getRepository());
-//        }
-//        generatorDescription.setOptions(options);
-//    }
 
     private void validateCoordinates() {
         view.showArtifactIdMissingIndicator(view.getArtifactId().isEmpty());
@@ -282,6 +259,6 @@ public class MavenPagePresenter extends AbstractWizardPage<MutableProjectConfig>
     /** Sets single value of attribute of data-object. */
     private void setAttribute(String attrId, String value) {
         Map<String, List<String>> attributes = dataObject.getAttributes();
-        attributes.put(attrId, Arrays.asList(value));
+        attributes.put(attrId, singletonList(value));
     }
 }

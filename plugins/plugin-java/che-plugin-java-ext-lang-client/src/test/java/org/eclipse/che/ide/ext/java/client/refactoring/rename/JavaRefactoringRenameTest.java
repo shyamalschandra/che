@@ -30,7 +30,7 @@ import org.eclipse.che.ide.ext.java.client.JavaLocalizationConstant;
 import org.eclipse.che.ide.ext.java.client.refactoring.RefactoringUpdater;
 import org.eclipse.che.ide.ext.java.client.refactoring.rename.wizard.RenamePresenter;
 import org.eclipse.che.ide.ext.java.client.refactoring.service.RefactoringServiceClient;
-import org.eclipse.che.ide.ext.java.client.resource.JavaSourceFolderMarker;
+import org.eclipse.che.ide.ext.java.client.resource.SourceFolderMarker;
 import org.eclipse.che.ide.ext.java.shared.dto.LinkedModeModel;
 import org.eclipse.che.ide.ext.java.shared.dto.refactoring.ChangeInfo;
 import org.eclipse.che.ide.ext.java.shared.dto.refactoring.CreateRenameRefactoring;
@@ -166,7 +166,7 @@ public class JavaRefactoringRenameTest {
         when(editorInput.getFile()).thenReturn(file);
         when(file.getName()).thenReturn("A.java");
         when(file.getFileExtension()).thenReturn("java");
-        when(file.getParentWithMarker(eq(JavaSourceFolderMarker.ID))).thenReturn(Optional.of(srcFolder));
+        when(file.getParentWithMarker(eq(SourceFolderMarker.ID))).thenReturn(Optional.of(srcFolder));
         when(file.getLocation()).thenReturn(Path.valueOf("/project/src/a/b/c/A.java"));
         when(file.getResourceType()).thenReturn(Resource.FILE);
         when(srcFolder.getLocation()).thenReturn(Path.valueOf("/project/src"));

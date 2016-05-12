@@ -8,42 +8,42 @@
  * Contributors:
  *   Codenvy, S.A. - initial API and implementation
  *******************************************************************************/
-package org.eclipse.che.ide.ext.java.client.resource;
+package org.eclipse.che.plugin.maven.client.resource;
 
-import com.google.inject.Singleton;
-
-import org.eclipse.che.ide.api.resources.File;
+import org.eclipse.che.ide.api.resources.Project;
 import org.eclipse.che.ide.api.resources.Resource;
 import org.eclipse.che.ide.api.resources.ResourceInterceptor;
 import org.eclipse.che.ide.api.resources.marker.PresentableTextMarker;
+import org.eclipse.che.plugin.maven.shared.MavenAttributes;
 
-import static org.eclipse.che.ide.api.resources.Resource.FILE;
-import static org.eclipse.che.ide.ext.java.client.util.JavaUtil.isJavaFile;
+import java.util.List;
+import java.util.Map;
+
+import static org.eclipse.che.ide.api.resources.Resource.PROJECT;
 
 /**
- * Intercept java based files (.java), cut extension and adds the marker which is responsible for displaying presentable text
- * to the corresponding resource.
- *
  * @author Vlad Zhukovskiy
- * @since 4.1.0-RC1
  */
-@Singleton
-public class JavaClassInterceptor implements ResourceInterceptor {
+public class MavenProjectInterceptor implements ResourceInterceptor {
 
     /** {@inheritDoc} */
     @Override
     public Resource intercept(Resource resource) {
-        if (resource.getResourceType() != FILE) {
+        if (resource.getResourceType() != PROJECT) {
             return resource;
         }
 
-        if (isJavaFile(resource)) {
-            final String name = resource.getName();
-            final String extension = ((File)resource).getFileExtension();
+        final Map<String, List<String>> attributes = ((Project)resource).getAttributes();
 
-            resource.addMarker(new PresentableTextMarker(name.substring(0, name.length() - extension.length() - 1)));
+        if (attributes != null && attributes.containsKey(MavenAttributes.ARTIFACT_ID)) {
+            final String artifactId = attributes.get(MavenAttributes.ARTIFACT_ID).get(0);
+
+            if (!artifactId.equals(resource.getName())) {
+                resource.addMarker(new PresentableTextMarker("[" + artifactId + "]"));
+            }
         }
 
         return resource;
     }
+
 }

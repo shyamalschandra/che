@@ -29,7 +29,7 @@ import org.eclipse.che.ide.api.texteditor.UndoableEditor;
 import org.eclipse.che.ide.dto.DtoFactory;
 import org.eclipse.che.ide.ext.java.client.JavaLocalizationConstant;
 import org.eclipse.che.ide.ext.java.client.editor.JavaCodeAssistClient;
-import org.eclipse.che.ide.ext.java.client.resource.JavaSourceFolderMarker;
+import org.eclipse.che.ide.ext.java.client.resource.SourceFolderMarker;
 import org.eclipse.che.ide.ext.java.client.util.JavaUtil;
 import org.eclipse.che.ide.ext.java.shared.dto.ConflictImportDTO;
 import org.eclipse.che.ide.jseditor.client.document.Document;
@@ -94,7 +94,7 @@ public class OrganizeImportsPresenter implements OrganizeImportsView.ActionDeleg
         if (file instanceof Resource) {
             final Project project = ((Resource)file).getRelatedProject();
 
-            final Optional<Resource> srcFolder = ((Resource)file).getParentWithMarker(JavaSourceFolderMarker.ID);
+            final Optional<Resource> srcFolder = ((Resource)file).getParentWithMarker(SourceFolderMarker.ID);
 
             if (!srcFolder.isPresent()) {
                 return;

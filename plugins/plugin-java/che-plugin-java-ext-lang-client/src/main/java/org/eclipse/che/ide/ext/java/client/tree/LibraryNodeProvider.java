@@ -11,6 +11,7 @@
 package org.eclipse.che.ide.ext.java.client.tree;
 
 import com.google.common.annotations.Beta;
+import com.google.inject.Inject;
 
 import org.eclipse.che.api.promises.client.Promise;
 import org.eclipse.che.api.promises.client.PromiseProvider;
@@ -31,12 +32,13 @@ import static org.eclipse.che.ide.ext.java.client.util.JavaUtil.isJavaProject;
  * @author Vlad Zhukovskiy
  */
 @Beta
-public abstract class LibraryNodeProvider implements NodeInterceptor {
+public class LibraryNodeProvider implements NodeInterceptor {
 
     private final JavaNodeFactory  nodeFactory;
     private final PromiseProvider  promises;
     private final SettingsProvider settingsProvider;
 
+    @Inject
     public LibraryNodeProvider(JavaNodeFactory nodeFactory,
                                PromiseProvider promises,
                                SettingsProvider settingsProvider) {
@@ -74,5 +76,7 @@ public abstract class LibraryNodeProvider implements NodeInterceptor {
         return NORM_PRIORITY;
     }
 
-    public abstract boolean isDisplayLibraries(Project project);
+    public boolean isDisplayLibraries(Project project) {
+        return true;
+    }
 }

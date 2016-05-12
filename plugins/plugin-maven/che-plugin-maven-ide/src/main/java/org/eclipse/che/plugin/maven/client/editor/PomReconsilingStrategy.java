@@ -20,13 +20,13 @@ import org.eclipse.che.ide.api.editor.EditorWithErrors;
 import org.eclipse.che.ide.api.text.Region;
 import org.eclipse.che.ide.ext.java.client.editor.ProblemRequester;
 import org.eclipse.che.ide.ext.java.shared.dto.Problem;
-import org.eclipse.che.plugin.maven.client.service.MavenServerServiceClient;
 import org.eclipse.che.ide.jseditor.client.annotation.AnnotationModel;
 import org.eclipse.che.ide.jseditor.client.document.Document;
 import org.eclipse.che.ide.jseditor.client.reconciler.DirtyRegion;
 import org.eclipse.che.ide.jseditor.client.reconciler.ReconcilingStrategy;
 import org.eclipse.che.ide.jseditor.client.texteditor.EmbeddedTextEditorPresenter;
 import org.eclipse.che.ide.util.loging.Log;
+import org.eclipse.che.plugin.maven.client.service.MavenServerServiceClient;
 
 import javax.validation.constraints.NotNull;
 import java.util.List;
@@ -43,7 +43,6 @@ public class PomReconsilingStrategy implements ReconcilingStrategy {
                                            editor;
     private final MavenServerServiceClient client;
     private       String                   pomPath;
-    private       String                   projectPath;
 
     @Inject
     public PomReconsilingStrategy(@Assisted AnnotationModel annotationModel,
@@ -56,8 +55,7 @@ public class PomReconsilingStrategy implements ReconcilingStrategy {
 
     @Override
     public void setDocument(Document document) {
-        pomPath = document.getFile().getPath();
-        projectPath = document.getFile().getProject().getProjectConfig().getPath();
+        pomPath = document.getFile().getLocation().toString();
     }
 
     @Override

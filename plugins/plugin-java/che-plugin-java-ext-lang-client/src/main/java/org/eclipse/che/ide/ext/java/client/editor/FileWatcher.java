@@ -23,7 +23,7 @@ import org.eclipse.che.ide.api.parts.PartPresenter;
 import org.eclipse.che.ide.api.parts.PropertyListener;
 import org.eclipse.che.ide.api.resources.Resource;
 import org.eclipse.che.ide.api.resources.ResourceChangedEvent;
-import org.eclipse.che.ide.ext.java.client.resource.JavaSourceFolderMarker;
+import org.eclipse.che.ide.ext.java.client.resource.SourceFolderMarker;
 import org.eclipse.che.ide.jseditor.client.texteditor.EmbeddedTextEditorPresenter;
 
 import java.util.HashSet;
@@ -53,7 +53,7 @@ public class FileWatcher {
                 }
 
                 final Resource resource = event.getDelta().getResource();
-                final Optional<Resource> srcFolder = resource.getParentWithMarker(JavaSourceFolderMarker.ID);
+                final Optional<Resource> srcFolder = resource.getParentWithMarker(SourceFolderMarker.ID);
 
                 if (srcFolder.isPresent()) {
                     reparseAllOpenedFiles();

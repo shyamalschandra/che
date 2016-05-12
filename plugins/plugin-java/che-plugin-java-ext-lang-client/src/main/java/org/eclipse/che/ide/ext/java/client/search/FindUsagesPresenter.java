@@ -33,7 +33,7 @@ import org.eclipse.che.ide.api.resources.VirtualFile;
 import org.eclipse.che.ide.commons.exception.ServerException;
 import org.eclipse.che.ide.dto.DtoFactory;
 import org.eclipse.che.ide.ext.java.client.JavaLocalizationConstant;
-import org.eclipse.che.ide.ext.java.client.resource.JavaSourceFolderMarker;
+import org.eclipse.che.ide.ext.java.client.resource.SourceFolderMarker;
 import org.eclipse.che.ide.ext.java.client.util.JavaUtil;
 import org.eclipse.che.ide.ext.java.shared.dto.search.FindUsagesRequest;
 import org.eclipse.che.ide.ext.java.shared.dto.search.FindUsagesResponse;
@@ -121,7 +121,7 @@ public class FindUsagesPresenter extends BasePresenter implements FindUsagesView
                 return;
             }
 
-            final Optional<Resource> srcFolder = ((Resource)virtualFile).getParentWithMarker(JavaSourceFolderMarker.ID);
+            final Optional<Resource> srcFolder = ((Resource)virtualFile).getParentWithMarker(SourceFolderMarker.ID);
 
             if (!srcFolder.isPresent()) {
                 return;
