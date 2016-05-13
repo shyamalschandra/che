@@ -65,13 +65,19 @@ public class DevMachine {
         return devMachineDescriptor.getConfig().getType();
     }
 
+    /**
+     * Returns base URL to the ws agent websocket endpoint. URL will be always without trailing slash
+     */
     public String getWsAgentWebSocketUrl() {
         DevMachineServer server = getServer(Constants.WSAGENT_REFERENCE);
         if (server != null) {
             String url = server.getUrl();
             String extUrl = url.substring(url.indexOf(':'), url.length());
-            boolean isSecureConnection = Window.Location.getProtocol().equals("https:");
-            return (isSecureConnection ? "wss" : "ws") + extUrl + "/ws/" + getWorkspace();
+            final String protocol = Window.Location.getProtocol().equals("https:") ? "wss" : "ws";
+            return protocol
+                   + extUrl
+                   + (extUrl.endsWith("/") ? "ws/" : "/ws/")
+                   + getWorkspace();
         } else {
             //should not be
             String message = "Reference " + Constants.WSAGENT_REFERENCE + " not found in DevMachine description";

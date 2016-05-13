@@ -34,7 +34,7 @@ public class EventBusURLProvider implements Provider<String> {
     public String get() {
         return UriBuilder.fromUri(apiEndpoint)
                          .scheme(apiEndpoint.startsWith("https") ? "wss" : "ws")
-                         .path("/eventbus/")
+                         .path("/eventbus")
                          .queryParam("token", token)
                          .build()
                          .toString();

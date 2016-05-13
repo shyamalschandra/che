@@ -10,6 +10,8 @@
  *******************************************************************************/
 package org.eclipse.che.everrest;
 
+import com.google.common.base.MoreObjects;
+
 import org.eclipse.che.commons.env.EnvironmentContext;
 import org.eclipse.che.commons.user.User;
 import org.everrest.core.DependencySupplier;
@@ -22,7 +24,6 @@ import org.everrest.core.impl.provider.json.JsonException;
 import org.everrest.core.tools.SimplePrincipal;
 import org.everrest.core.tools.SimpleSecurityContext;
 import org.everrest.core.tools.WebApplicationDeclaredRoles;
-import org.everrest.websockets.WSConnectionImpl;
 import org.everrest.websockets.message.BaseTextDecoder;
 import org.everrest.websockets.message.BaseTextEncoder;
 import org.everrest.websockets.message.JsonMessageConverter;
@@ -44,11 +45,8 @@ import javax.websocket.server.ServerContainer;
 import javax.websocket.server.ServerEndpointConfig;
 import javax.ws.rs.core.SecurityContext;
 import java.security.Principal;
-import java.util.Collections;
-import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
@@ -56,8 +54,6 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import static javax.websocket.server.ServerEndpointConfig.Builder.create;
 import static javax.websocket.server.ServerEndpointConfig.Configurator;
-
-import com.google.common.base.MoreObjects;
 
 /**
  * @author andrew00x
@@ -132,7 +128,7 @@ public class ServerContainerInitializeListener implements ServletContextListener
         final List<Class<? extends Decoder>> decoders = new LinkedList<>();
         encoders.add(OutputMessageEncoder.class);
         decoders.add(InputMessageDecoder.class);
-        final ServerEndpointConfig endpointConfig = create(CheWSConnection.class, websocketContext+"/eventbus/")
+        final ServerEndpointConfig endpointConfig = create(CheWSConnection.class, websocketContext+"/eventbus")
                 .configurator(createConfigurator()).encoders(encoders).decoders(decoders).build();
         endpointConfig.getUserProperties().put(EVERREST_PROCESSOR_ATTRIBUTE, getEverrestProcessor(servletContext));
         endpointConfig.getUserProperties().put(EVERREST_CONFIG_ATTRIBUTE, getEverrestConfiguration(servletContext));
