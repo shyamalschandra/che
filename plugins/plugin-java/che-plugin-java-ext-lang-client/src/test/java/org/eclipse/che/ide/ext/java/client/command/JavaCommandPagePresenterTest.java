@@ -126,7 +126,7 @@ public class JavaCommandPagePresenterTest {
 
         presenter.setDirtyStateListener(listener);
         presenter.resetFrom(configuration);
-        presenter.setMainClass(MAIN_CLASS_PATH, MAIN_CLASS_FQN);
+//        presenter.setMainClass(MAIN_CLASS_PATH, MAIN_CLASS_FQN);
 
         verify(view).setMainClass(RELATIVE_MAIN_CLASS_PATH);
         verify(configuration).setMainClass(RELATIVE_MAIN_CLASS_PATH);

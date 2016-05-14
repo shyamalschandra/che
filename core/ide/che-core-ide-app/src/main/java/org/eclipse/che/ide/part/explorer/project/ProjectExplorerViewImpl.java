@@ -33,6 +33,7 @@ import org.eclipse.che.ide.api.resources.Resource;
 import org.eclipse.che.ide.menu.ContextMenu;
 import org.eclipse.che.ide.project.node.SyntheticNode;
 import org.eclipse.che.ide.resources.tree.ResourceNode;
+import org.eclipse.che.ide.resources.tree.SkipHiddenNodesInterceptor;
 import org.eclipse.che.ide.ui.FontAwesome;
 import org.eclipse.che.ide.ui.Tooltip;
 import org.eclipse.che.ide.ui.smartTree.NodeDescriptor;
@@ -66,6 +67,7 @@ import static org.eclipse.che.ide.ui.smartTree.event.GoIntoStateEvent.State.DEAC
 public class ProjectExplorerViewImpl extends BaseView<ProjectExplorerView.ActionDelegate> implements ProjectExplorerView,
                                                                                                      GoIntoStateHandler {
     private final Tree tree;
+    private final SkipHiddenNodesInterceptor skipHiddenNodesInterceptor;
     private StoreSortInfo foldersOnTopSort = new StoreSortInfo(new NodeTypeComparator(), SortDir.ASC);
 
     private ToolButton goBackButton;
@@ -79,14 +81,17 @@ public class ProjectExplorerViewImpl extends BaseView<ProjectExplorerView.Action
     public ProjectExplorerViewImpl(final Resources resources,
                                    final ContextMenu contextMenu,
                                    final CoreLocalizationConstant coreLocalizationConstant,
-                                   final Set<NodeInterceptor> nodeInterceptorSet) {
+                                   final Set<NodeInterceptor> nodeInterceptorSet,
+                                   SkipHiddenNodesInterceptor skipHiddenNodesInterceptor) {
         super(resources);
+        this.skipHiddenNodesInterceptor = skipHiddenNodesInterceptor;
 
         setTitle(coreLocalizationConstant.projectExplorerTitleBarText());
 
         NodeStorage nodeStorage = new NodeStorage();
 
         NodeLoader nodeLoader = new NodeLoader(nodeInterceptorSet);
+        nodeLoader.getNodeInterceptors().add(skipHiddenNodesInterceptor);
 
         tree = new Tree(nodeStorage, nodeLoader);
         tree.setContextMenuInvocationHandler(new Tree.ContextMenuInvocationHandler() {
@@ -196,6 +201,12 @@ public class ProjectExplorerViewImpl extends BaseView<ProjectExplorerView.Action
     /** {@inheritDoc} */
     @Override
     public void showHiddenFilesForAllExpandedNodes(boolean show) {
+        if (show) {
+            tree.getNodeLoader().getNodeInterceptors().remove(skipHiddenNodesInterceptor);
+        } else {
+            tree.getNodeLoader().getNodeInterceptors().add(skipHiddenNodesInterceptor);
+        }
+
         for (Node node : tree.getRootNodes()) {
             if (node instanceof HasSettings) {
                 ((HasSettings)node).getSettings().setShowHiddenFiles(show);

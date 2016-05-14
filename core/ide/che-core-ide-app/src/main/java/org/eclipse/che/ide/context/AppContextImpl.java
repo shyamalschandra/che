@@ -33,12 +33,18 @@ import org.eclipse.che.ide.api.event.project.ProjectUpdatedEvent;
 import org.eclipse.che.ide.api.event.project.ProjectUpdatedEvent.ProjectUpdatedHandler;
 import org.eclipse.che.ide.api.resources.Project;
 import org.eclipse.che.ide.api.resources.Resource;
+import org.eclipse.che.ide.api.resources.ResourceChangedEvent;
+import org.eclipse.che.ide.api.resources.ResourceChangedEvent.ResourceChangedHandler;
+import org.eclipse.che.ide.api.resources.ResourceDelta;
 import org.eclipse.che.ide.api.selection.Selection;
 import org.eclipse.che.ide.api.workspace.Workspace;
+import org.eclipse.che.ide.util.Arrays;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+
+import static org.eclipse.che.ide.api.resources.ResourceDelta.REMOVED;
 
 /**
  * Implementation of {@link AppContext}.
@@ -48,7 +54,8 @@ import java.util.Set;
  * @author Vlad Zhukovskyi
  */
 @Singleton
-public class AppContextImpl implements AppContext, SelectionChangedHandler, WsAgentStateHandler, ProjectUpdatedHandler {
+public class AppContextImpl implements AppContext, SelectionChangedHandler, WsAgentStateHandler, ProjectUpdatedHandler,
+                                       ResourceChangedHandler {
 
     private final EventBus                  eventBus;
     private final BrowserQueryFieldRenderer browserQueryFieldRenderer;
@@ -82,6 +89,7 @@ public class AppContextImpl implements AppContext, SelectionChangedHandler, WsAg
         eventBus.addHandler(SelectionChangedEvent.TYPE, this);
         eventBus.addHandler(WsAgentStateEvent.TYPE, this);
         eventBus.addHandler(ProjectUpdatedEvent.getType(), this);
+        eventBus.addHandler(ResourceChangedEvent.getType(), this);
     }
 
     @Override
@@ -284,5 +292,22 @@ public class AppContextImpl implements AppContext, SelectionChangedHandler, WsAg
         }
 
         return root;
+    }
+
+    @Override
+    public void onResourceChanged(ResourceChangedEvent event) {
+        final ResourceDelta delta = event.getDelta();
+
+        if (delta.getKind() == REMOVED) {
+            if (currentResource.equals(delta.getResource())) {
+                currentResource = null;
+            }
+
+            for (Resource resource : currentResources) {
+                if (resource.equals(delta.getResource())) {
+                    currentResources = Arrays.remove(currentResources, resource);
+                }
+            }
+        }
     }
 }

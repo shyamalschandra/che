@@ -22,12 +22,13 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 import org.eclipse.che.ide.CoreLocalizationConstant;
-import org.eclipse.che.ide.api.project.node.HasStorablePath;
-import org.eclipse.che.ide.api.project.node.Node;
-import org.eclipse.che.ide.api.project.node.interceptor.NodeInterceptor;
-import org.eclipse.che.ide.ext.java.client.project.interceptor.JavaContentRootInterceptor;
-import org.eclipse.che.ide.ext.java.client.projecttree.JavaSourceFolderUtil;
-import org.eclipse.che.ide.project.node.FileReferenceNode;
+import org.eclipse.che.ide.api.data.HasStorablePath;
+import org.eclipse.che.ide.api.data.tree.Node;
+import org.eclipse.che.ide.api.data.tree.NodeInterceptor;
+import org.eclipse.che.ide.api.resources.Resource;
+import org.eclipse.che.ide.ext.java.client.tree.JavaPackageConnector;
+import org.eclipse.che.ide.resources.tree.ResourceNode;
+import org.eclipse.che.ide.resources.tree.SkipHiddenNodesInterceptor;
 import org.eclipse.che.ide.ui.smartTree.KeyboardNavigationHandler;
 import org.eclipse.che.ide.ui.smartTree.NodeLoader;
 import org.eclipse.che.ide.ui.smartTree.NodeStorage;
@@ -42,6 +43,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import static org.eclipse.che.ide.ext.java.client.util.JavaUtil.resolveFQN;
 import static org.eclipse.che.ide.ui.smartTree.SelectionModel.Mode.SINGLE;
 
 /**
@@ -51,8 +53,9 @@ import static org.eclipse.che.ide.ui.smartTree.SelectionModel.Mode.SINGLE;
  */
 @Singleton
 public class SelectNodeViewImpl extends Window implements SelectNodeView {
-    private final JavaContentRootInterceptor javaContentRootInterceptor;
     private final ClassNodeInterceptor classNodeInterceptor;
+    private final JavaPackageConnector javaPackageConnector;
+    private final SkipHiddenNodesInterceptor skipHiddenNodesInterceptor;
 
     private Tree                     tree;
     private ActionDelegate           delegate;
@@ -69,10 +72,12 @@ public class SelectNodeViewImpl extends Window implements SelectNodeView {
     @Inject
     public SelectNodeViewImpl(CoreLocalizationConstant locale,
                               ClassNodeInterceptor classNodeInterceptor,
-                              JavaContentRootInterceptor javaContentRootInterceptor,
-                              SelectPathViewImplUiBinder uiBinder) {
+                              SelectPathViewImplUiBinder uiBinder,
+                              JavaPackageConnector javaPackageConnector,
+                              SkipHiddenNodesInterceptor skipHiddenNodesInterceptor) {
         this.classNodeInterceptor = classNodeInterceptor;
-        this.javaContentRootInterceptor = javaContentRootInterceptor;
+        this.javaPackageConnector = javaPackageConnector;
+        this.skipHiddenNodesInterceptor = skipHiddenNodesInterceptor;
 
         setTitle(locale.selectPathWindowTitle());
 
@@ -109,14 +114,14 @@ public class SelectNodeViewImpl extends Window implements SelectNodeView {
 
                 Node node = event.getSelection().get(0);
 
-                if (!(node instanceof FileReferenceNode)) {
+                if (!(node instanceof ResourceNode)) {
                     acceptButton.setEnabled(false);
                     return;
                 }
 
-                FileReferenceNode selectedNode = (FileReferenceNode)node;
+                ResourceNode selectedNode = (ResourceNode)node;
 
-                acceptButton.setEnabled(selectedNode.getPath().endsWith(".java"));
+                acceptButton.setEnabled(selectedNode.getData().getLocation().toString().endsWith(".java"));
             }
         });
 
@@ -178,7 +183,8 @@ public class SelectNodeViewImpl extends Window implements SelectNodeView {
         tree.getNodeStorage().clear();
         tree.getNodeLoader().getNodeInterceptors().clear();
         tree.getNodeLoader().getNodeInterceptors().add(classNodeInterceptor);
-        tree.getNodeLoader().getNodeInterceptors().add(javaContentRootInterceptor);
+        tree.getNodeLoader().getNodeInterceptors().add(javaPackageConnector);
+        tree.getNodeLoader().getNodeInterceptors().add(skipHiddenNodesInterceptor);
         for (Node node : nodes) {
             tree.getNodeStorage().add(node);
         }
@@ -190,14 +196,11 @@ public class SelectNodeViewImpl extends Window implements SelectNodeView {
             return;
         }
         Node selectedNode = nodes.get(0);
-        String fqn = "";
 
-        if (selectedNode instanceof FileReferenceNode) {
-            FileReferenceNode fileNode = (FileReferenceNode)selectedNode;
-            fqn = JavaSourceFolderUtil.getFQNForFile(fileNode);
+        if (selectedNode instanceof ResourceNode) {
+            final Resource resource = ((ResourceNode)selectedNode).getData();
+            delegate.setSelectedNode(resource, resolveFQN(resource));
         }
-
-        delegate.setSelectedNode(((HasStorablePath)selectedNode).getStorablePath(), fqn);
 
         hide();
     }

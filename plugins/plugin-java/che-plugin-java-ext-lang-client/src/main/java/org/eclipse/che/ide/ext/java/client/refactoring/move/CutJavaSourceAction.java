@@ -15,7 +15,6 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.web.bindery.event.shared.EventBus;
 
-import org.eclipse.che.ide.MimeType;
 import org.eclipse.che.ide.api.action.Action;
 import org.eclipse.che.ide.api.action.ActionEvent;
 import org.eclipse.che.ide.api.app.AppContext;
@@ -102,10 +101,8 @@ public class CutJavaSourceAction extends Action implements ActivePartChangedHand
     }
 
     protected boolean isJavaFile(VirtualFile file) {
-        final String mediaType = fileTypeRegistry.getFileTypeByFile(file).getMimeTypes().get(0);
+        final String ext = fileTypeRegistry.getFileTypeByFile(file).getExtension();
 
-        return mediaType != null && ((mediaType.equals(MimeType.TEXT_X_JAVA) ||
-                                      mediaType.equals(MimeType.TEXT_X_JAVA_SOURCE) ||
-                                      mediaType.equals(MimeType.APPLICATION_JAVA_CLASS)));
+        return "java".equals(ext) || "class".equals(ext);
     }
 }

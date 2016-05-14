@@ -81,29 +81,6 @@ public class CutJavaSourceActionTest {
     }
 
     @Test
-    public void actionShouldBeEnabledWhenFileInContext() throws Exception {
-        when(updateActionEvent.getPresentation()).thenReturn(presentation);
-        when(appContext.getResources()).thenReturn(new Resource[]{resource});
-        when(resource.getRelatedProject()).thenReturn(project);
-        when(resource.getParentWithMarker(eq(SourceFolderMarker.ID))).thenReturn(Optional.of(srcFolder));
-
-        final Map<String, List<String>> attributes = new HashMap<>();
-        attributes.put(Constants.LANGUAGE, Collections.singletonList("java"));
-
-        when(project.getAttributes()).thenReturn(attributes);
-
-        when(fileTypeRegistry.getFileTypeByFile(eq(resource))).thenReturn(fileType);
-
-        List<String> mimeTypes = Collections.singletonList(MimeType.TEXT_X_JAVA);
-        when(fileType.getMimeTypes()).thenReturn(mimeTypes);
-        when(resource.getResourceType()).thenReturn(Resource.FILE);
-
-        action.update(updateActionEvent);
-
-        verify(presentation).setEnabled(eq(true));
-    }
-
-    @Test
     public void actionShouldBeEnabledWhenFolderInContext() throws Exception {
         final Container container = mock(Container.class);
         when(updateActionEvent.getPresentation()).thenReturn(presentation);

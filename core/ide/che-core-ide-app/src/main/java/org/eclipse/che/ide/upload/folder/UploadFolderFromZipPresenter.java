@@ -13,11 +13,11 @@ package org.eclipse.che.ide.upload.folder;
 import com.google.gwt.user.client.ui.FormPanel;
 import com.google.inject.Inject;
 
-import org.eclipse.che.api.machine.gwt.client.DevMachine;
 import org.eclipse.che.api.promises.client.Operation;
 import org.eclipse.che.api.promises.client.OperationException;
 import org.eclipse.che.ide.CoreLocalizationConstant;
 import org.eclipse.che.ide.api.app.AppContext;
+import org.eclipse.che.ide.api.machine.DevMachine;
 import org.eclipse.che.ide.api.notification.NotificationManager;
 import org.eclipse.che.ide.api.resources.Container;
 import org.eclipse.che.ide.api.resources.Resource;
@@ -37,7 +37,7 @@ public class UploadFolderFromZipPresenter implements UploadFolderFromZipView.Act
     private final UploadFolderFromZipView  view;
     private final CoreLocalizationConstant locale;
     private final NotificationManager      notificationManager;
-    private final DevMachine devMachine;
+    private final DevMachine               devMachine;
     private       Container                container;
 
     @Inject

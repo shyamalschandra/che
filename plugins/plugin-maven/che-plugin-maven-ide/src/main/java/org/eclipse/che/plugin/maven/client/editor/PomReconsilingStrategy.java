@@ -39,8 +39,7 @@ import java.util.List;
 public class PomReconsilingStrategy implements ReconcilingStrategy {
 
     private final AnnotationModel          annotationModel;
-    private final TextEditorPresenter<?>
-                                           editor;
+    private final TextEditorPresenter<?>   editor;
     private final MavenServerServiceClient client;
     private       String                   pomPath;
 

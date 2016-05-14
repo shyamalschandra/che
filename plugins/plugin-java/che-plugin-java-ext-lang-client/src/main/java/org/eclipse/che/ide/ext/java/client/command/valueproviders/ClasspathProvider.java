@@ -16,12 +16,13 @@ import com.google.inject.Singleton;
 import org.eclipse.che.api.promises.client.Function;
 import org.eclipse.che.api.promises.client.FunctionException;
 import org.eclipse.che.api.promises.client.Promise;
-import org.eclipse.che.api.promises.client.js.Promises;
+import org.eclipse.che.api.promises.client.PromiseProvider;
 import org.eclipse.che.ide.api.app.AppContext;
-import org.eclipse.che.ide.api.app.CurrentProject;
+import org.eclipse.che.ide.api.resources.Project;
+import org.eclipse.che.ide.api.resources.Resource;
 import org.eclipse.che.ide.ext.java.client.command.ClasspathContainer;
 import org.eclipse.che.ide.ext.java.client.project.classpath.ClasspathResolver;
-import org.eclipse.che.ide.ext.java.shared.Constants;
+import org.eclipse.che.ide.ext.java.client.util.JavaUtil;
 import org.eclipse.che.ide.ext.java.shared.dto.classpath.ClasspathEntryDTO;
 import org.eclipse.che.ide.extension.machine.client.command.valueproviders.CommandPropertyValueProvider;
 
@@ -40,14 +41,17 @@ public class ClasspathProvider implements CommandPropertyValueProvider {
     private final ClasspathContainer classpathContainer;
     private final ClasspathResolver  classpathResolver;
     private final AppContext         appContext;
+    private final PromiseProvider    promises;
 
     @Inject
     public ClasspathProvider(ClasspathContainer classpathContainer,
                              ClasspathResolver classpathResolver,
-                             AppContext appContext) {
+                             AppContext appContext,
+                             PromiseProvider promises) {
         this.classpathContainer = classpathContainer;
         this.classpathResolver = classpathResolver;
         this.appContext = appContext;
+        this.promises = promises;
     }
 
     @Override
@@ -57,38 +61,41 @@ public class ClasspathProvider implements CommandPropertyValueProvider {
 
     @Override
     public Promise<String> getValue() {
-        CurrentProject currentProject = appContext.getCurrentProject();
-        if (currentProject == null) {
-            return Promises.resolve("");
+
+        final Resource[] resources = appContext.getResources();
+
+        if (resources != null && resources.length == 1) {
+
+            final Resource resource = resources[0];
+            final Project project = resource.getRelatedProject();
+
+            if (JavaUtil.isJavaProject(project)) {
+                return classpathContainer.getClasspathEntries(project.getLocation().toString()).then(
+                        new Function<List<ClasspathEntryDTO>, String>() {
+                            @Override
+                            public String apply(List<ClasspathEntryDTO> arg) throws FunctionException {
+                                classpathResolver.resolveClasspathEntries(arg);
+                                Set<String> sources = classpathResolver.getSources();
+                                StringBuilder classpath = new StringBuilder("");
+                                for (String source : sources) {
+                                    classpath.append(source);
+                                }
+
+                                if (classpath.toString().isEmpty()) {
+                                    classpath.append(appContext.getProjectsRoot()).append(project.getLocation().toString());
+                                }
+
+                                classpath.append(':');
+
+                                return classpath.toString();
+                            }
+                        });
+            } else {
+                return promises.resolve("");
+            }
         }
 
-        String languageAttribute = currentProject.getAttributeValue(Constants.LANGUAGE);
-        if (!Constants.JAVA_ID.equals(languageAttribute)) {
-            return Promises.resolve("");
-        }
-
-        final String projectPath = currentProject.getProjectConfig().getPath();
-
-        return classpathContainer.getClasspathEntries(projectPath).then(
-                new Function<List<ClasspathEntryDTO>, String>() {
-                    @Override
-                    public String apply(List<ClasspathEntryDTO> arg) throws FunctionException {
-                        classpathResolver.resolveClasspathEntries(arg);
-                        Set<String> libs = classpathResolver.getLibs();
-                        StringBuilder classpath = new StringBuilder("");
-                        for (String lib : libs) {
-                            classpath.append(lib);
-                        }
-
-                        if (classpath.toString().isEmpty()) {
-                            classpath.append(appContext.getProjectsRoot()).append(projectPath);
-                        }
-
-                        classpath.append(':');
-
-                        return classpath.toString();
-                    }
-                });
+        return promises.resolve("");
     }
 
 }

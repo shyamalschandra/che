@@ -57,6 +57,7 @@ public class JarFileNode extends SyntheticNode<JarEntry> implements VirtualFile,
     private final JavaResources         javaResources;
     private final NodesResources        nodesResources;
     private final JavaNavigationService service;
+    private       boolean               contentGenerated;
 
     @Inject
     public JarFileNode(@Assisted JarEntry jarEntry,
@@ -152,21 +153,27 @@ public class JarFileNode extends SyntheticNode<JarEntry> implements VirtualFile,
         return null;
     }
 
+    public Path getProjectLocation() {
+        return project;
+    }
+
     /** {@inheritDoc} */
     @Override
     public Promise<String> getContent() {
         if (libId != -1) {
             return service.getContent(project, libId, Path.valueOf(getData().getPath())).then(new Function<ClassContent, String>() {
                 @Override
-                public String apply(ClassContent arg) throws FunctionException {
-                    return arg.getContent();
+                public String apply(ClassContent result) throws FunctionException {
+                    JarFileNode.this.contentGenerated = result.isGenerated();
+                    return result.getContent();
                 }
             });
         } else {
             return service.getContent(project, getData().getPath()).then(new Function<ClassContent, String>() {
                 @Override
-                public String apply(ClassContent arg) throws FunctionException {
-                    return arg.getContent();
+                public String apply(ClassContent result) throws FunctionException {
+                    JarFileNode.this.contentGenerated = result.isGenerated();
+                    return result.getContent();
                 }
             });
         }
@@ -180,6 +187,10 @@ public class JarFileNode extends SyntheticNode<JarEntry> implements VirtualFile,
 
     private boolean isClassFile() {
         return getData().getName().endsWith(".class");
+    }
+
+    public boolean isContentGenerated() {
+        return contentGenerated;
     }
 
     @Override

@@ -20,9 +20,6 @@ import com.google.web.bindery.event.shared.EventBus;
 import org.eclipse.che.api.core.model.project.ProjectConfig;
 import org.eclipse.che.api.core.model.project.SourceStorage;
 import org.eclipse.che.api.core.rest.shared.dto.Link;
-import org.eclipse.che.api.machine.gwt.client.DevMachine;
-import org.eclipse.che.api.project.gwt.client.ProjectServiceClient;
-import org.eclipse.che.api.project.gwt.client.QueryExpression;
 import org.eclipse.che.api.project.shared.dto.ItemReference;
 import org.eclipse.che.api.project.shared.dto.SourceEstimation;
 import org.eclipse.che.api.project.shared.dto.TreeElement;
@@ -33,6 +30,9 @@ import org.eclipse.che.api.promises.client.PromiseProvider;
 import org.eclipse.che.api.workspace.shared.dto.ProjectConfigDto;
 import org.eclipse.che.api.workspace.shared.dto.ProjectProblemDto;
 import org.eclipse.che.api.workspace.shared.dto.SourceStorageDto;
+import org.eclipse.che.ide.api.machine.DevMachine;
+import org.eclipse.che.ide.api.project.ProjectServiceClient;
+import org.eclipse.che.ide.api.project.QueryExpression;
 import org.eclipse.che.ide.api.project.type.ProjectTypeRegistry;
 import org.eclipse.che.ide.api.resources.Container;
 import org.eclipse.che.ide.api.resources.File;
@@ -320,15 +320,15 @@ public final class ResourceManager {
     protected Promise<Folder> createFolder(final Container parent, final String name) {
         final Path path = Path.valueOf(name);
 
-        if (path.segmentCount() == 1) {
-            checkArgument(checkFolderName(name), "Invalid folder name");
-        }
-
         return findResource(parent.getLocation().append(path), true).thenPromise(new Function<Optional<Resource>, Promise<Folder>>() {
             @Override
             public Promise<Folder> apply(Optional<Resource> resource) throws FunctionException {
                 checkState(!resource.isPresent(), "Resource already exists");
                 checkArgument(!parent.getLocation().isRoot(), "Failed to create folder in workspace root");
+
+                if (path.segmentCount() == 1) {
+                    checkArgument(checkFolderName(name), "Invalid folder name");
+                }
 
                 return ps.createFolder(devMachine, parent.getLocation().append(name)).thenPromise(new Function<ItemReference, Promise<Folder>>() {
                     @Override

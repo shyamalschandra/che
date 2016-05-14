@@ -22,6 +22,8 @@
     <inherits name="org.eclipse.che.ide.Core"/>
     <inherits name="com.google.gwt.webworker.WebWorker"/>
     <inherits name="org.eclipse.che.api.project.Project"/>
+    <inherits name="org.eclipse.che.ide.ui.CodenvyUI"/>
+    <inherits name="org.eclipse.che.ide.extension.machine.Machine"/>
 
     <source path="client"/>
     <source path="shared"/>

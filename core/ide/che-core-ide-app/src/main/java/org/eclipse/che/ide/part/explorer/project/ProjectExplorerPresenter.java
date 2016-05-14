@@ -31,6 +31,7 @@ import org.eclipse.che.ide.api.resources.ResourceChangedEvent;
 import org.eclipse.che.ide.api.resources.ResourceChangedEvent.ResourceChangedHandler;
 import org.eclipse.che.ide.api.resources.ResourceDelta;
 import org.eclipse.che.ide.api.resources.marker.MarkerChangedEvent;
+import org.eclipse.che.ide.api.resources.marker.MarkerChangedEvent.MarkerChangedHandler;
 import org.eclipse.che.ide.api.selection.Selection;
 import org.eclipse.che.ide.part.explorer.project.ProjectExplorerView.ActionDelegate;
 import org.eclipse.che.ide.resource.Path;
@@ -46,6 +47,7 @@ import javax.validation.constraints.NotNull;
 
 import static org.eclipse.che.ide.api.resources.Resource.PROJECT;
 import static org.eclipse.che.ide.api.resources.ResourceDelta.ADDED;
+import static org.eclipse.che.ide.api.resources.ResourceDelta.DERIVED;
 import static org.eclipse.che.ide.api.resources.ResourceDelta.MOVED_FROM;
 import static org.eclipse.che.ide.api.resources.ResourceDelta.MOVED_TO;
 import static org.eclipse.che.ide.api.resources.ResourceDelta.REMOVED;
@@ -62,7 +64,7 @@ public class ProjectExplorerPresenter extends BasePresenter implements ActionDel
                                                                        ProjectExplorerPart,
                                                                        HasView,
                                                                        ResourceChangedHandler,
-                                                                       MarkerChangedEvent.MarkerChangedHandler {
+                                                                       MarkerChangedHandler {
     private final ProjectExplorerView      view;
     private final EventBus                 eventBus;
     private final ResourceNode.NodeFactory nodeFactory;
@@ -118,6 +120,10 @@ public class ProjectExplorerPresenter extends BasePresenter implements ActionDel
 
     @SuppressWarnings("unchecked")
     protected void onResourceAdded(ResourceDelta delta) {
+        if ((delta.getFlags()) != DERIVED) {
+            return;
+        }
+
         final Tree tree = view.getTree();
         final NodeSettings nodeSettings = settingsProvider.getSettings();
 
@@ -140,18 +146,7 @@ public class ProjectExplorerPresenter extends BasePresenter implements ActionDel
             }
         }
 
-        final Path parent = resource.getLocation().parent();
-
-        if (parent.isRoot()) {
-            return;
-        }
-
-        for (final Node exist : tree.getNodeStorage().getAll()) {
-            if (isNodeServesLocation(exist, parent) && tree.getNodeDescriptor(exist).isLoaded()) {
-                    eventBus.fireEvent(new RevealResourceEvent(resource));
-            }
-        }
-
+        eventBus.fireEvent(new RevealResourceEvent(resource));
     }
 
     @SuppressWarnings("unchecked")
@@ -161,7 +156,23 @@ public class ProjectExplorerPresenter extends BasePresenter implements ActionDel
         //look for removed node from existing
         for (final Node exist : tree.getNodeStorage().getAll()) {
             if (isNodeServesLocation(exist, delta.getResource().getLocation())) {
-                tree.getNodeStorage().remove(exist);
+
+                Node toReveal;
+
+                toReveal = tree.getNodeStorage().getPreviousSibling(exist);
+
+                if (toReveal == null) {
+                    toReveal = tree.getNodeStorage().getNextSibling(exist);
+                }
+
+                if (toReveal == null) {
+                    toReveal = exist.getParent();
+                }
+
+                if (toReveal != null && toReveal instanceof ResourceNode) {
+                    eventBus.fireEvent(new RevealResourceEvent(((ResourceNode)toReveal).getData()));
+                }
+
                 return;
             }
         }

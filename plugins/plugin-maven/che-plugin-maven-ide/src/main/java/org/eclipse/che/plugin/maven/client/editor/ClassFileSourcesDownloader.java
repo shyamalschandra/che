@@ -77,6 +77,7 @@ public class ClassFileSourcesDownloader implements EditorOpenedEventHandler {
         VirtualFile file = editor.getEditorInput().getFile();
         if (file instanceof JarFileNode) {
             final JarFileNode jarFileNode = (JarFileNode)file;
+            if (jarFileNode.isContentGenerated()) {
                 if (editor instanceof TextEditorPresenter) {
                     final TextEditorPresenter presenter = (TextEditorPresenter)editor;
                     TextEditorPartView view = presenter.getView();
@@ -92,21 +93,22 @@ public class ClassFileSourcesDownloader implements EditorOpenedEventHandler {
                     anchorElement.setHref("#");
                     anchorElement.setClassName(resources.css().downloadLink());
 
-                divElement.appendChild(anchorElement);
-                final HasNotificationPanel.NotificationRemover remover = view.addNotification((Element)divElement);
-                anchorElement.setOnclick(new EventListener() {
-                    @Override
-                    public void handleEvent(Event evt) {
-                        downloadSources(jarFileNode, remover);
-                    }
-                });
+                    divElement.appendChild(anchorElement);
+                    final HasNotificationPanel.NotificationRemover remover = view.addNotification((Element)divElement);
+                    anchorElement.setOnclick(new EventListener() {
+                        @Override
+                        public void handleEvent(Event evt) {
+                            downloadSources(jarFileNode, remover);
+                        }
+                    });
+                }
             }
+        }
     }
 
     private void downloadSources(JarFileNode jarFileNode, final HasNotificationPanel.NotificationRemover remover) {
         final String path = jarFileNode.getPath();
-        Promise<Boolean> promise =
-                client.downloadSources(jarFileNode.getProject().getProjectConfig().getPath(), path);
+        Promise<Boolean> promise = client.downloadSources(jarFileNode.getProjectLocation().toString(), path);
         promise.then(new Operation<Boolean>() {
             @Override
             public void apply(Boolean arg) throws OperationException {

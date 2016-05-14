@@ -14,10 +14,14 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.web.bindery.event.shared.EventBus;
 
+import org.eclipse.che.api.promises.client.Operation;
+import org.eclipse.che.api.promises.client.OperationException;
+import org.eclipse.che.api.promises.client.PromiseError;
 import org.eclipse.che.commons.annotation.Nullable;
 import org.eclipse.che.ide.CoreLocalizationConstant;
 import org.eclipse.che.ide.api.action.ActionEvent;
 import org.eclipse.che.ide.api.app.AppContext;
+import org.eclipse.che.ide.api.dialogs.DialogFactory;
 import org.eclipse.che.ide.api.notification.NotificationManager;
 import org.eclipse.che.ide.api.resources.Container;
 import org.eclipse.che.ide.api.resources.Resource;
@@ -83,7 +87,12 @@ public class NewPackageAction extends AbstractNewResourceAction {
 
         checkState(resource instanceof Container, "Parent should be a container");
 
-        ((Container)resource).newFolder(value.replace('.', '/'));
+        ((Container)resource).newFolder(value.replace('.', '/')).catchError(new Operation<PromiseError>() {
+            @Override
+            public void apply(PromiseError error) throws OperationException {
+                dialogFactory.createMessageDialog(coreLocalizationConstant.invalidName(), error.getMessage(), null).show();
+            }
+        });
     }
 
     private class NameValidator implements InputValidator {

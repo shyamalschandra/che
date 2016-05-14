@@ -12,21 +12,12 @@ package org.eclipse.che.plugin.cpp.ide.action;
 
 import com.google.web.bindery.event.shared.EventBus;
 
-import org.eclipse.che.commons.annotation.Nullable;
 import org.eclipse.che.ide.CoreLocalizationConstant;
-import org.eclipse.che.ide.api.action.ActionEvent;
 import org.eclipse.che.ide.api.app.AppContext;
-import org.eclipse.che.ide.api.app.CurrentProject;
+import org.eclipse.che.ide.api.dialogs.DialogFactory;
 import org.eclipse.che.ide.api.notification.NotificationManager;
-import org.eclipse.che.ide.api.selection.Selection;
 import org.eclipse.che.ide.newresource.AbstractNewResourceAction;
-import org.eclipse.che.ide.ui.dialogs.DialogFactory;
 import org.vectomatic.dom.svg.ui.SVGResource;
-
-import javax.validation.constraints.NotNull;
-
-import static org.eclipse.che.plugin.cpp.shared.Constants.CPP_PROJECT_TYPE_ID;
-import static org.eclipse.che.plugin.cpp.shared.Constants.C_PROJECT_TYPE_ID;
 
 /**
  * Base class for ne C/C++ resource

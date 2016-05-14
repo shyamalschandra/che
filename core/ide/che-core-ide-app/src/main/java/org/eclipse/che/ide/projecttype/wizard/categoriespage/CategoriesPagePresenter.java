@@ -13,6 +13,8 @@ package org.eclipse.che.ide.projecttype.wizard.categoriespage;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
 
+import org.eclipse.che.api.project.shared.dto.ProjectTypeDto;
+import org.eclipse.che.api.project.templates.shared.dto.ProjectTemplateDescriptor;
 import org.eclipse.che.ide.api.project.type.ProjectTemplateRegistry;
 import org.eclipse.che.ide.api.project.type.ProjectTypeRegistry;
 import org.eclipse.che.ide.api.project.type.wizard.PreSelectedProjectTypeManager;
@@ -28,6 +30,10 @@ import org.eclipse.che.ide.resources.selector.SelectionPathHandler;
 import org.eclipse.che.ide.util.NameUtils;
 
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static org.eclipse.che.ide.api.project.type.wizard.ProjectWizardMode.CREATE;
 import static org.eclipse.che.ide.api.project.type.wizard.ProjectWizardMode.UPDATE;
@@ -49,8 +55,8 @@ public class CategoriesPagePresenter extends AbstractWizardPage<MutableProjectCo
     private final ProjectTemplateRegistry          projectTemplateRegistry;
     private final ProjectWizardRegistry            wizardRegistry;
     private final PreSelectedProjectTypeManager    preSelectedProjectTypeManager;
-    private final SelectPathPresenter selectPathPresenter;
-    private final Workspace workspace;
+    private final SelectPathPresenter              selectPathPresenter;
+    private final Workspace                        workspace;
     private       ProjectTypeDto                   selectedProjectType;
     private       ProjectTemplateDescriptor        selectedProjectTemplate;
     private       ProjectTypeSelectionListener     projectTypeSelectionListener;

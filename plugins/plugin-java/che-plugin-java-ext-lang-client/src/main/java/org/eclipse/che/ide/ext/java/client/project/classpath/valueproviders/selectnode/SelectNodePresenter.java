@@ -28,8 +28,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static java.util.Collections.singletonList;
-
 /**
  * Presenter for choosing directory for searching a node.
  *

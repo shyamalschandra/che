@@ -175,7 +175,7 @@ public class TreeResourceRevealer {
                 toSelect[index] = parent;
             }
 
-            selectTask.delay(500);
+            selectTask.delay(200);
 
             callback.onSuccess(parent);
             return;

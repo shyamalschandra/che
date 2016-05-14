@@ -600,7 +600,13 @@ public class NodeStorage implements StoreHandlers.HasStoreHandlers {
     }
 
     public Node getParent(Node child) {
-        NodeDescriptor nodeDescriptor = getWrapper(child).getParent();
+        final NodeDescriptor wrapper = getWrapper(child);
+
+        if (wrapper == null) {
+            return null;
+        }
+
+        NodeDescriptor nodeDescriptor = wrapper.getParent();
         return (nodeDescriptor != null && !nodeDescriptor.isRoot()) ? nodeDescriptor.getNode() : null;
     }
 

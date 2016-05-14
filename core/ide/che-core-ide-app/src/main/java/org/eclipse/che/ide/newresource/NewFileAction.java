@@ -13,8 +13,8 @@ package org.eclipse.che.ide.newresource;
 import org.eclipse.che.ide.CoreLocalizationConstant;
 import org.eclipse.che.ide.Resources;
 import org.eclipse.che.ide.api.app.AppContext;
+import org.eclipse.che.ide.api.dialogs.DialogFactory;
 import org.eclipse.che.ide.api.notification.NotificationManager;
-import org.eclipse.che.ide.ui.dialogs.DialogFactory;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;

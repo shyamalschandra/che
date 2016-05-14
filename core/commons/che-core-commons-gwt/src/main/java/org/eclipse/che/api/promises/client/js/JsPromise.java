@@ -36,23 +36,23 @@ public class JsPromise<V> extends JavaScriptObject implements Promise<V> {
     protected JsPromise() {
     }
 
-    private static void applyOperationToError(Operation<PromiseError> onRejected, JavaScriptObject reason) throws OperationException {
+    private static void applyOperationToError(Operation<PromiseError> onRejected, Object reason) throws OperationException {
         final Throwable cause = getCause(reason);
 
         if (cause != null) {
             onRejected.apply(JsPromiseError.create(cause));
         } else {
-            onRejected.apply((JsPromiseError)reason);
+            onRejected.apply(JsPromiseError.create(reason instanceof Throwable ? (Throwable)reason : null));
         }
     }
 
-    private static <V> V applyFunctionToError(Function<PromiseError, V> onRejected, JavaScriptObject reason) throws FunctionException {
+    private static <V> V applyFunctionToError(Function<PromiseError, V> onRejected, Object reason) throws FunctionException {
         final Throwable cause = getCause(reason);
 
         if (cause != null) {
             return onRejected.apply(JsPromiseError.create(cause));
         } else {
-            return onRejected.apply((JsPromiseError)reason);
+            return onRejected.apply(JsPromiseError.create(reason instanceof Throwable ? (Throwable)reason : null));
         }
     }
 
@@ -182,7 +182,7 @@ public class JsPromise<V> extends JavaScriptObject implements Promise<V> {
         ;
     }-*/;
 
-    public static Throwable getCause(JavaScriptObject object) {
+    public static Throwable getCause(Object object) {
         return object instanceof JsPromiseError ? ((JsPromiseError)object).getCause() : null;
     }
 }

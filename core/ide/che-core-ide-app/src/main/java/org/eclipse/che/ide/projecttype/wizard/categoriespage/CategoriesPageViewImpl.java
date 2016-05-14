@@ -14,6 +14,9 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.SpanElement;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.resources.client.CssResource;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -30,6 +33,8 @@ import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
+import org.eclipse.che.api.project.shared.dto.ProjectTypeDto;
+import org.eclipse.che.api.project.templates.shared.dto.ProjectTemplateDescriptor;
 import org.eclipse.che.ide.Resources;
 import org.eclipse.che.ide.api.icon.Icon;
 import org.eclipse.che.ide.api.icon.IconRegistry;
@@ -37,12 +42,15 @@ import org.eclipse.che.ide.projecttype.wizard.ProjectWizardResources;
 import org.eclipse.che.ide.resource.Path;
 import org.eclipse.che.ide.ui.list.CategoriesList;
 import org.eclipse.che.ide.ui.list.Category;
+import org.eclipse.che.ide.ui.list.CategoryRenderer;
 import org.vectomatic.dom.svg.ui.SVGImage;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Evgen Vidolob
@@ -62,14 +70,14 @@ public class CategoriesPageViewImpl implements CategoriesPageView {
                     selectNextWizardType(itemData);
                 }
             };
-    private final Category.CategoryEventDelegate<ProjectTypeDto>     projectTypeCategoryEventDelegate =
+    private final Category.CategoryEventDelegate<ProjectTypeDto>            projectTypeCategoryEventDelegate =
             new Category.CategoryEventDelegate<ProjectTypeDto>() {
                 @Override
                 public void onListItemClicked(Element listItemBase, ProjectTypeDto itemData) {
                     selectNextWizardType(itemData);
                 }
             };
-    private final CategoryRenderer<ProjectTypeDto> projectTypeCategoryRenderer      =
+    private final CategoryRenderer<ProjectTypeDto>            projectTypeCategoryRenderer =
             new CategoryRenderer<ProjectTypeDto>() {
                 @Override
                 public void renderElement(Element element, ProjectTypeDto data) {
@@ -81,7 +89,7 @@ public class CategoriesPageViewImpl implements CategoriesPageView {
                     return renderCategoryHeader(category.getTitle());
                 }
             };
-    private final CategoryRenderer<ProjectTemplateDescriptor> templateCategoryRenderer         =
+    private final CategoryRenderer<ProjectTemplateDescriptor> templateCategoryRenderer    =
             new CategoryRenderer<ProjectTemplateDescriptor>() {
                 @Override
                 public void renderElement(Element element, ProjectTemplateDescriptor data) {
@@ -116,12 +124,12 @@ public class CategoriesPageViewImpl implements CategoriesPageView {
     @UiField
     TextBox parentPath;
 
-    private ActionDelegate delegate;
-    private Map<String, Set<ProjectTypeDto>>     typesByCategory;
+    private ActionDelegate                              delegate;
+    private Map<String, Set<ProjectTypeDto>>            typesByCategory;
     private Map<String, Set<ProjectTemplateDescriptor>> templatesByCategory;
-    private Resources resources;
-    private CategoriesList categoriesList;
-    private List<ProjectTypeDto>                 availableProjectTypes;
+    private Resources                                   resources;
+    private CategoriesList                              categoriesList;
+    private List<ProjectTypeDto>                        availableProjectTypes;
 
     @Inject
     public CategoriesPageViewImpl(Resources resources,
@@ -301,7 +309,7 @@ public class CategoriesPageViewImpl implements CategoriesPageView {
     @Override
     public void selectProjectType(final String projectTypeId) {
         ProjectTypeDto typeDescriptor = null;
-        for (Entry<String, Set<ProjectTypeDto>> entry : typesByCategory.entrySet()) {
+        for (Map.Entry<String, Set<ProjectTypeDto>> entry : typesByCategory.entrySet()) {
             for (ProjectTypeDto typeDefinition : entry.getValue()) {
                 if (typeDefinition.getId().equals(projectTypeId)) {
                     typeDescriptor = typeDefinition;
@@ -350,7 +358,7 @@ public class CategoriesPageViewImpl implements CategoriesPageView {
     public void updateCategories(boolean includeTemplates) {
         List<Category<?>> categories = new ArrayList<>();
 
-        for (Entry<String, Set<ProjectTypeDto>> entry : typesByCategory.entrySet()) {
+        for (Map.Entry<String, Set<ProjectTypeDto>> entry : typesByCategory.entrySet()) {
             final Set<ProjectTypeDto> projectTypes = entry.getValue();
 
             List<ProjectTypeDto> projectTypeDescriptors = new ArrayList<>();
@@ -366,7 +374,7 @@ public class CategoriesPageViewImpl implements CategoriesPageView {
         Collections.sort(categories, categoriesComparator);
 
         if (includeTemplates) {
-            for (Entry<String, Set<ProjectTemplateDescriptor>> entry : templatesByCategory.entrySet()) {
+            for (Map.Entry<String, Set<ProjectTemplateDescriptor>> entry : templatesByCategory.entrySet()) {
                 final Set<ProjectTemplateDescriptor> projectTemplates = entry.getValue();
 
                 List<ProjectTemplateDescriptor> templateDescriptors = new ArrayList<>();
