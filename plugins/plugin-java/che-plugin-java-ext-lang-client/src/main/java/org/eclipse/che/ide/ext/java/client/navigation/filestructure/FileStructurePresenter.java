@@ -38,8 +38,8 @@ import org.eclipse.che.ide.ext.java.shared.dto.ClassContent;
 import org.eclipse.che.ide.ext.java.shared.dto.Region;
 import org.eclipse.che.ide.ext.java.shared.dto.model.CompilationUnit;
 import org.eclipse.che.ide.ext.java.shared.dto.model.Member;
-import org.eclipse.che.ide.jseditor.client.text.LinearRange;
-import org.eclipse.che.ide.jseditor.client.texteditor.EmbeddedTextEditorPresenter;
+import org.eclipse.che.ide.api.editor.text.LinearRange;
+import org.eclipse.che.ide.api.editor.texteditor.TextEditorPresenter;
 import org.eclipse.che.ide.resource.Path;
 import org.eclipse.che.ide.ui.loaders.request.LoaderFactory;
 import org.eclipse.che.ide.ui.loaders.request.MessageLoader;
@@ -61,9 +61,9 @@ public class FileStructurePresenter implements FileStructure.ActionDelegate {
     private final PromiseProvider       promises;
     private final MessageLoader         loader;
 
-    private EmbeddedTextEditorPresenter activeEditor;
-    private boolean                     showInheritedMembers;
-    private int                         cursorOffset;
+    private TextEditorPresenter activeEditor;
+    private boolean             showInheritedMembers;
+    private int                 cursorOffset;
 
     @Inject
     public FileStructurePresenter(FileStructure view,
@@ -93,11 +93,11 @@ public class FileStructurePresenter implements FileStructure.ActionDelegate {
         loader.show();
         view.setTitle(editorPartPresenter.getEditorInput().getFile().getName());
 
-        if (!(editorPartPresenter instanceof EmbeddedTextEditorPresenter)) {
-            Log.error(getClass(), "Open Declaration support only EmbeddedTextEditorPresenter as editor");
+        if (!(editorPartPresenter instanceof TextEditorPresenter)) {
+            Log.error(getClass(), "Open Declaration support only TextEditorPresenter as editor");
             return;
         }
-        activeEditor = ((EmbeddedTextEditorPresenter)editorPartPresenter);
+        activeEditor = ((TextEditorPresenter)editorPartPresenter);
         cursorOffset = activeEditor.getCursorOffset();
         VirtualFile file = activeEditor.getEditorInput().getFile();
 
@@ -201,8 +201,8 @@ public class FileStructurePresenter implements FileStructure.ActionDelegate {
     }
 
     private void setCursor(EditorPartPresenter editor, int offset) {
-        if (editor instanceof EmbeddedTextEditorPresenter) {
-            ((EmbeddedTextEditorPresenter)editor).getDocument().setSelectedRange(LinearRange.createWithStart(offset).andLength(0), true);
+        if (editor instanceof TextEditorPresenter) {
+            ((TextEditorPresenter)editor).getDocument().setSelectedRange(LinearRange.createWithStart(offset).andLength(0), true);
         }
     }
 }

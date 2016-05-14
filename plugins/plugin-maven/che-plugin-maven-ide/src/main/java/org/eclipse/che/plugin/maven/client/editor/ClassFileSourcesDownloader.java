@@ -30,15 +30,15 @@ import org.eclipse.che.ide.api.editor.EditorPartPresenter;
 import org.eclipse.che.ide.api.event.FileContentUpdateEvent;
 import org.eclipse.che.ide.api.notification.NotificationManager;
 import org.eclipse.che.ide.api.notification.StatusNotification;
+import org.eclipse.che.ide.api.editor.texteditor.HasNotificationPanel;
+import org.eclipse.che.ide.api.editor.texteditor.TextEditorPartView;
+import org.eclipse.che.ide.api.editor.texteditor.TextEditorPresenter;
+import org.eclipse.che.ide.util.dom.Elements;
 import org.eclipse.che.ide.api.resources.VirtualFile;
 import org.eclipse.che.ide.ext.java.client.tree.library.JarFileNode;
 import org.eclipse.che.plugin.maven.client.MavenLocalizationConstant;
 import org.eclipse.che.plugin.maven.client.MavenResources;
 import org.eclipse.che.plugin.maven.client.service.MavenServerServiceClient;
-import org.eclipse.che.ide.jseditor.client.texteditor.EmbeddedTextEditorPartView;
-import org.eclipse.che.ide.jseditor.client.texteditor.EmbeddedTextEditorPresenter;
-import org.eclipse.che.ide.jseditor.client.texteditor.HasNotificationPanel;
-import org.eclipse.che.ide.util.dom.Elements;
 
 import static org.eclipse.che.ide.api.notification.StatusNotification.DisplayMode.EMERGE_MODE;
 
@@ -77,20 +77,20 @@ public class ClassFileSourcesDownloader implements EditorOpenedEventHandler {
         VirtualFile file = editor.getEditorInput().getFile();
         if (file instanceof JarFileNode) {
             final JarFileNode jarFileNode = (JarFileNode)file;
-            if (editor instanceof EmbeddedTextEditorPresenter) {
-                final EmbeddedTextEditorPresenter presenter = (EmbeddedTextEditorPresenter)editor;
-                EmbeddedTextEditorPartView view = presenter.getView();
-                final DivElement divElement = Elements.createDivElement();
-                divElement.setClassName(resources.css().editorInfoPanel());
-                Text textNode = Elements.createTextNode(constant.mavenClassDecompiled());
-                DivElement decompiledElement = Elements.createDivElement();
-                decompiledElement.appendChild(textNode);
-                decompiledElement.setClassName(resources.css().editorMessage());
-                divElement.appendChild(decompiledElement);
-                AnchorElement anchorElement = Elements.createAnchorElement();
-                anchorElement.appendChild(Elements.createTextNode(constant.mavenDownloadSources()));
-                anchorElement.setHref("#");
-                anchorElement.setClassName(resources.css().downloadLink());
+                if (editor instanceof TextEditorPresenter) {
+                    final TextEditorPresenter presenter = (TextEditorPresenter)editor;
+                    TextEditorPartView view = presenter.getView();
+                    final DivElement divElement = Elements.createDivElement();
+                    divElement.setClassName(resources.css().editorInfoPanel());
+                    Text textNode = Elements.createTextNode(constant.mavenClassDecompiled());
+                    DivElement decompiledElement = Elements.createDivElement();
+                    decompiledElement.appendChild(textNode);
+                    decompiledElement.setClassName(resources.css().editorMessage());
+                    divElement.appendChild(decompiledElement);
+                    AnchorElement anchorElement = Elements.createAnchorElement();
+                    anchorElement.appendChild(Elements.createTextNode(constant.mavenDownloadSources()));
+                    anchorElement.setHref("#");
+                    anchorElement.setClassName(resources.css().downloadLink());
 
                 divElement.appendChild(anchorElement);
                 final HasNotificationPanel.NotificationRemover remover = view.addNotification((Element)divElement);
@@ -101,7 +101,6 @@ public class ClassFileSourcesDownloader implements EditorOpenedEventHandler {
                     }
                 });
             }
-        }
     }
 
     private void downloadSources(JarFileNode jarFileNode, final HasNotificationPanel.NotificationRemover remover) {

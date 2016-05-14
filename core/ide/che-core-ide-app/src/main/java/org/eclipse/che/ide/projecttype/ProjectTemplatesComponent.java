@@ -10,9 +10,9 @@
  *******************************************************************************/
 package org.eclipse.che.ide.projecttype;
 
-import org.eclipse.che.api.project.gwt.client.ProjectTemplateServiceClient;
-import org.eclipse.che.api.project.shared.dto.ProjectTemplateDescriptor;
+import org.eclipse.che.ide.api.project.ProjectTemplateServiceClient;
 
+import org.eclipse.che.api.project.templates.shared.dto.ProjectTemplateDescriptor;
 import org.eclipse.che.ide.api.project.type.ProjectTemplateRegistry;
 import org.eclipse.che.ide.api.component.Component;
 import org.eclipse.che.ide.rest.AsyncRequestCallback;

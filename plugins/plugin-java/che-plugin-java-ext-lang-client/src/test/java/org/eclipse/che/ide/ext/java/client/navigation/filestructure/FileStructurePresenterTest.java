@@ -35,6 +35,10 @@ import org.eclipse.che.ide.jseditor.client.document.Document;
 import org.eclipse.che.ide.jseditor.client.text.LinearRange;
 import org.eclipse.che.ide.jseditor.client.texteditor.EmbeddedTextEditorPresenter;
 import org.eclipse.che.ide.resource.Path;
+import org.eclipse.che.ide.api.editor.document.Document;
+import org.eclipse.che.ide.api.editor.text.LinearRange;
+import org.eclipse.che.ide.api.editor.texteditor.TextEditorPresenter;
+import org.eclipse.che.ide.part.explorer.project.ProjectExplorerPresenter;
 import org.eclipse.che.ide.ui.loaders.request.LoaderFactory;
 import org.eclipse.che.ide.ui.loaders.request.MessageLoader;
 import org.junit.Before;
@@ -76,9 +80,9 @@ public class FileStructurePresenterTest {
     private PromiseProvider       promiseProvider;
 
     @Mock
-    private EmbeddedTextEditorPresenter editorPartPresenter;
+    private TextEditorPresenter      editorPartPresenter;
     @Mock
-    private EditorInput                 editorInput;
+    private EditorInput              editorInput;
     @Mock
     private File                        file;
     @Mock
@@ -88,9 +92,9 @@ public class FileStructurePresenterTest {
     @Mock
     private Promise<CompilationUnit>    promise;
     @Mock
-    private Promise<Node>               nodePromise;
+    private Promise<Node>            nodePromise;
     @Mock
-    private CompilationUnit             compilationUnit;
+    private CompilationUnit          compilationUnit;
     @Mock
     private Member                      member;
     @Mock

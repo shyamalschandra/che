@@ -39,8 +39,28 @@
             <artifactId>guice</artifactId>
         </dependency>
         <dependency>
+            <groupId>com.google.inject.extensions</groupId>
+            <artifactId>guice-assistedinject</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>javax.inject</groupId>
+            <artifactId>javax.inject</artifactId>
+        </dependency>
+        <dependency>
             <groupId>javax.validation</groupId>
             <artifactId>validation-api</artifactId>
+        </dependency>
+         <dependency>
+            <groupId>org.eclipse.che.core</groupId>
+            <artifactId>che-core-api-auth</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.che.core</groupId>
+            <artifactId>che-core-api-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.che.core</groupId>
+            <artifactId>che-core-api-dto</artifactId>
         </dependency>
         <dependency>
             <groupId>org.eclipse.che.core</groupId>
@@ -48,11 +68,27 @@
         </dependency>
         <dependency>
             <groupId>org.eclipse.che.core</groupId>
+            <artifactId>che-core-api-git-shared</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.che.core</groupId>
+            <artifactId>che-core-api-machine-shared</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.che.core</groupId>
             <artifactId>che-core-api-model</artifactId>
         </dependency>
         <dependency>
             <groupId>org.eclipse.che.core</groupId>
-            <artifactId>che-core-api-project</artifactId>
+            <artifactId>che-core-api-project-shared</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.che.core</groupId>
+            <artifactId>che-core-api-project-templates-shared</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.che.core</groupId>
+            <artifactId>che-core-api-ssh-shared</artifactId>
         </dependency>
         <dependency>
             <groupId>org.eclipse.che.core</groupId>
@@ -61,10 +97,6 @@
         <dependency>
             <groupId>org.eclipse.che.core</groupId>
             <artifactId>che-core-api-workspace-shared</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.che.core</groupId>
-            <artifactId>che-core-client-gwt-machine</artifactId>
         </dependency>
         <dependency>
             <groupId>org.eclipse.che.core</groupId>
@@ -87,6 +119,11 @@
         <dependency>
             <groupId>com.google.gwt</groupId>
             <artifactId>gwt-dev</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.google.gwt.gwtmockito</groupId>
+            <artifactId>gwtmockito</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -181,10 +218,19 @@
                 </dependencies>
                 <configuration>
                     <dtoPackages>
-                        <package>org.eclipse.che.ide.api.user</package>
+                        <package>org.eclipse.che.api.auth</package>
+                        <package>org.eclipse.che.api.core</package>
+                        <package>org.eclipse.che.api.factory</package>
+                        <package>org.eclipse.che.api.git</package>
+                        <package>org.eclipse.che.api.project</package>
+                        <package>org.eclipse.che.api.project.templates</package>
+                        <package>org.eclipse.che.api.machine</package>
+                        <package>org.eclipse.che.api.workspace</package>
+                        <package>org.eclipse.che.api.ssh</package>
+                        <package>org.eclipse.che.api.user</package>
                     </dtoPackages>
                     <outputDirectory>${dto-generator-out-directory}</outputDirectory>
-                    <genClassName>org.eclipse.che.ide.api.user.dto.DtoClientImpls</genClassName>
+                    <genClassName>org.eclipse.che.ide.api.dto.DtoClientImpls</genClassName>
                     <impl>client</impl>
                 </configuration>
             </plugin>
@@ -197,12 +243,12 @@
                         <exclude>**/*.png</exclude>
                         <exclude>**/*.gif</exclude>
                         <exclude>**/*.jpg</exclude>
-                        <exclude>**/ide/api/text/TextSelection.java</exclude>
-                        <exclude>**/ide/api/text/TextSelectionImpl.java</exclude>
-                        <exclude>**/ide/api/text/TypedPosition.java</exclude>
+                        <exclude>**/ide/api/editor/text/TypedPosition.java</exclude>
                         <exclude>**/ide/api/text/annotation/AnnotationModelEvent.java</exclude>
-                        <exclude>**/ide/api/text/rules/**/*.*</exclude>
-                        <exclude>**/ide/api/text/undo/**/*.*</exclude>
+                        <exclude>**/ide/api/editor/text/rules/**/*.*</exclude>
+                        <exclude>**/org/eclipse/che/ide/api/editor/reconciler/DirtyRegion.java</exclude>
+                        <exclude>**/org/eclipse/che/ide/api/editor/reconciler/DirtyRegionQueue.java</exclude>
+                        <exclude>**/org/eclipse/che/ide/api/editor/annotation/AnnotationModelEvent.java</exclude>
                     </excludes>
                 </configuration>
             </plugin>

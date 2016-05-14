@@ -13,7 +13,6 @@ package org.eclipse.che.ide.editor;
 import org.eclipse.che.ide.api.editor.EditorInput;
 import org.eclipse.che.ide.api.filetypes.FileType;
 import org.eclipse.che.ide.api.resources.VirtualFile;
-import com.google.gwt.resources.client.ImageResource;
 
 import org.vectomatic.dom.svg.ui.SVGResource;
 
@@ -28,11 +27,6 @@ final class EditorInputImpl implements EditorInput {
     }
 
     @Override
-    public String getContentDescription() {
-        return fileType.getContentDescription();
-    }
-
-    @Override
     public String getToolTipText() {
         return null;
     }
@@ -43,13 +37,8 @@ final class EditorInputImpl implements EditorInput {
     }
 
     @Override
-    public ImageResource getImageResource() {
-        return fileType.getImage();
-    }
-
-    @Override
     public SVGResource getSVGResource() {
-        return fileType.getSVGImage();
+        return fileType.getImage();
     }
 
     @Override

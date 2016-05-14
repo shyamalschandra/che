@@ -10,12 +10,12 @@
  *******************************************************************************/
 package org.eclipse.che.ide.extension.machine.client.actions;
 
-import org.eclipse.che.api.machine.gwt.client.MachineManager;
+import org.eclipse.che.ide.api.machine.MachineManager;
 import org.eclipse.che.api.machine.shared.dto.MachineDto;
 import org.eclipse.che.ide.api.action.ActionEvent;
 import org.eclipse.che.ide.extension.machine.client.MachineLocalizationConstant;
 import org.eclipse.che.ide.extension.machine.client.perspective.widgets.machine.panel.MachinePanelPresenter;
-import org.eclipse.che.ide.ui.dialogs.DialogFactory;
+import org.eclipse.che.ide.api.dialogs.DialogFactory;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

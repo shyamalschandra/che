@@ -15,7 +15,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.web.bindery.event.shared.EventBus;
 
-import org.eclipse.che.api.project.gwt.client.ProjectServiceClient;
+import org.eclipse.che.ide.api.project.ProjectServiceClient;
 import org.eclipse.che.api.promises.client.Operation;
 import org.eclipse.che.api.promises.client.OperationException;
 import org.eclipse.che.api.promises.client.Promise;
@@ -114,7 +114,7 @@ public class ClasspathResolver {
 
         final Project project = resource.getRelatedProject();
 
-        List<ClasspathEntryDTO> entries = new ArrayList<>();
+        final List<ClasspathEntryDTO> entries = new ArrayList<>();
         for (String path : libs) {
             entries.add(dtoFactory.createDto(ClasspathEntryDTO.class).withPath(path).withEntryKind(LIBRARY));
         }
@@ -132,6 +132,7 @@ public class ClasspathResolver {
         promise.then(new Operation<Void>() {
             @Override
             public void apply(Void arg) throws OperationException {
+                eventBus.fireEvent(new ClasspathChangedEvent(project.getLocation().toString(), entries));
                 projectService.getProject(appContext.getDevMachine(), project.getLocation()).then(
                         new Operation<ProjectConfigDto>() {
                             @Override

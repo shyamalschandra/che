@@ -47,6 +47,6 @@ public class FileIconProvider implements NodeIconProvider {
 
         FileType fileType = fileTypeRegistry.getFileTypeByFile((File)resource);
 
-        return fileType.equals(unknownFileType) ? null : fileType.getSVGImage();
+        return fileType.equals(unknownFileType) ? null : fileType.getImage();
     }
 }

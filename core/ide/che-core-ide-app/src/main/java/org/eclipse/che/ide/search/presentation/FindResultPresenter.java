@@ -86,7 +86,7 @@ public class FindResultPresenter extends BasePresenter implements FindResultView
     }
 
     @Override
-    public SVGResource getTitleSVGImage() {
+    public SVGResource getTitleImage() {
         return (resources.find());
     }
 

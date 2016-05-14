@@ -15,7 +15,6 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.web.bindery.event.shared.EventBus;
 
-import org.eclipse.che.ide.MimeType;
 import org.eclipse.che.ide.api.action.Action;
 import org.eclipse.che.ide.api.action.ActionEvent;
 import org.eclipse.che.ide.api.app.AppContext;
@@ -35,7 +34,7 @@ import org.eclipse.che.ide.ext.java.client.refactoring.move.RefactoredItemType;
 import org.eclipse.che.ide.ext.java.client.refactoring.rename.wizard.RenamePresenter;
 import org.eclipse.che.ide.ext.java.client.resource.SourceFolderMarker;
 import org.eclipse.che.ide.ext.java.client.util.JavaUtil;
-import org.eclipse.che.ide.jseditor.client.texteditor.TextEditor;
+import org.eclipse.che.ide.api.editor.texteditor.TextEditor;
 
 import static org.eclipse.che.ide.api.resources.Resource.FILE;
 import static org.eclipse.che.ide.ext.java.client.refactoring.move.RefactoredItemType.COMPILATION_UNIT;
@@ -168,11 +167,9 @@ public class RenameRefactoringAction extends Action implements ActivePartChanged
     }
 
     protected boolean isJavaFile(VirtualFile file) {
-        final String mediaType = fileTypeRegistry.getFileTypeByFile(file).getMimeTypes().get(0);
+        String fileExtension = fileTypeRegistry.getFileTypeByFile(file).getExtension();
 
-        return mediaType != null && ((mediaType.equals(MimeType.TEXT_X_JAVA) ||
-                                      mediaType.equals(MimeType.TEXT_X_JAVA_SOURCE) ||
-                                      mediaType.equals(MimeType.APPLICATION_JAVA_CLASS)));
+        return fileExtension.equals("java") || fileExtension.equals("class");
     }
 
     @Override

@@ -15,12 +15,12 @@ import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import org.eclipse.che.api.promises.client.Operation;
 import org.eclipse.che.api.promises.client.OperationException;
 import org.eclipse.che.api.promises.client.PromiseError;
-import org.eclipse.che.api.user.gwt.client.UserProfileServiceClient;
+import org.eclipse.che.ide.api.user.UserProfileServiceClient;
 import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.preferences.AbstractPreferencePagePresenter;
 import org.eclipse.che.ide.dto.DtoFactory;
-import org.eclipse.che.ide.ui.dialogs.ConfirmCallback;
-import org.eclipse.che.ide.ui.dialogs.DialogFactory;
+import org.eclipse.che.ide.api.dialogs.ConfirmCallback;
+import org.eclipse.che.ide.api.dialogs.DialogFactory;
 import org.eclipse.che.ide.util.Base64;
 import org.eclipse.che.plugin.docker.client.dto.AuthConfig;
 import org.eclipse.che.plugin.docker.client.dto.AuthConfigs;
@@ -59,7 +59,7 @@ public class CredentialsPreferencesPresenter extends AbstractPreferencePagePrese
                                            CredentialsDialogFactory credentialsDialogFactory,
                                            AppContext appContext,
                                            DialogFactory dialogFactory) {
-        super(locale.dockerPreferencesTitle(), locale.dockerPreferencesCategory(), null);
+        super(locale.dockerPreferencesTitle(), locale.dockerPreferencesCategory());
         this.view = view;
         this.view.setDelegate(this);
         this.userProfileServiceClient = userProfileServiceClient;

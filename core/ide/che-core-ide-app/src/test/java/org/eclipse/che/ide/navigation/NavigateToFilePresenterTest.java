@@ -13,7 +13,7 @@ package org.eclipse.che.ide.navigation;
 import com.google.common.base.Optional;
 import com.google.web.bindery.event.shared.EventBus;
 
-import org.eclipse.che.api.machine.gwt.client.events.WsAgentStateEvent;
+import org.eclipse.che.ide.api.machine.events.WsAgentStateEvent;
 import org.eclipse.che.api.promises.client.Promise;
 import org.eclipse.che.ide.api.resources.Container;
 import org.eclipse.che.ide.api.resources.File;

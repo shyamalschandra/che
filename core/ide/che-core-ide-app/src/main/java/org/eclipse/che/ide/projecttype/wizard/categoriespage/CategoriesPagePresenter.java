@@ -13,8 +13,6 @@ package org.eclipse.che.ide.projecttype.wizard.categoriespage;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
 
-import org.eclipse.che.api.project.shared.dto.ProjectTemplateDescriptor;
-import org.eclipse.che.api.project.shared.dto.ProjectTypeDto;
 import org.eclipse.che.ide.api.project.type.ProjectTemplateRegistry;
 import org.eclipse.che.ide.api.project.type.ProjectTypeRegistry;
 import org.eclipse.che.ide.api.project.type.wizard.PreSelectedProjectTypeManager;
@@ -28,13 +26,8 @@ import org.eclipse.che.ide.resource.Path;
 import org.eclipse.che.ide.resources.selector.SelectPathPresenter;
 import org.eclipse.che.ide.resources.selector.SelectionPathHandler;
 import org.eclipse.che.ide.util.NameUtils;
-import org.eclipse.che.ide.util.loging.Log;
 
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import static org.eclipse.che.ide.api.project.type.wizard.ProjectWizardMode.CREATE;
 import static org.eclipse.che.ide.api.project.type.wizard.ProjectWizardMode.UPDATE;

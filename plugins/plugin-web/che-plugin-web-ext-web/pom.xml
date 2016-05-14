@@ -54,27 +54,12 @@
         </dependency>
         <dependency>
             <groupId>org.eclipse.che.core</groupId>
-            <artifactId>che-core-client-gwt-project</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.che.core</groupId>
             <artifactId>che-core-commons-gwt</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.eclipse.che.core</groupId>
             <artifactId>che-core-ide-app</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.che.core</groupId>
-            <artifactId>che-core-ide-jseditor</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.che.core</groupId>
-            <artifactId>che-core-ide-ui</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -106,7 +91,6 @@
                 <configuration>
                     <excludes>
                         <exclude>**/*.svg</exclude>
-                        <exclude>**/*.png</exclude>
                     </excludes>
                 </configuration>
             </plugin>

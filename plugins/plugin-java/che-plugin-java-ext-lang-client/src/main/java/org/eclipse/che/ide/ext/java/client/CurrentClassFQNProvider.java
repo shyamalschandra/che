@@ -14,6 +14,8 @@ import com.google.common.base.Optional;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
+import org.eclipse.che.api.promises.client.Promise;
+import org.eclipse.che.api.promises.client.js.Promises;
 import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.resources.Container;
 import org.eclipse.che.ide.api.resources.Resource;
@@ -46,20 +48,20 @@ public class CurrentClassFQNProvider implements CommandPropertyValueProvider {
     }
 
     @Override
-    public String getValue() {
+    public Promise<String> getValue() {
         final Resource[] resources = appContext.getResources();
 
         if (resources == null || resources.length > 1) {
-            return "";
+            return Promises.resolve("");
         }
 
         final Resource resource = resources[0];
         final Optional<Resource> srcFolder = resource.getParentWithMarker(SourceFolderMarker.ID);
 
         if (resource.getResourceType() == FILE && isJavaFile(resource) && srcFolder.isPresent()) {
-            return JavaUtil.resolveFQN((Container)srcFolder.get(), resource);
+            return Promises.resolve(JavaUtil.resolveFQN((Container)srcFolder.get(), resource));
         } else {
-            return "";
+            return Promises.resolve("");
         }
     }
 }

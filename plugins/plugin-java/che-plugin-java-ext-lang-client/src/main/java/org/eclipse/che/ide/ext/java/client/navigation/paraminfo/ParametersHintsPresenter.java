@@ -22,9 +22,9 @@ import org.eclipse.che.ide.api.resources.VirtualFile;
 import org.eclipse.che.ide.ext.java.client.navigation.service.JavaNavigationService;
 import org.eclipse.che.ide.ext.java.client.util.JavaUtil;
 import org.eclipse.che.ide.ext.java.shared.dto.model.MethodParameters;
-import org.eclipse.che.ide.jseditor.client.document.Document;
-import org.eclipse.che.ide.jseditor.client.position.PositionConverter;
-import org.eclipse.che.ide.jseditor.client.texteditor.EmbeddedTextEditorPresenter;
+import org.eclipse.che.ide.api.editor.document.Document;
+import org.eclipse.che.ide.api.editor.position.PositionConverter;
+import org.eclipse.che.ide.api.editor.texteditor.TextEditorPresenter;
 import org.eclipse.che.ide.util.loging.Log;
 
 import java.util.List;
@@ -53,7 +53,7 @@ public class ParametersHintsPresenter {
      * @param activeEditor
      *         active editor which contains method or constructor for which parameters will be displayed
      */
-    public void show(final EmbeddedTextEditorPresenter activeEditor) {
+    public void show(final TextEditorPresenter activeEditor) {
         final int offset = activeEditor.getCursorOffset();
 
         if (!isCursorInRightPlace(activeEditor, offset)) {
@@ -91,7 +91,7 @@ public class ParametersHintsPresenter {
 
     }
 
-    private boolean isCursorInRightPlace(EmbeddedTextEditorPresenter activeEditor, int offset) {
+    private boolean isCursorInRightPlace(TextEditorPresenter activeEditor, int offset) {
         Document document = activeEditor.getDocument();
 
         int lineIndex = document.getLineAtOffset(offset);
@@ -103,7 +103,7 @@ public class ParametersHintsPresenter {
         return contentRange.contains(")");
     }
 
-    private int getLineStartOffset(EmbeddedTextEditorPresenter activeEditor, int offset) {
+    private int getLineStartOffset(TextEditorPresenter activeEditor, int offset) {
         Document document = activeEditor.getDocument();
         int lineIndex = document.getLineAtOffset(offset);
         return document.getLineStart(lineIndex);

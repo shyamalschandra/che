@@ -10,7 +10,6 @@
  *******************************************************************************/
 package org.eclipse.che.ide.extension.machine.client.perspective.widgets.machine.panel;
 
-import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.inject.Inject;
@@ -18,16 +17,16 @@ import com.google.inject.Singleton;
 import com.google.web.bindery.event.shared.EventBus;
 
 import org.eclipse.che.api.core.model.machine.MachineStatus;
-import org.eclipse.che.api.machine.gwt.client.MachineServiceClient;
+import org.eclipse.che.ide.api.machine.MachineServiceClient;
 import org.eclipse.che.api.machine.shared.dto.MachineDto;
 import org.eclipse.che.api.promises.client.Operation;
 import org.eclipse.che.api.promises.client.OperationException;
 import org.eclipse.che.api.promises.client.Promise;
 import org.eclipse.che.api.promises.client.PromiseError;
-import org.eclipse.che.api.workspace.gwt.client.event.WorkspaceStartedEvent;
-import org.eclipse.che.api.workspace.gwt.client.event.WorkspaceStartedHandler;
-import org.eclipse.che.api.workspace.gwt.client.event.WorkspaceStoppedEvent;
-import org.eclipse.che.api.workspace.gwt.client.event.WorkspaceStoppedHandler;
+import org.eclipse.che.ide.api.workspace.event.WorkspaceStartedEvent;
+import org.eclipse.che.ide.api.workspace.event.WorkspaceStartedHandler;
+import org.eclipse.che.ide.api.workspace.event.WorkspaceStoppedEvent;
+import org.eclipse.che.ide.api.workspace.event.WorkspaceStoppedHandler;
 import org.eclipse.che.commons.annotation.Nullable;
 import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.event.ActivePartChangedEvent;
@@ -214,16 +213,9 @@ public class MachinePanelPresenter extends BasePresenter implements MachinePanel
         return view;
     }
 
-    /** {@inheritDoc} */
     @Nullable
     @Override
-    public ImageResource getTitleImage() {
-        return null;
-    }
-
-    @Nullable
-    @Override
-    public SVGResource getTitleSVGImage() {
+    public SVGResource getTitleImage() {
         return resources.machinesPartIcon();
     }
 

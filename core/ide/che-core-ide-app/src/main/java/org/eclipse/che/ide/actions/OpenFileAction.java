@@ -12,6 +12,8 @@ package org.eclipse.che.ide.actions;
 
 import com.google.common.base.Optional;
 import com.google.gwt.core.client.Callback;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import com.google.web.bindery.event.shared.EventBus;
 import com.google.web.bindery.event.shared.HandlerRegistration;
 
@@ -34,9 +36,6 @@ import org.eclipse.che.ide.api.resources.File;
 import org.eclipse.che.ide.api.workspace.Workspace;
 import org.eclipse.che.ide.resource.Path;
 import org.eclipse.che.ide.util.loging.Log;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
 
 import static org.eclipse.che.api.promises.client.callback.CallbackPromiseHelper.createFromCallback;
 import static org.eclipse.che.ide.api.notification.StatusNotification.DisplayMode.FLOAT_MODE;

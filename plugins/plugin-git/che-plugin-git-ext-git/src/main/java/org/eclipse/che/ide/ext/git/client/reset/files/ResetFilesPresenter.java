@@ -13,7 +13,8 @@ package org.eclipse.che.ide.ext.git.client.reset.files;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
-import org.eclipse.che.api.git.gwt.client.GitServiceClient;
+import org.eclipse.che.ide.ext.git.client.GitLocalizationConstant;
+import org.eclipse.che.ide.api.git.GitServiceClient;
 import org.eclipse.che.api.git.shared.IndexFile;
 import org.eclipse.che.api.git.shared.Status;
 import org.eclipse.che.api.promises.client.Operation;
@@ -24,12 +25,11 @@ import org.eclipse.che.ide.api.notification.NotificationManager;
 import org.eclipse.che.ide.api.resources.Project;
 import org.eclipse.che.ide.api.workspace.Workspace;
 import org.eclipse.che.ide.dto.DtoFactory;
-import org.eclipse.che.ide.ext.git.client.GitLocalizationConstant;
 import org.eclipse.che.ide.ext.git.client.outputconsole.GitOutputConsole;
 import org.eclipse.che.ide.ext.git.client.outputconsole.GitOutputConsoleFactory;
 import org.eclipse.che.ide.extension.machine.client.processes.ConsolesPanelPresenter;
+import org.eclipse.che.ide.api.dialogs.DialogFactory;
 import org.eclipse.che.ide.resource.Path;
-import org.eclipse.che.ide.ui.dialogs.DialogFactory;
 
 import static org.eclipse.che.api.git.shared.ResetRequest.ResetType;
 import static org.eclipse.che.ide.ext.git.client.status.StatusCommandPresenter.STATUS_COMMAND_NAME;

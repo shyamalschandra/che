@@ -84,13 +84,15 @@ import static javax.ws.rs.HttpMethod.GET;
 import static javax.ws.rs.HttpMethod.PUT;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static org.eclipse.che.api.core.util.LinksHelper.createLink;
-import static org.eclipse.che.api.project.server.Constants.LINK_REL_CHILDREN;
-import static org.eclipse.che.api.project.server.Constants.LINK_REL_DELETE;
-import static org.eclipse.che.api.project.server.Constants.LINK_REL_GET_CONTENT;
-import static org.eclipse.che.api.project.server.Constants.LINK_REL_TREE;
-import static org.eclipse.che.api.project.server.Constants.LINK_REL_UPDATE_CONTENT;
-import static org.eclipse.che.api.project.server.Constants.LINK_REL_UPDATE_PROJECT;
 import static org.eclipse.che.api.project.server.DtoConverter.asDto;
+import static org.eclipse.che.api.project.shared.Constants.LINK_REL_CHILDREN;
+import static org.eclipse.che.api.project.shared.Constants.LINK_REL_CREATE_PROJECT;
+import static org.eclipse.che.api.project.shared.Constants.LINK_REL_DELETE;
+import static org.eclipse.che.api.project.shared.Constants.LINK_REL_GET_CONTENT;
+import static org.eclipse.che.api.project.shared.Constants.LINK_REL_GET_PROJECTS;
+import static org.eclipse.che.api.project.shared.Constants.LINK_REL_TREE;
+import static org.eclipse.che.api.project.shared.Constants.LINK_REL_UPDATE_CONTENT;
+import static org.eclipse.che.api.project.shared.Constants.LINK_REL_UPDATE_PROJECT;
 import static org.eclipse.che.dto.server.DtoFactory.newDto;
 
 /**
@@ -125,7 +127,7 @@ public class ProjectService extends Service {
                   responseContainer = "List")
     @ApiResponses({@ApiResponse(code = 200, message = "OK"),
                    @ApiResponse(code = 500, message = "Server error")})
-    @GenerateLink(rel = Constants.LINK_REL_GET_PROJECTS)
+    @GenerateLink(rel = LINK_REL_GET_PROJECTS)
     public List<ProjectConfigDto> getProjects(@ApiParam("ID of workspace to get projects")
                                               @PathParam("ws-id") String workspace) throws IOException,
                                                                                            ServerException,
@@ -165,7 +167,7 @@ public class ProjectService extends Service {
                    @ApiResponse(code = 403, message = "Operation is forbidden"),
                    @ApiResponse(code = 409, message = "Project with specified name already exist in workspace"),
                    @ApiResponse(code = 500, message = "Server error")})
-    @GenerateLink(rel = Constants.LINK_REL_CREATE_PROJECT)
+    @GenerateLink(rel = LINK_REL_CREATE_PROJECT)
     /**
      * NOTE: parentPath is added to make a module
      */
@@ -885,25 +887,17 @@ public class ProjectService extends Service {
         final QueryExpression expr = new QueryExpression()
                 .setPath(path.startsWith("/") ? path : ('/' + path))
                 .setName(name)
-                .setText(text);
+                .setText(text)
+                .setMaxItems(maxItems)
+                .setSkipCount(skipCount);
 
         final SearchResult result = searcher.search(expr);
-
-        if (skipCount > 0) {
-            if (skipCount > result.getTotalHits()) {
-                throw new ConflictException(
-                        String.format("'skipCount' parameter: %d is greater then total number of items in result: %d.",
-                                      skipCount, result.getTotalHits()));
-            }
-        }
-
-        final int length = maxItems > 0 ? Math.min(result.getTotalHits(), maxItems) : result.getTotalHits();
-        final List<ItemReference> items = new ArrayList<>(length);
+        final List<SearchResultEntry> searchResultEntries = result.getResults();
+        final List<ItemReference> items = new ArrayList<>(searchResultEntries.size());
         final FolderEntry root = projectManager.getProjectsRoot();
 
-        List<SearchResultEntry> entries = result.getResults();
-        for (int i = skipCount; i < length; i++) {
-            final VirtualFileEntry child = root.getChild(entries.get(i).getFilePath());
+        for (SearchResultEntry searchResultEntry : searchResultEntries) {
+            final VirtualFileEntry child = root.getChild(searchResultEntry.getFilePath());
 
             if (child != null && child.isFile()) {
                 items.add(injectFileLinks(asDto((FileEntry)child), workspace));

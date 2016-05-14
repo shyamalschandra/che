@@ -13,7 +13,10 @@ package org.eclipse.che.ide.extension.machine.client.command.valueproviders;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
+import org.eclipse.che.api.promises.client.Promise;
+import org.eclipse.che.api.promises.client.js.Promises;
 import org.eclipse.che.ide.api.app.AppContext;
+import org.eclipse.che.ide.api.app.CurrentProject;
 
 /**
  * Provides relative path to specific project. Path to project resolves from current workspace root.
@@ -41,7 +44,11 @@ public class CurrentProjectRelativePathProvider implements CommandPropertyValueP
     }
 
     @Override
-    public String getValue() {
-        return appContext.getCurrentProject().getProjectConfig().getPath().substring(1);
+    public Promise<String> getValue() {
+        CurrentProject currentProject = appContext.getCurrentProject();
+        if (currentProject == null) {
+            return Promises.resolve("");
+        }
+        return Promises.resolve(appContext.getCurrentProject().getProjectConfig().getPath().substring(1));
     }
 }

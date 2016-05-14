@@ -11,7 +11,6 @@
 package org.eclipse.che.ide.api.editor;
 
 import org.eclipse.che.ide.api.resources.VirtualFile;
-import com.google.gwt.resources.client.ImageResource;
 
 import org.vectomatic.dom.svg.ui.SVGResource;
 
@@ -24,24 +23,9 @@ import javax.validation.constraints.NotNull;
  * An editor input is passed to an editor via the <code>EditorPartPresenter.init</code> method.
  * </p>
  *
- * @author <a href="mailto:evidolob@exoplatform.com">Evgen Vidolob</a>
+ * @author Evgen Vidolob
  */
 public interface EditorInput {
-
-    /**
-     * Returns the content description for this editor input. This content description is used for editors' information panel
-     *
-     * @return the content description for this input
-     */
-    String getContentDescription();
-
-    /**
-     * Returns the image descriptor for this input.
-     *
-     * @return the image resource for this input.
-     */
-    @NotNull
-    ImageResource getImageResource();
 
     /**
      * Returns the image descriptor for this input.

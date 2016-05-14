@@ -17,13 +17,13 @@ import com.google.inject.Singleton;
 import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.editor.EditorAgent;
 import org.eclipse.che.ide.api.editor.EditorPartPresenter;
+import org.eclipse.che.ide.api.editor.position.PositionConverter;
+import org.eclipse.che.ide.api.editor.texteditor.TextEditorPresenter;
 import org.eclipse.che.ide.api.resources.Container;
 import org.eclipse.che.ide.api.resources.Project;
 import org.eclipse.che.ide.api.resources.Resource;
 import org.eclipse.che.ide.ext.java.client.resource.SourceFolderMarker;
 import org.eclipse.che.ide.ext.java.client.util.JavaUtil;
-import org.eclipse.che.ide.jseditor.client.position.PositionConverter;
-import org.eclipse.che.ide.jseditor.client.texteditor.EmbeddedTextEditorPresenter;
 import org.eclipse.che.ide.util.loging.Log;
 
 /**
@@ -53,12 +53,12 @@ public class QuickDocPresenter implements QuickDocumentation, QuickDocView.Actio
             return;
         }
 
-        if (!(activeEditor instanceof EmbeddedTextEditorPresenter)) {
-            Log.error(getClass(), "Quick Document support only EmbeddedTextEditorPresenter as editor");
+        if (!(activeEditor instanceof TextEditorPresenter)) {
+            Log.error(getClass(), "Quick Document support only TextEditorPresenter as editor");
             return;
         }
 
-        EmbeddedTextEditorPresenter editor = ((EmbeddedTextEditorPresenter)activeEditor);
+        TextEditorPresenter editor = ((TextEditorPresenter)activeEditor);
         int offset = editor.getCursorOffset();
         final PositionConverter.PixelCoordinates coordinates = editor.getPositionConverter().offsetToPixel(offset);
 

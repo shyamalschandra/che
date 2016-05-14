@@ -34,9 +34,9 @@ import org.eclipse.che.ide.ext.java.client.resource.SourceFolderMarker;
 import org.eclipse.che.ide.ext.java.client.util.JavaUtil;
 import org.eclipse.che.ide.ext.java.shared.JarEntry;
 import org.eclipse.che.ide.ext.java.shared.OpenDeclarationDescriptor;
+import org.eclipse.che.ide.api.editor.text.LinearRange;
+import org.eclipse.che.ide.api.editor.texteditor.TextEditorPresenter;
 import org.eclipse.che.ide.ext.java.shared.dto.ClassContent;
-import org.eclipse.che.ide.jseditor.client.text.LinearRange;
-import org.eclipse.che.ide.jseditor.client.texteditor.EmbeddedTextEditorPresenter;
 import org.eclipse.che.ide.resource.Path;
 import org.eclipse.che.ide.util.loging.Log;
 
@@ -74,13 +74,12 @@ public class OpenDeclarationFinder {
             return;
         }
 
-        if (!(activeEditor instanceof EmbeddedTextEditorPresenter)) {
-            Log.error(getClass(), "Open Declaration support only EmbeddedTextEditorPresenter as editor");
+        if (!(activeEditor instanceof TextEditorPresenter)) {
+            Log.error(getClass(), "Open Declaration support only TextEditorPresenter as editor");
             return;
         }
-
-        final EmbeddedTextEditorPresenter editor = ((EmbeddedTextEditorPresenter)activeEditor);
-        final int offset = editor.getCursorOffset();
+        TextEditorPresenter editor = ((TextEditorPresenter)activeEditor);
+        int offset = editor.getCursorOffset();
         final VirtualFile file = editor.getEditorInput().getFile();
 
         if (file instanceof Resource) {
@@ -146,8 +145,8 @@ public class OpenDeclarationFinder {
         new Timer() { //in some reason we need here timeout otherwise it not work cursor don't set to correct position
             @Override
             public void run() {
-                if (editor instanceof EmbeddedTextEditorPresenter) {
-                    ((EmbeddedTextEditorPresenter)editor).getDocument().setSelectedRange(
+                if (editor instanceof TextEditorPresenter) {
+                    ((TextEditorPresenter)editor).getDocument().setSelectedRange(
                             LinearRange.createWithStart(offset).andLength(0), true);
                 }
             }

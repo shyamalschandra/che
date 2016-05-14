@@ -13,11 +13,11 @@ package org.eclipse.che.ide.ext.git.client.init;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
-import org.eclipse.che.api.git.gwt.client.GitServiceClient;
 import org.eclipse.che.api.promises.client.Operation;
 import org.eclipse.che.api.promises.client.OperationException;
 import org.eclipse.che.api.promises.client.PromiseError;
 import org.eclipse.che.ide.api.app.AppContext;
+import org.eclipse.che.ide.api.git.GitServiceClient;
 import org.eclipse.che.ide.api.notification.NotificationManager;
 import org.eclipse.che.ide.api.resources.Project;
 import org.eclipse.che.ide.api.workspace.Workspace;
@@ -48,7 +48,7 @@ public class InitRepositoryPresenter {
     private final Workspace               workspace;
     private final GitLocalizationConstant constant;
     private final NotificationManager     notificationManager;
-    private final AppContext               appContext;
+    private final AppContext              appContext;
 
     @Inject
     public InitRepositoryPresenter(GitLocalizationConstant constant,

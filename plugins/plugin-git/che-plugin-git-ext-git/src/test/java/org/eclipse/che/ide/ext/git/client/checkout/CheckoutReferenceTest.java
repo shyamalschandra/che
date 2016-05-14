@@ -12,14 +12,12 @@ package org.eclipse.che.ide.ext.git.client.checkout;
 
 import org.eclipse.che.api.git.shared.CheckoutRequest;
 import org.eclipse.che.api.promises.client.Operation;
-import org.eclipse.che.ide.api.notification.StatusNotification;
 import org.eclipse.che.ide.api.resources.Resource;
 import org.eclipse.che.ide.ext.git.client.BaseTest;
 import org.eclipse.che.ide.resource.Path;
 import org.junit.Test;
 import org.mockito.Mock;
 
-import static org.eclipse.che.ide.ext.git.client.checkout.CheckoutReferencePresenter.CHECKOUT_COMMAND_NAME;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyObject;

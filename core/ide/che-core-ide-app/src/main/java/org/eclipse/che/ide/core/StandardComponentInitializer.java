@@ -42,8 +42,6 @@ import org.eclipse.che.ide.actions.NavigateToFileAction;
 import org.eclipse.che.ide.actions.OpenFileAction;
 import org.eclipse.che.ide.actions.EditFileAction;
 import org.eclipse.che.ide.actions.ProjectConfigurationAction;
-import org.eclipse.che.ide.actions.RedirectToDashboardProjectsAction;
-import org.eclipse.che.ide.actions.RedirectToDashboardWorkspacesAction;
 import org.eclipse.che.ide.actions.RedoAction;
 import org.eclipse.che.ide.actions.RenameItemAction;
 import org.eclipse.che.ide.actions.SaveAction;
@@ -52,7 +50,6 @@ import org.eclipse.che.ide.actions.ShowHiddenFilesAction;
 import org.eclipse.che.ide.actions.ShowPreferencesAction;
 import org.eclipse.che.ide.editor.SwitchPreviousEditorAction;
 import org.eclipse.che.ide.editor.SwitchNextEditorAction;
-import org.eclipse.che.ide.actions.ShowReferenceAction;
 import org.eclipse.che.ide.actions.UndoAction;
 import org.eclipse.che.ide.actions.UploadFileAction;
 import org.eclipse.che.ide.actions.UploadFolderAction;
@@ -63,6 +60,7 @@ import org.eclipse.che.ide.api.action.ActionManager;
 import org.eclipse.che.ide.api.action.DefaultActionGroup;
 import org.eclipse.che.ide.api.action.IdeActions;
 import org.eclipse.che.ide.api.editor.EditorRegistry;
+import org.eclipse.che.ide.api.editor.texteditor.EditorResources;
 import org.eclipse.che.ide.api.filetypes.FileType;
 import org.eclipse.che.ide.api.filetypes.FileTypeRegistry;
 import org.eclipse.che.ide.api.icon.Icon;
@@ -81,6 +79,7 @@ import org.eclipse.che.ide.part.editor.actions.PinEditorTabAction;
 import org.eclipse.che.ide.part.editor.actions.ReopenClosedFileAction;
 import org.eclipse.che.ide.part.editor.recent.OpenRecentFilesAction;
 import org.eclipse.che.ide.ui.loaders.request.MessageLoaderResources;
+import org.eclipse.che.ide.ui.popup.PopupResources;
 import org.eclipse.che.ide.ui.toolbar.MainToolbar;
 import org.eclipse.che.ide.ui.toolbar.ToolbarPresenter;
 import org.eclipse.che.ide.util.browser.UserAgent;
@@ -131,9 +130,6 @@ public class StandardComponentInitializer {
 
     @Inject
     private FindActionAction findActionAction;
-
-//    @Inject
-//    private FindReplaceAction findReplaceAction;
 
     @Inject
     private NavigateToFileAction navigateToFileAction;
@@ -263,6 +259,12 @@ public class StandardComponentInitializer {
     private MessageLoaderResources messageLoaderResources;
 
     @Inject
+    private EditorResources editorResources;
+
+    @Inject
+    private PopupResources popupResources;
+
+    @Inject
     private ShowReferenceAction showReferenceAction;
 
     @Inject
@@ -337,8 +339,9 @@ public class StandardComponentInitializer {
     }
 
     public void initialize() {
-        //initialize loader resources
         messageLoaderResources.Css().ensureInjected();
+        editorResources.editorCss().ensureInjected();
+        popupResources.popupStyle().ensureInjected();
 
         fileTypeRegistry.registerFileType(xmlFile);
 
@@ -406,7 +409,7 @@ public class StandardComponentInitializer {
         newGroup.addSeparator();
 
         actionManager.registerAction("newXmlFile", newXmlFileAction);
-        newXmlFileAction.getTemplatePresentation().setSVGResource(xmlFile.getSVGImage());
+        newXmlFileAction.getTemplatePresentation().setSVGResource(xmlFile.getImage());
         newGroup.addAction(newXmlFileAction);
 
         actionManager.registerAction("uploadFile", uploadFileAction);
@@ -547,7 +550,6 @@ public class StandardComponentInitializer {
 
         actionManager.registerAction("collapseAll", collapseAllAction);
 
-//        actionManager.registerAction("findReplace", findReplaceAction);
         actionManager.registerAction("openFile", openFileAction);
         actionManager.registerAction("switchLeftTab", switchPreviousEditorAction);
         actionManager.registerAction("switchRightTab", switchNextEditorAction);
@@ -614,7 +616,6 @@ public class StandardComponentInitializer {
         } else {
             keyBinding.getGlobal().addKey(new KeyBuilder().alt().charCode('w').build(), "closeCurrentFile");
         }
-
     }
 
     /** Action that does nothing. It's just for disabling (catching) browser's hot key. */

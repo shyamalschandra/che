@@ -27,9 +27,9 @@ import org.eclipse.che.ide.api.resources.VirtualFile;
 import org.eclipse.che.ide.api.workspace.Workspace;
 import org.eclipse.che.ide.ext.debugger.client.debug.ActiveFileHandler;
 import org.eclipse.che.ide.ext.debugger.client.debug.DebuggerPresenter;
-import org.eclipse.che.ide.jseditor.client.document.Document;
-import org.eclipse.che.ide.jseditor.client.text.TextPosition;
-import org.eclipse.che.ide.jseditor.client.texteditor.EmbeddedTextEditorPresenter;
+import org.eclipse.che.ide.api.editor.document.Document;
+import org.eclipse.che.ide.api.editor.text.TextPosition;
+import org.eclipse.che.ide.api.editor.texteditor.TextEditorPresenter;
 import org.eclipse.che.ide.util.loging.Log;
 
 import javax.validation.constraints.NotNull;
@@ -72,7 +72,7 @@ public class GdbDebuggerFileHandler implements ActiveFileHandler {
             openFile(className, filePaths, 0, new AsyncCallback<VirtualFile>() {
                 @Override
                 public void onSuccess(VirtualFile result) {
-                    scrollEditorToExecutionPoint((EmbeddedTextEditorPresenter)editorAgent.getActiveEditor(), lineNumber);
+                    scrollEditorToExecutionPoint((TextEditorPresenter)editorAgent.getActiveEditor(), lineNumber);
                     callback.onSuccess(result);
                 }
 
@@ -82,7 +82,7 @@ public class GdbDebuggerFileHandler implements ActiveFileHandler {
                 }
             });
         } else {
-            scrollEditorToExecutionPoint((EmbeddedTextEditorPresenter)activeEditor, lineNumber);
+            scrollEditorToExecutionPoint((TextEditorPresenter)activeEditor, lineNumber);
             callback.onSuccess(activeFile);
         }
     }
@@ -148,7 +148,7 @@ public class GdbDebuggerFileHandler implements ActiveFileHandler {
         });
     }
 
-    private void scrollEditorToExecutionPoint(EmbeddedTextEditorPresenter editor, int lineNumber) {
+    private void scrollEditorToExecutionPoint(TextEditorPresenter editor, int lineNumber) {
         Document document = editor.getDocument();
 
         if (document != null) {

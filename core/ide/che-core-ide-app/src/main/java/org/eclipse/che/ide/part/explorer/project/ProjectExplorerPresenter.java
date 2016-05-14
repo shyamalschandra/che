@@ -214,7 +214,7 @@ public class ProjectExplorerPresenter extends BasePresenter implements ActionDel
 
     /** {@inheritDoc} */
     @Override
-    public SVGResource getTitleSVGImage() {
+    public SVGResource getTitleImage() {
         return resources.projectExplorerPartIcon();
     }
 
