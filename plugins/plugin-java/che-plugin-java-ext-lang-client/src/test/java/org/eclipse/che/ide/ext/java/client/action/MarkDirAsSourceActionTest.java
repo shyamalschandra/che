@@ -29,7 +29,6 @@ import org.eclipse.che.ide.ext.java.client.project.classpath.service.ClasspathSe
 //import org.eclipse.che.ide.ext.java.client.project.node.PackageNode;
 //import org.eclipse.che.ide.ext.java.client.project.node.SourceFolderNode;
 import org.eclipse.che.ide.ext.java.shared.dto.classpath.ClasspathEntryDTO;
-import org.eclipse.che.ide.part.explorer.project.ProjectExplorerPresenter;
 import org.eclipse.che.ide.project.node.FolderReferenceNode;
 import org.junit.Assert;
 import org.junit.Before;

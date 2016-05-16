@@ -50,7 +50,6 @@ import org.eclipse.che.ide.ext.java.shared.dto.refactoring.RefactoringStatusEntr
 import org.eclipse.che.ide.ext.java.shared.dto.refactoring.RenameRefactoringSession;
 import org.eclipse.che.ide.ext.java.shared.dto.refactoring.RenameSettings;
 import org.eclipse.che.ide.api.editor.texteditor.TextEditor;
-import org.eclipse.che.ide.part.explorer.project.ProjectExplorerPresenter;
 import org.eclipse.che.ide.api.dialogs.CancelCallback;
 import org.eclipse.che.ide.api.dialogs.ConfirmCallback;
 import org.eclipse.che.ide.api.dialogs.DialogFactory;
@@ -95,8 +94,6 @@ public class RenamePresenterTest {
     private JavaLocalizationConstant           locale;
     @Mock
     private EventBus                           eventBus;
-    @Mock
-    private ProjectExplorerPresenter           projectExplorer;
     @Mock
     private EditorAgent                        editorAgent;
     @Mock

@@ -11,25 +11,15 @@
 package org.eclipse.che.ide.ext.git.client.commit;
 
 import org.eclipse.che.api.git.shared.Revision;
-import org.eclipse.che.api.promises.client.Operation;
-import org.eclipse.che.ide.api.notification.StatusNotification;
 import org.eclipse.che.ide.ext.git.client.BaseTest;
 import org.eclipse.che.ide.ext.git.client.DateTimeFormatter;
-import org.eclipse.che.ide.part.explorer.project.ProjectExplorerPresenter;
-import org.eclipse.che.ide.resource.Path;
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 
-import static org.eclipse.che.ide.ext.git.client.commit.CommitPresenter.COMMIT_COMMAND_NAME;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.anyObject;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -52,8 +42,6 @@ public class CommitPresenterTest extends BaseTest {
     private Revision                 revision;
     @Mock
     private DateTimeFormatter        dateTimeFormatter;
-    @Mock
-    private ProjectExplorerPresenter projectExplorer;
 
     private CommitPresenter presenter;
 

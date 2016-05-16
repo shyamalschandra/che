@@ -446,7 +446,6 @@ public class CoreGinModule extends AbstractGinModule {
     private void configureProjectTree() {
         install(new GinFactoryModuleBuilder().build(NodeFactory.class));
         bind(SettingsProvider.class).to(DummySettingsProvider.class).in(Singleton.class);
-//        bind(NodeManager.class);
         bind(ProjectExplorerView.class).to(ProjectExplorerViewImpl.class).in(Singleton.class);
         bind(ProjectExplorerPart.class).to(ProjectExplorerPresenter.class).in(Singleton.class);
 
