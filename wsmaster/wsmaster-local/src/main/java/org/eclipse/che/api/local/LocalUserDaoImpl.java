@@ -86,7 +86,7 @@ public class LocalUserDaoImpl implements UserDao {
     }
 
     @Override
-    public void create(User user) throws ConflictException {
+    public User create(User user) throws ConflictException {
         lock.writeLock().lock();
         try {
             final String userId = user.getId();
@@ -104,6 +104,7 @@ public class LocalUserDaoImpl implements UserDao {
                 }
             }
             users.add(doClone(user));
+            return user;
         } finally {
             lock.writeLock().unlock();
         }

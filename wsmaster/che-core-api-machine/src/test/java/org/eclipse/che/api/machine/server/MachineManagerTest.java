@@ -106,7 +106,7 @@ public class MachineManagerTest {
                                          recipeDownloader));
 
         EnvironmentContext envCont = new EnvironmentContext();
-        envCont.setSubject(new SubjectImpl(null, USER_ID, null, null, false));
+        envCont.setSubject(new SubjectImpl(null, USER_ID, null, false));
         EnvironmentContext.setCurrent(envCont);
 
         RecipeImpl recipe = new RecipeImpl().withScript("script").withType("Dockerfile");

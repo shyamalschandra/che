@@ -32,18 +32,13 @@ public interface Subject {
         }
 
         @Override
-        public boolean isMemberOf(String role) {
-            return false;
-        }
-
-        @Override
         public boolean hasPermission(String domain, String instance, String action) {
             return false;
         }
 
         @Override
         public void checkPermission(String domain, String instance, String action) throws ForbiddenException {
-
+            throw new ForbiddenException("User is not authorized to perform " + action + " of " + domain + " with id '" + instance + "'");
         }
 
         @Override
@@ -70,15 +65,6 @@ public interface Subject {
      * @return name of user
      */
     String getUserName();
-
-    /**
-     * Checks is subject in specified {@code role}.
-     *
-     * @param role
-     *         role name to check
-     * @return {@code true} if subject in role and {@code false} otherwise
-     */
-    boolean isMemberOf(String role);
 
     /**
      * Checks does subject have specified permission.
