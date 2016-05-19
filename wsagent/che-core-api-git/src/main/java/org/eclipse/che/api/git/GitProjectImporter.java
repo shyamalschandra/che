@@ -123,6 +123,7 @@ public class GitProjectImporter implements ProjectImporter {
             // Delete vcs info if false.
             String branchMerge = null;
             boolean keepVcs = true;
+            boolean recursiveEnabled = false;
 
             Map<String, String> parameters = storage.getParameters();
             if (parameters != null) {
@@ -133,6 +134,9 @@ public class GitProjectImporter implements ProjectImporter {
                 keepDir = parameters.get("keepDir");
                 if (parameters.containsKey("keepVcs")) {
                     keepVcs = Boolean.parseBoolean(parameters.get("keepVcs"));
+                }
+                if (parameters.containsKey("recursive")) {
+                    recursiveEnabled = true;
                 }
                 branchMerge = parameters.get("branchMerge");
             }
@@ -156,7 +160,7 @@ public class GitProjectImporter implements ProjectImporter {
 
                 git = gitConnectionFactory.getConnection(localPath, consumerFactory);
                 if (baseFolder.getChildren().size() == 0) {
-                    cloneRepository(git, "origin", location, dtoFactory);
+                    cloneRepository(git, "origin", location, dtoFactory, recursiveEnabled);
                     if (commitId != null) {
                         checkoutCommit(git, commitId, dtoFactory);
                     } else if (fetch != null) {
@@ -208,9 +212,12 @@ public class GitProjectImporter implements ProjectImporter {
         }
     }
 
-    private void cloneRepository(GitConnection git, String remoteName, String url, DtoFactory dtoFactory)
+    private void cloneRepository(GitConnection git, String remoteName, String url, DtoFactory dtoFactory, boolean recursiveEnabled)
             throws ServerException, UnauthorizedException, URISyntaxException {
-        final CloneRequest request = dtoFactory.createDto(CloneRequest.class).withRemoteName(remoteName).withRemoteUri(url);
+        final CloneRequest request = dtoFactory.createDto(CloneRequest.class)
+                                               .withRemoteName(remoteName)
+                                               .withRemoteUri(url)
+                                               .withRecursiveEnabled(recursiveEnabled);
         git.clone(request);
     }
 
