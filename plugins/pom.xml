@@ -41,7 +41,7 @@
         <module>plugin-dashboard</module>
         <module>plugin-gwt</module>
         <module>plugin-python</module>
-        <!--<module>plugin-svn</module>-->
+        <module>plugin-svn</module>
         <module>plugin-cpp</module>
         <module>plugin-nodejs</module>
         <module>plugin-ssh-machine</module>

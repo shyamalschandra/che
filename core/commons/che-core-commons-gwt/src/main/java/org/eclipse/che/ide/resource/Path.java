@@ -13,7 +13,10 @@ package org.eclipse.che.ide.resource;
 import com.google.common.annotations.Beta;
 import com.google.common.base.Objects;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -1200,5 +1203,26 @@ public final class Path {
      */
     public Path parent() {
         return this.removeLastSegments(1);
+    }
+
+    /**
+     * Converts given input array of paths into the list.
+     *
+     * @param paths
+     *         the input array of paths
+     * @return the converted list
+     * @since 4.3.0
+     */
+    public static List<String> toList(Path[] paths) {
+        if (paths == null || paths.length == 0) {
+            return Collections.emptyList();
+        }
+
+        List<String> list = new ArrayList<>(paths.length);
+        for (Path path : paths) {
+            list.add(path.toString());
+        }
+
+        return list;
     }
 }

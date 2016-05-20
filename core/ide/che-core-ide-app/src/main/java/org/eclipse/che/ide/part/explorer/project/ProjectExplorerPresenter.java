@@ -157,6 +157,11 @@ public class ProjectExplorerPresenter extends BasePresenter implements ActionDel
         for (final Node exist : tree.getNodeStorage().getAll()) {
             if (isNodeServesLocation(exist, delta.getResource().getLocation())) {
 
+                if (delta.getResource().getLocation().segmentCount() == 1) {
+                    tree.getNodeStorage().remove(exist);
+                    return;
+                }
+
                 Node toReveal;
 
                 toReveal = tree.getNodeStorage().getPreviousSibling(exist);
