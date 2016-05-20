@@ -23,6 +23,7 @@ import org.eclipse.che.api.machine.server.model.impl.MachineImpl;
 import org.eclipse.che.api.machine.server.model.impl.MachineSourceImpl;
 import org.eclipse.che.api.machine.server.recipe.RecipeImpl;
 import org.eclipse.che.api.workspace.server.WorkspaceRuntimes.RuntimeDescriptor;
+import org.eclipse.che.api.workspace.server.env.spi.EnvironmentEngine;
 import org.eclipse.che.api.workspace.server.model.impl.EnvironmentImpl;
 import org.eclipse.che.api.workspace.server.model.impl.WorkspaceConfigImpl;
 import org.eclipse.che.api.workspace.server.model.impl.WorkspaceImpl;
@@ -33,6 +34,9 @@ import org.mockito.testng.MockitoTestNGListener;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
+
+import java.util.Collections;
+import java.util.Map;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
@@ -69,13 +73,19 @@ public class WorkspaceRuntimesTest {
     @Mock
     private EventService eventService;
 
+    @Mock
+    private EnvironmentEngine envEngine;
+
+    private Map<String, EnvironmentEngine> envEngines;
+
     private WorkspaceRuntimes runtimes;
 
     @BeforeMethod
     public void setUp() throws Exception {
         when(machineManagerMock.createMachineSync(any(), any(), any()))
                 .thenAnswer(invocation -> createMachine((MachineConfig)invocation.getArguments()[0]));
-        runtimes = new WorkspaceRuntimes(machineManagerMock, eventService);
+        envEngines = Collections.singletonMap("envType", envEngine);
+        runtimes = new WorkspaceRuntimes(eventService, envEngines);
     }
 
     @Test(expectedExceptions = NotFoundException.class,
@@ -96,7 +106,7 @@ public class WorkspaceRuntimesTest {
     @Test
     public void workspaceShouldBeInStartingStatusUntilDevMachineIsNotStarted() throws Exception {
         final MachineManager machineManagerMock = mock(MachineManager.class);
-        final WorkspaceRuntimes runtimes = new WorkspaceRuntimes(machineManagerMock, eventService);
+        final WorkspaceRuntimes runtimes = new WorkspaceRuntimes(eventService, envEngines);
         final WorkspaceImpl workspace = createWorkspace();
 
         // check if workspace in starting status before dev machine is started
@@ -117,7 +127,7 @@ public class WorkspaceRuntimesTest {
     @Test
     public void workspaceShouldNotHaveRuntimeIfDevMachineCreationFailed() throws Exception {
         final MachineManager machineManagerMock = mock(MachineManager.class);
-        final WorkspaceRuntimes runtimes = new WorkspaceRuntimes(machineManagerMock, eventService);
+        final WorkspaceRuntimes runtimes = new WorkspaceRuntimes(eventService, envEngines);
         final WorkspaceImpl workspaceMock = createWorkspace();
         when(machineManagerMock.createMachineSync(any(), any(), any())).thenThrow(new MachineException("Creation error"));
 
@@ -152,7 +162,7 @@ public class WorkspaceRuntimesTest {
           expectedExceptionsMessageRegExp = "Couldn't stop '.*' workspace because its status is 'STARTING'")
     public void shouldNotStopWorkspaceIfItIsStarting() throws Exception {
         final MachineManager machineManagerMock = mock(MachineManager.class);
-        final WorkspaceRuntimes registry = new WorkspaceRuntimes(machineManagerMock, eventService);
+        final WorkspaceRuntimes registry = new WorkspaceRuntimes(eventService, envEngines);
         final WorkspaceImpl workspace = createWorkspace();
 
         when(machineManagerMock.createMachineSync(any(), any(), any())).thenAnswer(invocationOnMock -> {
@@ -297,7 +307,7 @@ public class WorkspaceRuntimesTest {
     @Test
     public void startingEventShouldBePublishedBeforeStart() throws Exception {
         final WorkspaceImpl workspace = createWorkspace();
-        runtimes = spy(new WorkspaceRuntimes(machineManagerMock, eventService));
+        runtimes = spy(new WorkspaceRuntimes(eventService, envEngines));
         doNothing().when(runtimes).publishEvent(any(), any(), any());
 
         doAnswer(invocation -> {
@@ -311,7 +321,7 @@ public class WorkspaceRuntimesTest {
     @Test
     public void runningEventShouldBePublishedAfterDevMachineStarted() throws Exception {
         final WorkspaceImpl workspace = createWorkspace();
-        runtimes = spy(new WorkspaceRuntimes(machineManagerMock, eventService));
+        runtimes = spy(new WorkspaceRuntimes(eventService, envEngines));
         doNothing().when(runtimes).publishEvent(any(), any(), any());
 
         doAnswer(invocation -> {
@@ -328,7 +338,7 @@ public class WorkspaceRuntimesTest {
     @Test
     public void errorEventShouldBePublishedIfDevMachineFailedToStart() throws Exception {
         final WorkspaceImpl workspace = createWorkspace();
-        runtimes = spy(new WorkspaceRuntimes(machineManagerMock, eventService));
+        runtimes = spy(new WorkspaceRuntimes(eventService, envEngines));
         doNothing().when(runtimes).publishEvent(any(), any(), any());
         doNothing().when(runtimes).cleanupStartResources(any());
 
@@ -350,7 +360,7 @@ public class WorkspaceRuntimesTest {
     @Test
     public void stoppingEventShouldBePublishedBeforeStop() throws Exception {
         final WorkspaceImpl workspace = createWorkspace();
-        runtimes = spy(new WorkspaceRuntimes(machineManagerMock, eventService));
+        runtimes = spy(new WorkspaceRuntimes(eventService, envEngines));
         doNothing().when(runtimes).publishEvent(any(), any(), any());
 
         doAnswer(invocation -> {
@@ -371,7 +381,7 @@ public class WorkspaceRuntimesTest {
     @Test
     public void stoppedEventShouldBePublishedAfterDevMachineStopped() throws Exception {
         final WorkspaceImpl workspace = createWorkspace();
-        runtimes = spy(new WorkspaceRuntimes(machineManagerMock, eventService));
+        runtimes = spy(new WorkspaceRuntimes(eventService, envEngines));
         doNothing().when(runtimes).publishEvent(any(), any(), any());
 
         runtimes.start(workspace, workspace.getConfig().getDefaultEnv());
@@ -383,7 +393,7 @@ public class WorkspaceRuntimesTest {
     @Test
     public void errorEventShouldBePublishedIfDevMachineFailedToStop() throws Exception {
         final WorkspaceImpl workspace = createWorkspace();
-        runtimes = spy(new WorkspaceRuntimes(machineManagerMock, eventService));
+        runtimes = spy(new WorkspaceRuntimes(eventService, envEngines));
         doNothing().when(runtimes).publishEvent(any(), any(), any());
 
         doAnswer(invocation -> {
