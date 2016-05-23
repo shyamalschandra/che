@@ -12,6 +12,7 @@ package org.eclipse.che.ide.api.machine;
 
 import com.google.common.base.Strings;
 
+import org.eclipse.che.api.core.rest.shared.dto.Hyperlinks;
 import org.eclipse.che.api.core.rest.shared.dto.Link;
 import org.eclipse.che.api.core.model.machine.Machine;
 import org.eclipse.che.api.core.model.machine.Server;
@@ -41,7 +42,7 @@ public class DevMachine {
 
     public DevMachine(@NotNull Machine devMachineDescriptor) {
         this.devMachineDescriptor = devMachineDescriptor;
-//        this.devMachineLinks = devMachineDescriptor.getLinks();
+        this.devMachineLinks = devMachineDescriptor instanceof Hyperlinks ? ((Hyperlinks)devMachineDescriptor).getLinks() : null;
 
         Map<String, ? extends Server> serverDtoMap = devMachineDescriptor.getRuntime().getServers();
         servers = new HashMap<>(serverDtoMap.size());

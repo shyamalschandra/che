@@ -150,11 +150,20 @@ public class JavaNavigationServiceImpl implements JavaNavigationService {
     }
 
     @Override
-    public Promise<CompilationUnit> getCompilationUnit(String projectPath, String fqn, boolean showInherited) {
-        final String url = appContext.getDevMachine().getWsAgentBaseUrl() + "/java/navigation/compilation-unit" +
-                           "?projectpath=" + projectPath + "&fqn=" + fqn + "&showinherited=" + showInherited;
+    public Promise<ClassContent> getContent(Path project, String fqn) {
+        String url = appContext.getDevMachine().getWsAgentBaseUrl() + "/java/navigation/contentbyfqn?projectpath=" + project + "&fqn=" + fqn;
+        return requestFactory.createGetRequest(url).send(unmarshallerFactory.newUnmarshaller(ClassContent.class));
+    }
 
-        return requestFactory.createGetRequest(url).send(unmarshallerFactory.newUnmarshaller(CompilationUnit.class));
+    @Override
+    public Promise<ImplementationsDescriptorDTO> getImplementations(Path project, String fqn, int offset) {
+        final String url = appContext.getDevMachine().getWsAgentBaseUrl() + "/java/navigation/implementations" +
+                           "?projectpath=" + project + "&fqn=" + fqn + "&offset=" + offset;
+
+        return requestFactory.createGetRequest(url)
+                             .header(ACCEPT, APPLICATION_JSON)
+                             .loader(loaderFactory.newLoader())
+                             .send(unmarshallerFactory.newUnmarshaller(ImplementationsDescriptorDTO.class));
     }
 
     @Override
@@ -165,17 +174,6 @@ public class JavaNavigationServiceImpl implements JavaNavigationService {
         return requestFactory.createGetRequest(url)
                              .header(ACCEPT, APPLICATION_JSON)
                              .send(unmarshallerFactory.newUnmarshaller(CompilationUnit.class));
-    }
-
-    @Override
-    public Promise<ImplementationsDescriptorDTO> getImplementations(String projectPath, String fqn, int offset) {
-        final String url = appContext.getDevMachine().getWsAgentBaseUrl() + "/java/navigation/implementations" +
-                           "?projectpath=" + projectPath + "&fqn=" + fqn + "&offset=" + offset;
-
-        return requestFactory.createGetRequest(url)
-                             .header(ACCEPT, APPLICATION_JSON)
-                             .loader(loaderFactory.newLoader())
-                             .send(unmarshallerFactory.newUnmarshaller(ImplementationsDescriptorDTO.class));
     }
 
     @Override
