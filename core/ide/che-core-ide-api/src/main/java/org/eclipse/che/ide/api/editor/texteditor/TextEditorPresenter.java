@@ -270,7 +270,7 @@ public class TextEditorPresenter<T extends EditorWidget> extends AbstractEditorP
         this.generalEventBus.addHandler(FileContentUpdateEvent.TYPE, new FileContentUpdateHandler() {
             @Override
             public void onFileContentUpdate(final FileContentUpdateEvent event) {
-                if (event.getFilePath() != null && Path.valueOf(event.getFilePath()).equals(getEditorInput().getFile().getLocation())) {
+                if (event.getFilePath() != null && Path.valueOf(event.getFilePath()).equals(document.getFile().getLocation())) {
                     updateContent();
                 }
             }
@@ -285,7 +285,7 @@ public class TextEditorPresenter<T extends EditorWidget> extends AbstractEditorP
          * -restore current cursor position
          */
         final TextPosition currentCursor = getCursorPosition();
-        this.documentStorage.getDocument(getEditorInput().getFile(), new DocumentCallback() {
+        this.documentStorage.getDocument(document.getFile(), new DocumentCallback() {
 
             @Override
             public void onDocumentReceived(final String content) {

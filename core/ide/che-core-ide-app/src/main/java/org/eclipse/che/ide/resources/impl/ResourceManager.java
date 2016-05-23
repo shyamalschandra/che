@@ -135,8 +135,6 @@ public final class ResourceManager {
     private final DtoFactory               dtoFactory;
     private final ProjectTypeRegistry      typeRegistry;
     private final Set<ResourceInterceptor> resourceInterceptors;
-    //    private final String                   wsAgentPath;
-//    private final String                   wsId;
     private       DevMachine               devMachine;
 
     /**
@@ -609,7 +607,7 @@ public final class ResourceManager {
             @Override
             public Void apply(Void ignored) throws FunctionException {
                 store.dispose(resource.getLocation(), true);
-                eventBus.fireEvent(new ResourceChangedEvent(new ResourceDeltaImpl(resource, REMOVED)));
+                eventBus.fireEvent(new ResourceChangedEvent(new ResourceDeltaImpl(resource, REMOVED | DERIVED)));
 
                 return null;
             }
@@ -1008,7 +1006,7 @@ public final class ResourceManager {
             @Override
             public Void apply(final Optional<Resource> resource) throws FunctionException {
                 if (resource.isPresent()) {
-                    eventBus.fireEvent(new ResourceChangedEvent(new ResourceDeltaImpl(resource.get(), ADDED)));
+                    eventBus.fireEvent(new ResourceChangedEvent(new ResourceDeltaImpl(resource.get(), ADDED | DERIVED)));
                 }
 
                 return null;
@@ -1022,7 +1020,7 @@ public final class ResourceManager {
             public Void apply(Optional<Resource> resource) throws FunctionException {
 
                 if (resource.isPresent()) {
-                    eventBus.fireEvent(new ResourceChangedEvent(new ResourceDeltaImpl(resource.get(), UPDATED)));
+                    eventBus.fireEvent(new ResourceChangedEvent(new ResourceDeltaImpl(resource.get(), UPDATED | DERIVED)));
                 }
 
                 return null;
@@ -1037,7 +1035,7 @@ public final class ResourceManager {
 
                 if (resource.isPresent()) {
                     store.dispose(resource.get().getLocation(), true);
-                    eventBus.fireEvent(new ResourceChangedEvent(new ResourceDeltaImpl(resource.get(), REMOVED)));
+                    eventBus.fireEvent(new ResourceChangedEvent(new ResourceDeltaImpl(resource.get(), REMOVED | DERIVED)));
                 }
 
                 return null;
