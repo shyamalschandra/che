@@ -45,7 +45,7 @@ public class JavaClasspathServiceClientImpl implements JavaClasspathServiceClien
     protected JavaClasspathServiceClientImpl(Workspace workspace,
                                              WsAgentStateController wsAgentStateController) {
         this.wsAgentStateController = wsAgentStateController;
-        this.baseHttpUrl = "/jdt/";
+        this.baseHttpUrl = "/java/";
     }
 
     /** {@inheritDoc} */

@@ -11,8 +11,8 @@
 package org.eclipse.che.ide.api.machine;
 
 import com.google.common.base.Strings;
-import com.google.gwt.user.client.Window;
 
+import org.eclipse.che.api.core.rest.shared.dto.Link;
 import org.eclipse.che.api.core.model.machine.Machine;
 import org.eclipse.che.api.core.model.machine.Server;
 import org.eclipse.che.api.machine.shared.Constants;
@@ -20,6 +20,7 @@ import org.eclipse.che.ide.util.loging.Log;
 
 import javax.validation.constraints.NotNull;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -34,13 +35,13 @@ public class DevMachine {
     private final Machine devMachineDescriptor;
 
     private final Map<String, DevMachineServer> servers;
-
-    private final Map<String, String> runtimeProperties;
-
-    private final Map<String, String> envVariables;
+    private final Map<String, String>           runtimeProperties;
+    private final Map<String, String>           envVariables;
+    private final List<Link>                    devMachineLinks;
 
     public DevMachine(@NotNull Machine devMachineDescriptor) {
         this.devMachineDescriptor = devMachineDescriptor;
+//        this.devMachineLinks = devMachineDescriptor.getLinks();
 
         Map<String, ? extends Server> serverDtoMap = devMachineDescriptor.getRuntime().getServers();
         servers = new HashMap<>(serverDtoMap.size());
@@ -49,13 +50,11 @@ public class DevMachine {
         }
         runtimeProperties = devMachineDescriptor.getRuntime().getProperties();
         envVariables = devMachineDescriptor.getRuntime().getEnvVariables();
-
     }
 
     public Map<String, String> getEnvVariables() {
         return envVariables;
     }
-
 
     public Map<String, String> getRuntimeProperties() {
         return runtimeProperties;
@@ -66,18 +65,27 @@ public class DevMachine {
     }
 
     public String getWsAgentWebSocketUrl() {
-        DevMachineServer server = getServer(Constants.WSAGENT_REFERENCE);
-        if (server != null) {
-            String url = server.getUrl();
-            String extUrl = url.substring(url.indexOf(':'), url.length());
-            final String protocol = Window.Location.getProtocol().equals("https:") ? "wss" : "ws";
-            return protocol + extUrl + (extUrl.endsWith("/") ? "ws" : "/ws");
-        } else {
-            //should not be
-            String message = "Reference " + Constants.WSAGENT_REFERENCE + " not found in DevMachine description";
-            Log.error(getClass(), message);
-            throw new RuntimeException(message);
+        for (Link link : devMachineLinks) {
+            if (Constants.WSAGENT_WEBSOCKET_REFERENCE.equals(link.getRel())) {
+                return link.getHref();
+            }
         }
+        //should not be
+        final String message = "Reference " + Constants.WSAGENT_REFERENCE + " not found in DevMachine description";
+        Log.error(getClass(), message);
+        throw new RuntimeException(message);
+    }
+
+    public String getTerminalUrl() {
+        for (Link link : devMachineLinks) {
+            if (Constants.TERMINAL_REFERENCE.equals(link.getRel())) {
+                return link.getHref();
+            }
+        }
+        //should not be
+        final String message = "Reference " + Constants.WSAGENT_REFERENCE + " not found in DevMachine description";
+        Log.error(getClass(), message);
+        throw new RuntimeException(message);
     }
 
     /**
@@ -104,9 +112,6 @@ public class DevMachine {
         return servers;
     }
 
-
-
-
     public DevMachineServer getServer(String reference) {
         if (!Strings.isNullOrEmpty(reference)) {
             for (DevMachineServer server : servers.values()) {
@@ -118,7 +123,7 @@ public class DevMachine {
         return null;
     }
 
-    public String getWorkspace(){
+    public String getWorkspace() {
         return devMachineDescriptor.getWorkspaceId();
     }
 
