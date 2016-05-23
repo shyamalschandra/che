@@ -172,7 +172,7 @@ public class MatchNode extends AbstractPresentationNode implements HasAction {
                 return;
             }
 
-            final Project project = resource.getRelatedProject();
+            final Project project = resource.getRelatedProject().get();
 
             service.getContent(project.getLocation(), className)
                    .then(new Operation<ClassContent>() {

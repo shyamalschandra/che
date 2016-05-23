@@ -10,6 +10,8 @@
  *******************************************************************************/
 package org.eclipse.che.ide.reference;
 
+import com.google.common.base.Optional;
+
 import org.eclipse.che.ide.api.reference.FqnProvider;
 import org.eclipse.che.ide.api.resources.Project;
 import org.eclipse.che.ide.api.resources.Resource;
@@ -59,7 +61,7 @@ public class ShowReferencePresenterTest {
         presenter = new ShowReferencePresenter(view, providers);
 
         when(resource.getLocation()).thenReturn(PATH);
-        when(resource.getRelatedProject()).thenReturn(project);
+        when(resource.getRelatedProject()).thenReturn(Optional.of(project));
         when(project.getType()).thenReturn(PROJECT_TYPE);
     }
 

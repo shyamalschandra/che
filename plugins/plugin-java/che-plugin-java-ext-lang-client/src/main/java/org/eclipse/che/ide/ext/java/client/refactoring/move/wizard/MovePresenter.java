@@ -149,7 +149,7 @@ public class MovePresenter implements MoveView.ActionDelegate {
             elements.add(element);
 
             if (project == null) {
-                project = resource.getRelatedProject();
+                project = resource.getRelatedProject().get();
             }
         }
 
@@ -228,7 +228,7 @@ public class MovePresenter implements MoveView.ActionDelegate {
                                 final Resource[] resources = refactorInfo.getResources();
 
                                 if (resources != null && resources.length == 1) {
-                                    refactorService.reindexProject(resources[0].getRelatedProject().getLocation().toString());
+                                    refactorService.reindexProject(resources[0].getRelatedProject().get().getLocation().toString());
                                 }
 
                             } else {

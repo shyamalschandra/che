@@ -102,7 +102,7 @@ public class FileStructurePresenter implements FileStructure.ActionDelegate {
         VirtualFile file = activeEditor.getEditorInput().getFile();
 
         if (file instanceof Resource) {
-            final Project project = ((Resource)file).getRelatedProject();
+            final Optional<Project> project = ((Resource)file).getRelatedProject();
 
             final Optional<Resource> srcFolder = ((Resource)file).getParentWithMarker(SourceFolderMarker.ID);
 
@@ -112,7 +112,7 @@ public class FileStructurePresenter implements FileStructure.ActionDelegate {
 
             final String fqn = JavaUtil.resolveFQN((Container)srcFolder.get(), (Resource)file);
 
-            javaNavigationService.getCompilationUnit(project.getLocation(), fqn, showInheritedMembers).then(
+            javaNavigationService.getCompilationUnit(project.get().getLocation(), fqn, showInheritedMembers).then(
                     new Operation<CompilationUnit>() {
                         @Override
                         public void apply(CompilationUnit unit) throws OperationException {
@@ -142,14 +142,14 @@ public class FileStructurePresenter implements FileStructure.ActionDelegate {
                 return;
             }
 
-            final Project project = resource.getRelatedProject();
+            final Optional<Project> project = resource.getRelatedProject();
 
-            javaNavigationService.getEntry(project.getLocation(), member.getLibId(), member.getRootPath())
+            javaNavigationService.getEntry(project.get().getLocation(), member.getLibId(), member.getRootPath())
                                  .then(new Operation<JarEntry>() {
                                      @Override
                                      public void apply(final JarEntry entry) throws OperationException {
                                          javaNavigationService
-                                                 .getContent(project.getLocation(), member.getLibId(), Path.valueOf(entry.getPath()))
+                                                 .getContent(project.get().getLocation(), member.getLibId(), Path.valueOf(entry.getPath()))
                                                  .then(new Operation<ClassContent>() {
                                                      @Override
                                                      public void apply(ClassContent content) throws OperationException {

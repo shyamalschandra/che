@@ -44,9 +44,9 @@ public class PomInterceptor implements ResourceInterceptor {
             return resource;
         }
 
-        final Project project = resource.getRelatedProject();
+        final Project project = resource.getRelatedProject().get();
 
-        if (!project.getType().equals(MavenAttributes.MAVEN_ID)) {
+        if (project == null || !project.getType().equals(MavenAttributes.MAVEN_ID)) {
             return resource;
         }
 

@@ -92,7 +92,7 @@ public class OrganizeImportsPresenter implements OrganizeImportsView.ActionDeleg
         this.file = editor.getEditorInput().getFile();
 
         if (file instanceof Resource) {
-            final Project project = ((Resource)file).getRelatedProject();
+            final Optional<Project> project = ((Resource)file).getRelatedProject();
 
             final Optional<Resource> srcFolder = ((Resource)file).getParentWithMarker(SourceFolderMarker.ID);
 
@@ -102,7 +102,7 @@ public class OrganizeImportsPresenter implements OrganizeImportsView.ActionDeleg
 
             final String fqn = JavaUtil.resolveFQN((Container)srcFolder.get(), (Resource)file);
 
-            javaCodeAssistClient.organizeImports(project.getLocation().toString(), fqn)
+            javaCodeAssistClient.organizeImports(project.get().getLocation().toString(), fqn)
                                 .then(new Operation<List<ConflictImportDTO>>() {
                                     @Override
                                     public void apply(List<ConflictImportDTO> choices) throws OperationException {
@@ -152,9 +152,9 @@ public class OrganizeImportsPresenter implements OrganizeImportsView.ActionDeleg
         ConflictImportDTO result = dtoFactory.createDto(ConflictImportDTO.class).withTypeMatches(new ArrayList<>(selected.values()));
 
         if (file instanceof Resource) {
-            final Project project = ((Resource)file).getRelatedProject();
+            final Optional<Project> project = ((Resource)file).getRelatedProject();
 
-            javaCodeAssistClient.applyChosenImports(project.getLocation().toString(), JavaUtil.resolveFQN(file), result)
+            javaCodeAssistClient.applyChosenImports(project.get().getLocation().toString(), JavaUtil.resolveFQN(file), result)
                                 .then(new Operation<Void>() {
                                     @Override
                                     public void apply(Void arg) throws OperationException {

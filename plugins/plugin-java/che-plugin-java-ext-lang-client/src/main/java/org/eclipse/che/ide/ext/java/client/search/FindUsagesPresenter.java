@@ -115,7 +115,7 @@ public class FindUsagesPresenter extends BasePresenter implements FindUsagesView
         final VirtualFile virtualFile = activeEditor.getEditorInput().getFile();
 
         if (virtualFile instanceof Resource) {
-            final Project project = ((Resource)virtualFile).getRelatedProject();
+            final Project project = ((Resource)virtualFile).getRelatedProject().get();
 
             if (project == null) {
                 return;

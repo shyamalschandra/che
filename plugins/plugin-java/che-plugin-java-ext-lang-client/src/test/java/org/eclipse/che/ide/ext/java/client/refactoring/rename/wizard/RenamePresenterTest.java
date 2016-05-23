@@ -170,7 +170,7 @@ public class RenamePresenterTest {
         when(editorAgent.getActiveEditor()).thenReturn(activeEditor);
         when(activeEditor.getEditorInput()).thenReturn(editorInput);
         when(editorInput.getFile()).thenReturn(file);
-        when(file.getRelatedProject()).thenReturn(project);
+        when(file.getRelatedProject()).thenReturn(Optional.of(project));
         when(file.getParentWithMarker(eq(SourceFolderMarker.ID))).thenReturn(Optional.of(srcFolder));
         when(file.getName()).thenReturn("A.java");
         when(file.getFileExtension()).thenReturn("java");
@@ -180,7 +180,7 @@ public class RenamePresenterTest {
         when(project.getLocation()).thenReturn(Path.valueOf("/project"));
         when(dtoFactory.createDto(CreateRenameRefactoring.class)).thenReturn(createRenameRefactoringDto);
         when(container.getLocation()).thenReturn(Path.valueOf("/project/src/a/b/c"));
-        when(container.getRelatedProject()).thenReturn(project);
+        when(container.getRelatedProject()).thenReturn(Optional.of(project));
         when(dtoFactory.createDto(RefactoringSession.class)).thenReturn(refactoringSession);
         when(dtoFactory.createDto(RenameSettings.class)).thenReturn(renameSettings);
         when(refactoringSession.getSessionId()).thenReturn(SESSION_ID);

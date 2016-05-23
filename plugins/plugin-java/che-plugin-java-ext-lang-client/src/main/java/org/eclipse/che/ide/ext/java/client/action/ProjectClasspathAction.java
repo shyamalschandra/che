@@ -59,6 +59,6 @@ public class ProjectClasspathAction extends AbstractPerspectiveAction {
     public void updateInPerspective(@NotNull ActionEvent event) {
         final Resource[] resources = appContext.getResources();
 
-        event.getPresentation().setEnabledAndVisible(resources != null && resources.length == 1 && isJavaProject(resources[0].getRelatedProject()));
+        event.getPresentation().setEnabledAndVisible(resources != null && resources.length == 1 && isJavaProject(resources[0].getRelatedProject().get()));
     }
 }

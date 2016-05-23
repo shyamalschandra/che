@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.java.client.project.classpath.valueproviders.pages.sources;
 
+import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
@@ -88,9 +89,9 @@ public class SourceEntryPresenter extends AbstractClasspathPagePresenter impleme
 
         Preconditions.checkState(resource != null);
 
-        final Project project = resource.getRelatedProject();
+        final Optional<Project> project = resource.getRelatedProject();
 
-        isPlainJava = "plainJava".equals(project.getType());
+        isPlainJava = "plainJava".equals(project.get().getType());
 
         setReadOnlyMod();
 
@@ -101,7 +102,7 @@ public class SourceEntryPresenter extends AbstractClasspathPagePresenter impleme
             return;
         }
 
-        classpathContainer.getClasspathEntries(project.getLocation().toString()).then(new Operation<List<ClasspathEntryDto>>() {
+        classpathContainer.getClasspathEntries(project.get().getLocation().toString()).then(new Operation<List<ClasspathEntryDto>>() {
             @Override
             public void apply(List<ClasspathEntryDto> entries) throws OperationException {
                 categories.clear();

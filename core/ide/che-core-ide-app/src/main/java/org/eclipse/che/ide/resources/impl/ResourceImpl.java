@@ -99,20 +99,19 @@ abstract class ResourceImpl implements Resource {
 
     /** {@inheritDoc} */
     @Override
-    public Project getRelatedProject() {
+    public Optional<Project> getRelatedProject() {
         if (this instanceof Project) {
-            return (Project)this;
+            return of((Project)this);
         }
 
         if (project != null) {
-            return project;
+            return of(project);
         }
 
         Optional<Container> optionalParent = getParent();
 
         if (!optionalParent.isPresent()) {
-            return null; //TODO need to return an optional
-//            throw new IllegalStateException("Related project wasn't found");
+            return absent();
         }
 
         Container parent = optionalParent.get();
@@ -121,7 +120,7 @@ abstract class ResourceImpl implements Resource {
             optionalParent = parent.getParent();
 
             if (!optionalParent.isPresent()) {
-                throw new IllegalStateException("Related project wasn't found");
+                return absent();
             }
 
             parent = optionalParent.get();
@@ -130,7 +129,7 @@ abstract class ResourceImpl implements Resource {
         //caching related project
         project = (Project)parent;
 
-        return project;
+        return of(project);
     }
 
     /** {@inheritDoc} */

@@ -83,7 +83,7 @@ public class OpenDeclarationFinder {
         final VirtualFile file = editor.getEditorInput().getFile();
 
         if (file instanceof Resource) {
-            final Project project = ((Resource)file).getRelatedProject();
+            final Optional<Project> project = ((Resource)file).getRelatedProject();
 
             final Optional<Resource> srcFolder = ((Resource)file).getParentWithMarker(SourceFolderMarker.ID);
 
@@ -93,11 +93,11 @@ public class OpenDeclarationFinder {
 
             final String fqn = JavaUtil.resolveFQN((Container)srcFolder.get(), (Resource)file);
 
-            navigationService.findDeclaration(project.getLocation(), fqn, offset).then(new Operation<OpenDeclarationDescriptor>() {
+            navigationService.findDeclaration(project.get().getLocation(), fqn, offset).then(new Operation<OpenDeclarationDescriptor>() {
                 @Override
                 public void apply(OpenDeclarationDescriptor result) throws OperationException {
                     if (result != null) {
-                        handleDescriptor(project, result);
+                        handleDescriptor(project.get(), result);
                     }
                 }
             });

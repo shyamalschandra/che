@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.java.client.project.classpath;
 
+import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -101,7 +102,7 @@ public class ClasspathResolver {
 
         Preconditions.checkState(resource != null);
 
-        final Project project = resource.getRelatedProject();
+        final Optional<Project> project = resource.getRelatedProject();
 
         final List<ClasspathEntryDto> entries = new ArrayList<>();
         for (String path : libs) {
@@ -116,12 +117,12 @@ public class ClasspathResolver {
         for (String path : projects) {
             entries.add(dtoFactory.createDto(ClasspathEntryDto.class).withPath(path).withEntryKind(PROJECT));
         }
-        Promise<Void> promise = classpathUpdater.setRawClasspath(project.getLocation().toString(), entries);
+        Promise<Void> promise = classpathUpdater.setRawClasspath(project.get().getLocation().toString(), entries);
 
         promise.then(new Operation<Void>() {
             @Override
             public void apply(Void arg) throws OperationException {
-                project.synchronize();
+                project.get().synchronize();
             }
         }).catchError(new Operation<PromiseError>() {
             @Override

@@ -84,7 +84,7 @@ public class JavaDebugger extends AbstractDebugger {
             return Collections.emptyList();
         }
 
-        final Project project = resource.getRelatedProject();
+        final Project project = resource.getRelatedProject().get();
 
         String pathSuffix = location.getTarget().replace(".", "/") + ".java";
 

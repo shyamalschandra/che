@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.java.client.project.classpath.valueproviders.pages.libraries;
 
+import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
@@ -17,7 +18,6 @@ import com.google.inject.Singleton;
 
 import org.eclipse.che.api.promises.client.Operation;
 import org.eclipse.che.api.promises.client.OperationException;
-import org.eclipse.che.api.workspace.shared.dto.ProjectConfigDto;
 import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.dto.DtoFactory;
 import org.eclipse.che.ide.api.resources.Project;
@@ -90,9 +90,9 @@ public class LibEntryPresenter extends AbstractClasspathPagePresenter implements
 
         Preconditions.checkState(resource != null);
 
-        final Project project = resource.getRelatedProject();
+        final Optional<Project> project = resource.getRelatedProject();
 
-        isPlainJava = "plainJava".equals(project.getType());
+        isPlainJava = "plainJava".equals(project.get().getType());
 
         setReadOnlyMod();
 
@@ -103,7 +103,7 @@ public class LibEntryPresenter extends AbstractClasspathPagePresenter implements
             return;
         }
 
-        classpathContainer.getClasspathEntries(project.getPath()).then(new Operation<List<ClasspathEntryDto>>() {
+        classpathContainer.getClasspathEntries(project.get().getPath()).then(new Operation<List<ClasspathEntryDto>>() {
             @Override
             public void apply(List<ClasspathEntryDto> arg) throws OperationException {
                 categories.clear();

@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.java.client.navigation.paraminfo;
 
+import com.google.common.base.Optional;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -63,10 +64,10 @@ public class ParametersHintsPresenter {
         VirtualFile file = activeEditor.getEditorInput().getFile();
 
         if (file instanceof Resource) {
-            final Project project = ((Resource)file).getRelatedProject();
+            final Optional<Project> project = ((Resource)file).getRelatedProject();
             final int lineStartOffset = getLineStartOffset(activeEditor, offset);
 
-            navigationService.getMethodParametersHints(project.getLocation(), JavaUtil.resolveFQN(file), offset, lineStartOffset)
+            navigationService.getMethodParametersHints(project.get().getLocation(), JavaUtil.resolveFQN(file), offset, lineStartOffset)
                              .then(new Operation<List<MethodParameters>>() {
                                  @Override
                                  public void apply(List<MethodParameters> parameters) throws OperationException {

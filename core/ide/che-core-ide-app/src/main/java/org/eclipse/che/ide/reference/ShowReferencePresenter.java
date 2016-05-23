@@ -45,7 +45,7 @@ public class ShowReferencePresenter implements ShowReferenceView.ActionDelegate 
      *         element for which fqn and path will be calculated
      */
     public void show(Resource resource) {
-        final Project project = resource.getRelatedProject();
+        final Project project = resource.getRelatedProject().get();
         final FqnProvider provider = providers.get(project.getType());
 
         view.show(provider != null ? provider.getFqn(resource) : "", resource.getLocation());

@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.java.client.editor;
 
+import com.google.common.base.Optional;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import com.google.web.bindery.event.shared.EventBus;
@@ -86,9 +87,9 @@ public class JavaReconcilerStrategy implements ReconcilingStrategy {
         }
 
         if (file instanceof Resource) {
-            final Project project = ((Resource)file).getRelatedProject();
+            final Optional<Project> project = ((Resource)file).getRelatedProject();
 
-            client.reconcile(project.getLocation().toString(), JavaUtil.resolveFQN(file), new JavaReconcileClient.ReconcileCallback() {
+            client.reconcile(project.get().getLocation().toString(), JavaUtil.resolveFQN(file), new JavaReconcileClient.ReconcileCallback() {
                 @Override
                 public void onReconcile(ReconcileResult result) {
                     if (result == null) {

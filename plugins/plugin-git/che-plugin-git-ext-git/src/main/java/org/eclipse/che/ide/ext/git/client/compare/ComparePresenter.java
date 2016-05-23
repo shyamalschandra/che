@@ -95,11 +95,16 @@ public class ComparePresenter implements CompareView.ActionDelegate {
             return;
         }
 
-        final Project project = file.getRelatedProject();
-        final Path relPath = file.getLocation().removeFirstSegments(project.getLocation().segmentCount());
+        final Optional<Project> project = file.getRelatedProject();
+
+        if (!project.isPresent()) {
+            return;
+        }
+
+        final Path relPath = file.getLocation().removeFirstSegments(project.get().getLocation().segmentCount());
 
         if (status.equals(DELETED)) {
-            service.showFileContent(appContext.getDevMachine(), project.getLocation(), relPath, revision)
+            service.showFileContent(appContext.getDevMachine(), project.get().getLocation(), relPath, revision)
                    .then(new Operation<ShowFileContentResponse>() {
                        @Override
                        public void apply(ShowFileContentResponse content) throws OperationException {
@@ -115,7 +120,7 @@ public class ComparePresenter implements CompareView.ActionDelegate {
                    });
         } else {
 
-            service.showFileContent(appContext.getDevMachine(), project.getLocation(), relPath, revision)
+            service.showFileContent(appContext.getDevMachine(), project.get().getLocation(), relPath, revision)
                    .then(new Operation<ShowFileContentResponse>() {
                        @Override
                        public void apply(ShowFileContentResponse content) throws OperationException {

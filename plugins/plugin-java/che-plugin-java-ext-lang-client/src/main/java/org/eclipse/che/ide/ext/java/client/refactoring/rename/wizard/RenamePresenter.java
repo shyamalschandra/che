@@ -346,7 +346,7 @@ public class RenamePresenter implements ActionDelegate {
                     final Project project;
 
                     if (resources != null && resources.length == 1) {
-                        project = resources[0].getRelatedProject();
+                        project = resources[0].getRelatedProject().get();
                     } else {
                         project = appContext.getRootProject();
                     }
@@ -409,7 +409,7 @@ public class RenamePresenter implements ActionDelegate {
             dto.setOffset(((TextEditor)editorAgent.getActiveEditor()).getCursorOffset());
 
             if (file instanceof Resource) {
-                final Project project = ((Resource)file).getRelatedProject();
+                final Project project = ((Resource)file).getRelatedProject().get();
 
                 dto.setProjectPath(project.getLocation().toString());
             }
@@ -428,7 +428,7 @@ public class RenamePresenter implements ActionDelegate {
                 dto.setType(PACKAGE);
             }
 
-            final Project project = resource.getRelatedProject();
+            final Project project = resource.getRelatedProject().get();
 
             dto.setProjectPath(project.getLocation().toString());
         }

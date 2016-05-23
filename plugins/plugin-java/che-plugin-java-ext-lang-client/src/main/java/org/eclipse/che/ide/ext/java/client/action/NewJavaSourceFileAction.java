@@ -52,7 +52,7 @@ public class NewJavaSourceFileAction extends ProjectAction {
     @Override
     public void actionPerformed(ActionEvent e) {
         final Resource[] resources = appContext.getResources();
-        final boolean inJavaProject = resources != null && resources.length == 1 && isJavaProject(resources[0].getRelatedProject());
+        final boolean inJavaProject = resources != null && resources.length == 1 && isJavaProject(resources[0].getRelatedProject().get());
 
         checkState(inJavaProject && resources[0].getParentWithMarker(SourceFolderMarker.ID).isPresent());
 
@@ -74,7 +74,7 @@ public class NewJavaSourceFileAction extends ProjectAction {
     @Override
     public void updateProjectAction(ActionEvent e) {
         final Resource[] resources = appContext.getResources();
-        final boolean inJavaProject = resources != null && resources.length == 1 && isJavaProject(resources[0].getRelatedProject());
+        final boolean inJavaProject = resources != null && resources.length == 1 && isJavaProject(resources[0].getRelatedProject().get());
 
         e.getPresentation().setEnabledAndVisible(inJavaProject && resources[0].getParentWithMarker(SourceFolderMarker.ID).isPresent());
     }

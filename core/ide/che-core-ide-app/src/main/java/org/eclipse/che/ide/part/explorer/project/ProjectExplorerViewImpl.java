@@ -283,7 +283,7 @@ public class ProjectExplorerViewImpl extends BaseView<ProjectExplorerView.Action
 
             if (node instanceof ResourceNode) {
                 final Resource resource = ((ResourceNode)node).getData();
-                final Project project = resource.getRelatedProject();
+                final Project project = resource.getRelatedProject().get();
                 element.setAttribute("path", resource.getLocation().toString());
                 element.setAttribute("project", project.getLocation().toString());
             }

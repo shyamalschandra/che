@@ -75,17 +75,17 @@ public class CutJavaSourceAction extends Action implements ActivePartChangedHand
 
         final Resource resource = resources[0];
 
-        final Project project = resource.getRelatedProject();
+        final Optional<Project> project = resource.getRelatedProject();
         final Optional<Resource> srcFolder = resource.getParentWithMarker(SourceFolderMarker.ID);
 
         if (resource.getResourceType() == FILE) {
             event.getPresentation().setEnabled(!isEditorPartActive
-                                               && isJavaProject(project)
+                                               && isJavaProject(project.get())
                                                && srcFolder.isPresent()
                                                && isJavaFile((File)resource));
         } else if (resource instanceof Container) {
             event.getPresentation().setEnabled(!isEditorPartActive
-                                               && isJavaProject(project)
+                                               && isJavaProject(project.get())
                                                && srcFolder.isPresent());
         }
     }

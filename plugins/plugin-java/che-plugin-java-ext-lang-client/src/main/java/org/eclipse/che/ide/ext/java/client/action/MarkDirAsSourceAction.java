@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.java.client.action;
 
+import com.google.common.base.Optional;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -21,6 +22,7 @@ import org.eclipse.che.ide.api.action.ActionEvent;
 import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.notification.NotificationManager;
 import org.eclipse.che.ide.api.resources.Container;
+import org.eclipse.che.ide.api.resources.Project;
 import org.eclipse.che.ide.api.resources.Resource;
 import org.eclipse.che.ide.ext.java.client.JavaLocalizationConstant;
 import org.eclipse.che.ide.ext.java.client.JavaResources;
@@ -75,7 +77,11 @@ public class MarkDirAsSourceAction extends AbstractPerspectiveAction {
 
         checkState(resource instanceof Container, "Parent should be a container");
 
-        classpathService.getClasspath(resource.getRelatedProject().getLocation().toString()).then(new Operation<List<ClasspathEntryDto>>() {
+        final Optional<Project> project = resource.getRelatedProject();
+
+        checkState(project.isPresent());
+
+        classpathService.getClasspath(project.get().getLocation().toString()).then(new Operation<List<ClasspathEntryDto>>() {
             @Override
             public void apply(List<ClasspathEntryDto> arg) throws OperationException {
                 classpathResolver.resolveClasspathEntries(arg);
@@ -93,7 +99,7 @@ public class MarkDirAsSourceAction extends AbstractPerspectiveAction {
     @Override
     public void updateInPerspective(ActionEvent e) {
         final Resource[] resources = appContext.getResources();
-        final boolean inJavaProject = resources != null && resources.length == 1 && isJavaProject(resources[0].getRelatedProject());
+        final boolean inJavaProject = resources != null && resources.length == 1 && isJavaProject(resources[0].getRelatedProject().get());
 
         e.getPresentation().setEnabledAndVisible(inJavaProject && !resources[0].getMarker(SourceFolderMarker.ID).isPresent());
     }

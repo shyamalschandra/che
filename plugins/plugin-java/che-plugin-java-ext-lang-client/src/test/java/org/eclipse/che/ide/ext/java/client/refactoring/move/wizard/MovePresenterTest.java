@@ -213,7 +213,7 @@ public class MovePresenterTest {
         when(srcFolder.getLocation()).thenReturn(Path.valueOf("/project/src"));
         when(file.getResourceType()).thenReturn(Resource.FILE);
 
-        when(file.getRelatedProject()).thenReturn(relatedProject);
+        when(file.getRelatedProject()).thenReturn(Optional.of(relatedProject));
         when(relatedProject.getLocation()).thenReturn(Path.valueOf("/project"));
 
         presenter.show(refactorInfo);
@@ -331,7 +331,7 @@ public class MovePresenterTest {
         when(refactoringResult.getSeverity()).thenReturn(OK);
 
         when(refactorInfo.getResources()).thenReturn(new Resource[]{file});
-        when(file.getRelatedProject()).thenReturn(relatedProject);
+        when(file.getRelatedProject()).thenReturn(Optional.of(relatedProject));
         when(relatedProject.getLocation()).thenReturn(Path.valueOf("/project"));
         presenter.refactorInfo = refactorInfo;
 
@@ -366,7 +366,7 @@ public class MovePresenterTest {
         when(refactoringResult.getSeverity()).thenReturn(2);
 
         when(refactorInfo.getResources()).thenReturn(new Resource[]{file});
-        when(file.getRelatedProject()).thenReturn(relatedProject);
+        when(file.getRelatedProject()).thenReturn(Optional.of(relatedProject));
         when(relatedProject.getLocation()).thenReturn(Path.valueOf("/project"));
         presenter.refactorInfo = refactorInfo;
 

@@ -14,7 +14,6 @@ import com.google.common.base.Optional;
 import com.google.gwtmockito.GwtMockitoTestRunner;
 import com.google.web.bindery.event.shared.EventBus;
 
-import org.eclipse.che.ide.MimeType;
 import org.eclipse.che.ide.api.action.ActionEvent;
 import org.eclipse.che.ide.api.action.Presentation;
 import org.eclipse.che.ide.api.app.AppContext;
@@ -85,7 +84,7 @@ public class CutJavaSourceActionTest {
         final Container container = mock(Container.class);
         when(updateActionEvent.getPresentation()).thenReturn(presentation);
         when(appContext.getResources()).thenReturn(new Resource[]{container});
-        when(container.getRelatedProject()).thenReturn(project);
+        when(container.getRelatedProject()).thenReturn(Optional.of(project));
         when(container.getParentWithMarker(eq(SourceFolderMarker.ID))).thenReturn(Optional.of(srcFolder));
 
         final Map<String, List<String>> attributes = new HashMap<>();

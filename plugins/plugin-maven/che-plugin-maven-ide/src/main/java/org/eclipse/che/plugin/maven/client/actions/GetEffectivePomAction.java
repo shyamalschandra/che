@@ -79,7 +79,7 @@ public class GetEffectivePomAction extends AbstractPerspectiveAction {
 
         event.getPresentation().setEnabledAndVisible(resources != null
                                                      && resources.length == 1
-                                                     && MAVEN_ID.equals(resources[0].getRelatedProject().getType()));
+                                                     && MAVEN_ID.equals(resources[0].getRelatedProject().get().getType()));
     }
 
     @Override
@@ -88,7 +88,7 @@ public class GetEffectivePomAction extends AbstractPerspectiveAction {
 
         checkState(resources != null && resources.length == 1);
 
-        final Project project = resources[0].getRelatedProject();
+        final Project project = resources[0].getRelatedProject().get();
 
         checkState(MAVEN_ID.equals(project.getType()));
 

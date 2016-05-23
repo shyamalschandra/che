@@ -86,7 +86,7 @@ public class OpenRecentFileViewImpl extends Window implements OpenRecentFilesVie
 
                 if (node instanceof ResourceNode) {
                     element.setAttribute("path", ((ResourceNode)node).getData().getLocation().toString());
-                    element.setAttribute("project", ((ResourceNode)node).getData().getRelatedProject().getLocation().toString());
+                    element.setAttribute("project", ((ResourceNode)node).getData().getRelatedProject().get().getLocation().toString());
                 }
 
                 if (node instanceof HasAttributes && ((HasAttributes)node).getAttributes().containsKey(CUSTOM_BACKGROUND_FILL)) {

@@ -165,7 +165,7 @@ public class JavaDebuggerFileHandler implements ActiveFileHandler {
             return;
         }
 
-        final Project project = resource.getRelatedProject();
+        final Project project = resource.getRelatedProject().get();
 
         service.getContent(project.getLocation(), className).then(new Operation<ClassContent>() {
             @Override

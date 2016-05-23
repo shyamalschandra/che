@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.java.client.refactoring.rename;
 
+import com.google.common.base.Optional;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.web.bindery.event.shared.EventBus;
@@ -295,9 +296,9 @@ public class JavaRefactoringRename implements FileEventHandler {
                 final VirtualFile file = textEditor.getDocument().getFile();
 
                 if (file instanceof Resource) {
-                    final Project project = ((Resource)file).getRelatedProject();
+                    final Optional<Project> project = ((Resource)file).getRelatedProject();
 
-                    refactoringServiceClient.reindexProject(project.getLocation().toString());
+                    refactoringServiceClient.reindexProject(project.get().getLocation().toString());
                 }
                 break;
             case WARNING:
@@ -346,9 +347,9 @@ public class JavaRefactoringRename implements FileEventHandler {
         dto.setPath(JavaUtil.resolveFQN(file));
 
         if (file instanceof Resource) {
-            final Project project = ((Resource)file).getRelatedProject();
+            final Optional<Project> project = ((Resource)file).getRelatedProject();
 
-            dto.setProjectPath(project.getLocation().toString());
+            dto.setProjectPath(project.get().getLocation().toString());
         }
 
         dto.setType(JAVA_ELEMENT);

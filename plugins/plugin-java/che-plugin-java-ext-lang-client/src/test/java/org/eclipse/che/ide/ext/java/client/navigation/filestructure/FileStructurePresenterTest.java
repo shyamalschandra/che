@@ -120,7 +120,7 @@ public class FileStructurePresenterTest {
         when(editorPartPresenter.getDocument()).thenReturn(document);
         when(editorInput.getFile()).thenReturn(file);
         when(editorPartPresenter.getCursorOffset()).thenReturn(0);
-        when(file.getRelatedProject()).thenReturn(relatedProject);
+        when(file.getRelatedProject()).thenReturn(Optional.of(relatedProject));
         when(file.getParentWithMarker(eq(SourceFolderMarker.ID))).thenReturn(Optional.of(srcFolder));
         when(file.getName()).thenReturn("A.java");
         when(file.getFileExtension()).thenReturn("java");

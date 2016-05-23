@@ -105,7 +105,7 @@ public class OpenImplementationPresenter {
         final VirtualFile file = activeEditor.getEditorInput().getFile();
 
         if (file instanceof Resource) {
-            final Project project = ((Resource)file).getRelatedProject();
+            final Optional<Project> project = ((Resource)file).getRelatedProject();
 
             final Optional<Resource> srcFolder = ((Resource)file).getParentWithMarker(SourceFolderMarker.ID);
 
@@ -115,7 +115,7 @@ public class OpenImplementationPresenter {
 
             final String fqn = JavaUtil.resolveFQN((Container)srcFolder.get(), (Resource)file);
 
-            service.getImplementations(project.getLocation(), fqn, activeEditor.getCursorOffset()).then(
+            service.getImplementations(project.get().getLocation(), fqn, activeEditor.getCursorOffset()).then(
                     new Operation<ImplementationsDescriptorDTO>() {
                         @Override
                         public void apply(ImplementationsDescriptorDTO impls) throws OperationException {
@@ -151,13 +151,13 @@ public class OpenImplementationPresenter {
                 return;
             }
 
-            final Project project = resource.getRelatedProject();
+            final Optional<Project> project = resource.getRelatedProject();
 
-            service.getEntry(project.getLocation(), member.getLibId(), member.getRootPath())
+            service.getEntry(project.get().getLocation(), member.getLibId(), member.getRootPath())
                    .then(new Operation<JarEntry>() {
                        @Override
                        public void apply(final JarEntry entry) throws OperationException {
-                           service.getContent(project.getLocation(), member.getLibId(), Path.valueOf(entry.getPath()))
+                           service.getContent(project.get().getLocation(), member.getLibId(), Path.valueOf(entry.getPath()))
                                    .then(new Operation<ClassContent>() {
                                        @Override
                                        public void apply(ClassContent content) throws OperationException {

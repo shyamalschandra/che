@@ -14,7 +14,6 @@ import com.google.common.base.Optional;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
-import org.eclipse.che.ide.MimeType;
 import org.eclipse.che.ide.api.action.Action;
 import org.eclipse.che.ide.api.action.ActionEvent;
 import org.eclipse.che.ide.api.app.AppContext;
@@ -72,13 +71,13 @@ public class MoveAction extends Action {
 
         final Resource resource = resources[0];
 
-        final Project project = resource.getRelatedProject();
+        final Optional<Project> project = resource.getRelatedProject();
         final Optional<Resource> srcFolder = resource.getParentWithMarker(SourceFolderMarker.ID);
 
         if (resource.getResourceType() == FILE) {
-            event.getPresentation().setEnabled(JavaUtil.isJavaProject(project) && srcFolder.isPresent() && isJavaFile((File)resource));
+            event.getPresentation().setEnabled(JavaUtil.isJavaProject(project.get()) && srcFolder.isPresent() && isJavaFile((File)resource));
         } else if (resource instanceof Container) {
-            event.getPresentation().setEnabled(JavaUtil.isJavaProject(project) && srcFolder.isPresent());
+            event.getPresentation().setEnabled(JavaUtil.isJavaProject(project.get()) && srcFolder.isPresent());
         }
     }
 
@@ -93,9 +92,9 @@ public class MoveAction extends Action {
 
         final Resource resource = resources[0];
 
-        final Project project = resource.getRelatedProject();
+        final Optional<Project> project = resource.getRelatedProject();
 
-        if (!JavaUtil.isJavaProject(project)) {
+        if (!JavaUtil.isJavaProject(project.get())) {
             return;
         }
 

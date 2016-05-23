@@ -65,7 +65,7 @@ public class QuickDocPresenter implements QuickDocumentation, QuickDocView.Actio
         final Resource resource = appContext.getResource();
 
         if (resource != null) {
-            final Project project = resource.getRelatedProject();
+            final Optional<Project> project = resource.getRelatedProject();
 
             final Optional<Resource> srcFolder = resource.getParentWithMarker(SourceFolderMarker.ID);
 
@@ -76,7 +76,7 @@ public class QuickDocPresenter implements QuickDocumentation, QuickDocView.Actio
             final String fqn = JavaUtil.resolveFQN((Container)srcFolder.get(), resource);
 
             view.show(appContext.getDevMachine().getWsAgentBaseUrl() + "/jdt/javadoc/find?fqn=" + fqn + "&projectpath=" +
-                      project.getLocation() + "&offset=" + offset, coordinates.getX(), coordinates.getY());
+                      project.get().getLocation() + "&offset=" + offset, coordinates.getX(), coordinates.getY());
         }
 
 

@@ -105,7 +105,7 @@ public class OrganizeImportsPresenterTest {
         when(editorInput.getFile()).thenReturn(file);
         when(editor.getDocument()).thenReturn(document);
         when(document.getContents()).thenReturn("content");
-        when(file.getRelatedProject()).thenReturn(relatedProject);
+        when(file.getRelatedProject()).thenReturn(Optional.of(relatedProject));
         when(file.getParentWithMarker(eq(SourceFolderMarker.ID))).thenReturn(Optional.of(srcFolder));
         when(file.getName()).thenReturn("A.java");
         when(file.getLocation()).thenReturn(Path.valueOf("/project/src/a/b/A.java"));

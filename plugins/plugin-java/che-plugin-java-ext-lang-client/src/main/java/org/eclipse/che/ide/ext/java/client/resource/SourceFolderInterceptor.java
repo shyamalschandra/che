@@ -38,9 +38,9 @@ public class SourceFolderInterceptor implements ResourceInterceptor {
             return resource;
         }
 
-        final Project project = resource.getRelatedProject();
+        final Project project = resource.getRelatedProject().get();
 
-        if (isJavaProject(project)) {
+        if (project != null && isJavaProject(project)) {
             final Path resourcePath = resource.getLocation();
 
             for (Path path : getPaths(project, getAttribute())) {

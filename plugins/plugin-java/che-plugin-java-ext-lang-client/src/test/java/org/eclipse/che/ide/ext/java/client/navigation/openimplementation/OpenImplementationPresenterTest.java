@@ -195,7 +195,7 @@ public class OpenImplementationPresenterTest {
     public void testShouldDisplayOneImplementationIsRealFile() throws Exception {
         when(editorPartPresenter.getEditorInput()).thenReturn(editorInput);
         when(editorInput.getFile()).thenReturn(file);
-        when(file.getRelatedProject()).thenReturn(relatedProject);
+        when(file.getRelatedProject()).thenReturn(Optional.of(relatedProject));
         when(file.getParentWithMarker(eq(SourceFolderMarker.ID))).thenReturn(Optional.of(srcFolder));
         when(file.getLocation()).thenReturn(Path.valueOf("/a/b/c/d/file.java"));
         when(srcFolder.getLocation()).thenReturn(Path.valueOf("/a/b"));
@@ -231,7 +231,7 @@ public class OpenImplementationPresenterTest {
     public void testShouldDisplayNoImplementations() throws Exception {
         when(editorPartPresenter.getEditorInput()).thenReturn(editorInput);
         when(editorInput.getFile()).thenReturn(file);
-        when(file.getRelatedProject()).thenReturn(relatedProject);
+        when(file.getRelatedProject()).thenReturn(Optional.of(relatedProject));
         when(file.getParentWithMarker(eq(SourceFolderMarker.ID))).thenReturn(Optional.of(srcFolder));
         when(file.getLocation()).thenReturn(Path.valueOf("/a/b/c/d/file.java"));
         when(srcFolder.getLocation()).thenReturn(Path.valueOf("/a/b"));

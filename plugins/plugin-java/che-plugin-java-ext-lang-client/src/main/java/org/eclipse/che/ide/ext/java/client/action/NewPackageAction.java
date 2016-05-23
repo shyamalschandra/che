@@ -66,7 +66,7 @@ public class NewPackageAction extends AbstractNewResourceAction {
     @Override
     public void updateInPerspective(@NotNull ActionEvent e) {
         final Resource[] resources = appContext.getResources();
-        final boolean inJavaProject = resources != null && resources.length == 1 && isJavaProject(resources[0].getRelatedProject());
+        final boolean inJavaProject = resources != null && resources.length == 1 && isJavaProject(resources[0].getRelatedProject().get());
 
         e.getPresentation().setEnabledAndVisible(inJavaProject && resources[0].getParentWithMarker(SourceFolderMarker.ID).isPresent());
     }

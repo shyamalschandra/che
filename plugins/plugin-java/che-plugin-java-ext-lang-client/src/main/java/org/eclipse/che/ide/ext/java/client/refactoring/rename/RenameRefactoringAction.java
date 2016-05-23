@@ -96,9 +96,9 @@ public class RenameRefactoringAction extends Action implements ActivePartChanged
 
             final Resource resource = resources[0];
 
-            final Project project = resource.getRelatedProject();
+            final Optional<Project> project = resource.getRelatedProject();
 
-            if (!JavaUtil.isJavaProject(project)) {
+            if (!JavaUtil.isJavaProject(project.get())) {
                 return;
             }
 
@@ -138,9 +138,9 @@ public class RenameRefactoringAction extends Action implements ActivePartChanged
             final VirtualFile file = editorPart.getEditorInput().getFile();
 
             if (file instanceof File) {
-                final Project project = ((File)file).getRelatedProject();
+                final Optional<Project> project = ((File)file).getRelatedProject();
 
-                event.getPresentation().setEnabled(JavaUtil.isJavaProject(project) && isJavaFile(file));
+                event.getPresentation().setEnabled(JavaUtil.isJavaProject(project.get()) && isJavaFile(file));
             } else {
                 event.getPresentation().setEnabled(isJavaFile(file));
             }
@@ -155,13 +155,13 @@ public class RenameRefactoringAction extends Action implements ActivePartChanged
 
             final Resource resource = resources[0];
 
-            final Project project = resource.getRelatedProject();
+            final Optional<Project> project = resource.getRelatedProject();
             final Optional<Resource> srcFolder = resource.getParentWithMarker(SourceFolderMarker.ID);
 
             if (resource.getResourceType() == FILE) {
-                event.getPresentation().setEnabled(JavaUtil.isJavaProject(project) && srcFolder.isPresent() && isJavaFile((File)resource));
+                event.getPresentation().setEnabled(JavaUtil.isJavaProject(project.get()) && srcFolder.isPresent() && isJavaFile((File)resource));
             } else if (resource instanceof Container) {
-                event.getPresentation().setEnabled(JavaUtil.isJavaProject(project) && srcFolder.isPresent());
+                event.getPresentation().setEnabled(JavaUtil.isJavaProject(project.get()) && srcFolder.isPresent());
             }
         }
     }

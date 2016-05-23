@@ -364,16 +364,11 @@ public interface Resource extends Comparable<Resource> {
      * <p/>
      * By design, each node should be bound to specified {@link Project}.
      *
-     * @return the project
-     * @throws IllegalStateException
-     *         if related project wasn't found. Reason include:
-     *         <ul>
-     *         <li>Related project wasn't found</li>
-     *         </ul>
+     * @return the {@link Optional} with related project
      * @see Project
      * @since 4.0.0-RC14
      */
-    Project getRelatedProject();
+    Optional<Project> getRelatedProject();
 
     /**
      * Returns the type of this resource.

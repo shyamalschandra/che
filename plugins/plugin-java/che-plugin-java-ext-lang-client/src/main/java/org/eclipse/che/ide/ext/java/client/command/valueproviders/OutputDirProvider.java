@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.java.client.command.valueproviders;
 
+import com.google.common.base.Optional;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -53,12 +54,12 @@ public class OutputDirProvider implements CommandPropertyValueProvider {
         if (resources != null && resources.length == 1) {
 
             final Resource resource = resources[0];
-            final Project project = resource.getRelatedProject();
+            final Optional<Project> project = resource.getRelatedProject();
 
-            if (JavaUtil.isJavaProject(project) && project.getAttributes().containsKey(OUTPUT_FOLDER)) {
-                return promises.resolve(appContext.getProjectsRoot() + project.getAttributes().get(OUTPUT_FOLDER).get(0));
+            if (JavaUtil.isJavaProject(project.get()) && project.get().getAttributes().containsKey(OUTPUT_FOLDER)) {
+                return promises.resolve(appContext.getProjectsRoot() + project.get().getAttributes().get(OUTPUT_FOLDER).get(0));
             } else {
-                return promises.resolve(appContext.getProjectsRoot() + project.getLocation());
+                return promises.resolve(appContext.getProjectsRoot() + project.get().getLocation());
             }
         }
 

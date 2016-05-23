@@ -10,11 +10,11 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.java.client.command;
 
+import com.google.common.base.Optional;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
-import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.resources.Project;
 import org.eclipse.che.ide.api.resources.Resource;
 import org.eclipse.che.ide.ext.java.client.command.mainclass.SelectNodePresenter;
@@ -96,9 +96,13 @@ public class JavaCommandPagePresenter implements JavaCommandPageView.ActionDeleg
             return;
         }
 
-        final Project project = resource.getRelatedProject();
+        final Optional<Project> project = resource.getRelatedProject();
 
-        final Path relPath = resource.getLocation().removeFirstSegments(project.getLocation().segmentCount());
+        if (!project.isPresent()) {
+            return;
+        }
+
+        final Path relPath = resource.getLocation().removeFirstSegments(project.get().getLocation().segmentCount());
 
         view.setMainClass(relPath.toString());
         editedConfiguration.setCommandLine(editedConfiguration.getCommandLine().replace(editedConfiguration.getMainClass(), relPath.toString()));

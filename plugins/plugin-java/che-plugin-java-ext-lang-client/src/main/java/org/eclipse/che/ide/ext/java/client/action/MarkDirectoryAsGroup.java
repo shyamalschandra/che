@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.java.client.action;
 
+import com.google.common.base.Optional;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -41,8 +42,8 @@ public class MarkDirectoryAsGroup extends DefaultActionGroup {
     public void update(ActionEvent e) {
         final Resource resource = appContext.getResource();
 
-        final Project relatedProject = resource.getRelatedProject();
+        final Optional<Project> project = resource.getRelatedProject();
 
-        e.getPresentation().setVisible("plainJava".equals(relatedProject.getType()));
+        e.getPresentation().setVisible(project.isPresent() && "plainJava".equals(project.get().getType()));
     }
 }

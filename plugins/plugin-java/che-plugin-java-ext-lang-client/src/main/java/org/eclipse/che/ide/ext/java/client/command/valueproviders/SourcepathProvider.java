@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.java.client.command.valueproviders;
 
+import com.google.common.base.Optional;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -66,10 +67,10 @@ public class SourcepathProvider implements CommandPropertyValueProvider {
         if (resources != null && resources.length == 1) {
 
             final Resource resource = resources[0];
-            final Project project = resource.getRelatedProject();
+            final Optional<Project> project = resource.getRelatedProject();
 
-            if (JavaUtil.isJavaProject(project)) {
-                return classpathContainer.getClasspathEntries(project.getLocation().toString()).then(
+            if (JavaUtil.isJavaProject(project.get())) {
+                return classpathContainer.getClasspathEntries(project.get().getLocation().toString()).then(
                         new Function<List<ClasspathEntryDto>, String>() {
                             @Override
                             public String apply(List<ClasspathEntryDto> arg) throws FunctionException {
@@ -81,7 +82,7 @@ public class SourcepathProvider implements CommandPropertyValueProvider {
                                 }
 
                                 if (classpath.toString().isEmpty()) {
-                                    classpath.append(appContext.getProjectsRoot()).append(project.getLocation().toString());
+                                    classpath.append(appContext.getProjectsRoot()).append(project.get().getLocation().toString());
                                 }
 
                                 classpath.append(':');

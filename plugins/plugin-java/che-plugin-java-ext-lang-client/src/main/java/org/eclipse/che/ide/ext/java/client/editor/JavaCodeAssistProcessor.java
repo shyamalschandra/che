@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.java.client.editor;
 
+import com.google.common.base.Optional;
 import com.google.gwt.resources.client.ImageResource;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
@@ -157,9 +158,9 @@ public class JavaCodeAssistProcessor implements CodeAssistProcessor {
         final VirtualFile file = editor.getEditorInput().getFile();
 
         if (file instanceof Resource) {
-            final Project project = ((Resource)file).getRelatedProject();
+            final Optional<Project> project = ((Resource)file).getRelatedProject();
             Unmarshallable<Proposals> unmarshaller = unmarshallerFactory.newUnmarshaller(Proposals.class);
-            client.computeProposals(project.getLocation().toString(), resolveFQN(file), offset, textEditor.getDocument().getContents(),
+            client.computeProposals(project.get().getLocation().toString(), resolveFQN(file), offset, textEditor.getDocument().getContents(),
                                     new AsyncRequestCallback<Proposals>(unmarshaller) {
                                         @Override
                                         protected void onSuccess(Proposals proposals) {

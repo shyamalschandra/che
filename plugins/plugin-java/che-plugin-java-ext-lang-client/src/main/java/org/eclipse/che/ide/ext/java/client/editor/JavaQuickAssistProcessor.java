@@ -10,6 +10,8 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.java.client.editor;
 
+import com.google.common.base.Optional;
+
 import org.eclipse.che.ide.api.editor.EditorAgent;
 import org.eclipse.che.ide.api.editor.text.Position;
 import org.eclipse.che.ide.api.editor.text.annotation.Annotation;
@@ -158,10 +160,10 @@ public class JavaQuickAssistProcessor implements QuickAssistProcessor {
         final VirtualFile file = textEditor.getEditorInput().getFile();
 
         if (file instanceof Resource) {
-            final Project project = ((Resource)file).getRelatedProject();
+            final Optional<Project> project = ((Resource)file).getRelatedProject();
 
             Unmarshallable<Proposals> unmarshaller = unmarshallerFactory.newUnmarshaller(Proposals.class);
-            client.computeAssistProposals(project.getLocation().toString(), resolveFQN(file), offset, annotations,
+            client.computeAssistProposals(project.get().getLocation().toString(), resolveFQN(file), offset, annotations,
                                           new AsyncRequestCallback<Proposals>(unmarshaller) {
                                               @Override
                                               protected void onSuccess(Proposals proposals) {

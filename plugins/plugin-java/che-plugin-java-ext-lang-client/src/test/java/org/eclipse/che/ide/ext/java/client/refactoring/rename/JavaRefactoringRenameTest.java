@@ -170,7 +170,7 @@ public class JavaRefactoringRenameTest {
         when(file.getLocation()).thenReturn(Path.valueOf("/project/src/a/b/c/A.java"));
         when(file.getResourceType()).thenReturn(Resource.FILE);
         when(srcFolder.getLocation()).thenReturn(Path.valueOf("/project/src"));
-        when(file.getRelatedProject()).thenReturn(relatedProject);
+        when(file.getRelatedProject()).thenReturn(Optional.of(relatedProject));
         when(relatedProject.getLocation()).thenReturn(Path.valueOf("/project"));
         when(refactoringServiceClient.createRenameRefactoring(createRenameRefactoringDto)).thenReturn(createRenamePromise);
         when(createRenamePromise.then((Operation<RenameRefactoringSession>)any())).thenReturn(createRenamePromise);
