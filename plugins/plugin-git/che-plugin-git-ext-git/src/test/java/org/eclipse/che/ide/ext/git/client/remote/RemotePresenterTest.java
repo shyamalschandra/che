@@ -15,7 +15,6 @@ import com.googlecode.gwt.test.utils.GwtReflectionUtils;
 
 import org.eclipse.che.api.git.shared.Remote;
 import org.eclipse.che.ide.api.machine.DevMachine;
-import org.eclipse.che.ide.api.project.ProjectServiceClient;
 import org.eclipse.che.api.workspace.shared.dto.ProjectConfigDto;
 import org.eclipse.che.ide.api.event.project.ProjectUpdatedEvent;
 import org.eclipse.che.ide.api.notification.StatusNotification;

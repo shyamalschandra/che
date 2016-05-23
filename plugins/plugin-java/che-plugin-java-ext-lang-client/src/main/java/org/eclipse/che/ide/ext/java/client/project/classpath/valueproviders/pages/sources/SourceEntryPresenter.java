@@ -17,7 +17,6 @@ import com.google.inject.Singleton;
 
 import org.eclipse.che.api.promises.client.Operation;
 import org.eclipse.che.api.promises.client.OperationException;
-import org.eclipse.che.api.workspace.shared.dto.ProjectConfigDto;
 import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.resources.Project;
 import org.eclipse.che.ide.api.resources.Resource;
@@ -93,9 +92,6 @@ public class SourceEntryPresenter extends AbstractClasspathPagePresenter impleme
 
         isPlainJava = "plainJava".equals(project.getType());
 
-//        ProjectConfigDto projectConfig = appContext.getCurrentProject().getProjectConfig();
-//        isPlainJava = "plainJava".equals(projectConfig.getType());
-
         setReadOnlyMod();
 
         container.setWidget(view);
@@ -105,7 +101,7 @@ public class SourceEntryPresenter extends AbstractClasspathPagePresenter impleme
             return;
         }
 
-        classpathContainer.getClasspathEntries(projectConfig.getPath()).then(new Operation<List<ClasspathEntryDto>>() {
+        classpathContainer.getClasspathEntries(project.getLocation().toString()).then(new Operation<List<ClasspathEntryDto>>() {
             @Override
             public void apply(List<ClasspathEntryDto> entries) throws OperationException {
                 categories.clear();

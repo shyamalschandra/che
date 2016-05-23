@@ -13,15 +13,12 @@ package org.eclipse.che.ide.ext.java.client.project.classpath;
 import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import com.google.web.bindery.event.shared.EventBus;
 
 import org.eclipse.che.api.promises.client.Operation;
 import org.eclipse.che.api.promises.client.OperationException;
 import org.eclipse.che.api.promises.client.Promise;
 import org.eclipse.che.api.promises.client.PromiseError;
-import org.eclipse.che.api.workspace.shared.dto.ProjectConfigDto;
 import org.eclipse.che.ide.api.app.AppContext;
-import org.eclipse.che.ide.api.event.project.ProjectUpdatedEvent;
 import org.eclipse.che.ide.api.notification.NotificationManager;
 import org.eclipse.che.ide.api.resources.Project;
 import org.eclipse.che.ide.api.resources.Resource;
@@ -52,8 +49,6 @@ public class ClasspathResolver {
 
     private final ClasspathUpdaterServiceClient classpathUpdater;
     private final NotificationManager           notificationManager;
-    private final ProjectServiceClient          projectService;
-    private final EventBus                      eventBus;
     private final AppContext                    appContext;
     private final DtoFactory                    dtoFactory;
 
@@ -65,14 +60,10 @@ public class ClasspathResolver {
     @Inject
     public ClasspathResolver(ClasspathUpdaterServiceClient classpathUpdater,
                              NotificationManager notificationManager,
-                             ProjectServiceClient projectService,
-                             EventBus eventBus,
                              AppContext appContext,
                              DtoFactory dtoFactory) {
         this.classpathUpdater = classpathUpdater;
         this.notificationManager = notificationManager;
-        this.projectService = projectService;
-        this.eventBus = eventBus;
         this.appContext = appContext;
         this.dtoFactory = dtoFactory;
     }
@@ -130,14 +121,7 @@ public class ClasspathResolver {
         promise.then(new Operation<Void>() {
             @Override
             public void apply(Void arg) throws OperationException {
-                eventBus.fireEvent(new ClasspathChangedEvent(project.getLocation().toString(), entries));
-                projectService.getProject(appContext.getDevMachine(), project.getLocation()).then(
-                        new Operation<ProjectConfigDto>() {
-                            @Override
-                            public void apply(ProjectConfigDto arg) throws OperationException {
-                                eventBus.fireEvent(new ProjectUpdatedEvent(arg.getPath(), arg));
-                            }
-                        });
+                project.synchronize();
             }
         }).catchError(new Operation<PromiseError>() {
             @Override

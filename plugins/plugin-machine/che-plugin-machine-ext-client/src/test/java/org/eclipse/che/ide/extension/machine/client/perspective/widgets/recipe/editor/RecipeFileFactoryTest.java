@@ -14,7 +14,6 @@ import com.google.inject.Provider;
 import com.google.web.bindery.event.shared.EventBus;
 
 import org.eclipse.che.api.core.rest.shared.dto.Link;
-import org.eclipse.che.ide.api.project.ProjectServiceClient;
 import org.eclipse.che.api.project.shared.dto.ItemReference;
 import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.app.CurrentProject;
@@ -54,8 +53,6 @@ public class RecipeFileFactoryTest {
     //constructor mocks
     @Mock
     private EventBus               eventBus;
-    @Mock
-    private ProjectServiceClient   projectServiceClient;
     @Mock
     private DtoUnmarshallerFactory dtoUnmarshallerFactory;
     @Mock

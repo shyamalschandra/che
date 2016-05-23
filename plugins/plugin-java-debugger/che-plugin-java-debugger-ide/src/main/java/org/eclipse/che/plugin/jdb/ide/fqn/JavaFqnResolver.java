@@ -14,8 +14,8 @@ import com.google.inject.Singleton;
 
 import org.eclipse.che.ide.api.resources.Resource;
 import org.eclipse.che.ide.api.resources.VirtualFile;
-import org.eclipse.che.ide.ext.debugger.client.fqn.FqnResolver;
 import org.eclipse.che.ide.ext.java.client.util.JavaUtil;
+import org.eclipse.che.plugin.debugger.ide.fqn.FqnResolver;
 
 import javax.validation.constraints.NotNull;
 
