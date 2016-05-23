@@ -18,7 +18,7 @@ import com.google.inject.Singleton;
 import org.eclipse.che.api.promises.client.Promise;
 import org.eclipse.che.api.promises.client.callback.AsyncPromiseHelper;
 import org.eclipse.che.api.promises.client.callback.PromiseHelper;
-import org.eclipse.che.ide.api.workspace.Workspace;
+import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.dto.DtoFactory;
 import org.eclipse.che.ide.ext.java.shared.dto.search.FindUsagesRequest;
 import org.eclipse.che.ide.ext.java.shared.dto.search.FindUsagesResponse;
@@ -51,7 +51,7 @@ public class JavaSearchServiceWS implements JavaSearchService {
 
     @Inject
     public JavaSearchServiceWS(MessageBusProvider provider,
-                               Workspace workspace,
+                               AppContext appContext,
                                DtoFactory dtoFactory,
                                LoaderFactory loaderFactory,
                                DtoUnmarshallerFactory unmarshallerFactory) {
@@ -59,7 +59,7 @@ public class JavaSearchServiceWS implements JavaSearchService {
         this.dtoFactory = dtoFactory;
         this.loader = loaderFactory.newLoader();
         this.unmarshallerFactory = unmarshallerFactory;
-        this.pathToService = "/jdt/" + workspace.getId() + "/search/";
+        this.pathToService = "/jdt/search/";
     }
 
     @Override

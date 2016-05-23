@@ -387,7 +387,7 @@ public class CategoriesPageViewImpl implements CategoriesPageView {
             }
         }
 
-        categoriesList.render(categories);
+        categoriesList.render(categories, true);
     }
 
     @Override

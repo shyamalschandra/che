@@ -742,20 +742,6 @@ public interface GitServiceClient {
 
     Promise<Status> getStatus(DevMachine devMachine, Path project);
 
-    /**
-     * Get the Git ReadOnly Url for the pointed item's location.
-     *
-     * @param workspaceId
-     *         id of current workspace
-     * @param project
-     *         project (root of GIT repository)
-     * @param callback
-     */
-    @Deprecated
-    void getGitReadOnlyUrl(DevMachine devMachine, ProjectConfigDto project, AsyncRequestCallback<String> callback);
-
-    Promise<String> getGitReadOnlyUrl(DevMachine devMachine, Path project);
-
     void getCommitters(DevMachine devMachine, ProjectConfigDto project, AsyncRequestCallback<Commiters> callback);
 
     @Deprecated

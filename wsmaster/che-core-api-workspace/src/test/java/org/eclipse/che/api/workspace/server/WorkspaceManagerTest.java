@@ -33,8 +33,8 @@ import org.eclipse.che.api.workspace.server.spi.WorkspaceDao;
 import org.eclipse.che.api.workspace.shared.Constants;
 import org.eclipse.che.commons.env.EnvironmentContext;
 import org.eclipse.che.commons.lang.NameGenerator;
-import org.eclipse.che.commons.user.User;
-import org.eclipse.che.commons.user.UserImpl;
+import org.eclipse.che.commons.subject.Subject;
+import org.eclipse.che.commons.subject.SubjectImpl;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
@@ -109,7 +109,9 @@ public class WorkspaceManagerTest {
                                                     runtimes,
                                                     eventService,
                                                     machineManager,
-                                                    userManager));
+                                                    userManager,
+                                                    false,
+                                                    false));
         workspaceManager.setHooks(workspaceHooks);
 
         when(workspaceDao.create(any(WorkspaceImpl.class))).thenAnswer(invocation -> invocation.getArguments()[0]);
@@ -117,8 +119,8 @@ public class WorkspaceManagerTest {
 
         EnvironmentContext.setCurrent(new EnvironmentContext() {
             @Override
-            public User getUser() {
-                return new UserImpl("Test User", USER_ID, "token", new ArrayList<>(), false);
+            public Subject getSubject() {
+                return new SubjectImpl("Test User", USER_ID, "token", new ArrayList<>(), false);
             }
         });
     }
@@ -529,6 +531,45 @@ public class WorkspaceManagerTest {
         final List<SnapshotImpl> snapshots = workspaceManager.getSnapshot("workspace123");
 
         assertEquals(snapshots.size(), 1);
+    }
+
+    @Test
+    public void shouldCreateWorkspaceSnapshotUsingDefaultValueForAutoRestore() throws Exception {
+        workspaceManager = spy(new WorkspaceManager(workspaceDao,
+                                                    runtimes,
+                                                    eventService,
+                                                    machineManager,
+                                                    userManager,
+                                                    true,
+                                                    false));
+        final WorkspaceImpl workspace = workspaceManager.createWorkspace(createConfig(), "user123", "account");
+        when(workspaceDao.get(workspace.getId())).thenReturn(workspace);
+        final RuntimeDescriptor descriptor = createDescriptor(workspace, RUNNING);
+        when(runtimes.get(any())).thenReturn(descriptor);
+
+        workspaceManager.stopWorkspace(workspace.getId());
+
+        verify(workspaceManager, timeout(2000)).createSnapshotSync(workspace.getRuntime(), workspace.getNamespace(), workspace.getId());
+        verify(runtimes, timeout(2000)).stop(any());
+    }
+
+    @Test
+    public void shouldStartWorkspaceFromSnapshotUsingDefaultValueForAutoRestore() throws Exception {
+        workspaceManager = spy(new WorkspaceManager(workspaceDao,
+                                                    runtimes,
+                                                    eventService,
+                                                    machineManager,
+                                                    userManager,
+                                                    false,
+                                                    true));
+        final WorkspaceImpl workspace = workspaceManager.createWorkspace(createConfig(), "user123", "account");
+        when(machineManager.getSnapshots(any(), any())).thenReturn(singletonList(mock(SnapshotImpl.class)));
+        when(workspaceDao.get(workspace.getId())).thenReturn(workspace);
+        when(runtimes.get(any())).thenThrow(new NotFoundException(""));
+
+        workspaceManager.startWorkspace(workspace.getId(), workspace.getConfig().getDefaultEnv(), "account");
+
+        verify(runtimes, timeout(2000)).start(workspace, workspace.getConfig().getDefaultEnv(), true);
     }
 
     private RuntimeDescriptor createDescriptor(WorkspaceImpl workspace, WorkspaceStatus status) {

@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.eclipse.che.ide.ext.java.shared.Constants.SOURCE_FOLDER;
 
 /**
  * @author Anatoliy Bazko

@@ -24,10 +24,15 @@ import org.eclipse.che.ide.api.resources.Resource;
 import org.eclipse.che.ide.ext.java.client.JavaLocalizationConstant;
 import org.eclipse.che.ide.ext.java.client.project.classpath.service.ClasspathServiceClient;
 import org.eclipse.che.ide.ext.java.client.project.classpath.valueproviders.pages.ClasspathPagePresenter;
-import org.eclipse.che.ide.ext.java.shared.dto.classpath.ClasspathEntryDTO;
+import org.eclipse.che.ide.ext.java.shared.dto.classpath.ClasspathEntryDto;
 import org.eclipse.che.ide.api.dialogs.CancelCallback;
 import org.eclipse.che.ide.api.dialogs.ConfirmCallback;
 import org.eclipse.che.ide.api.dialogs.DialogFactory;
+import org.eclipse.che.ide.api.notification.NotificationManager;
+import org.eclipse.che.ide.ext.java.client.JavaLocalizationConstant;
+import org.eclipse.che.ide.ext.java.client.command.ClasspathContainer;
+import org.eclipse.che.ide.ext.java.client.project.classpath.valueproviders.pages.ClasspathPagePresenter;
+import org.eclipse.che.ide.ext.java.shared.dto.classpath.ClasspathEntryDto;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -48,8 +53,8 @@ import static org.eclipse.che.ide.ext.java.client.util.JavaUtil.isJavaProject;
 public class ProjectClasspathPresenter implements ProjectClasspathView.ActionDelegate, ClasspathPagePresenter.DirtyStateListener {
     private final ProjectClasspathView        view;
     private final Set<ClasspathPagePresenter> classpathPages;
-    private final ClasspathServiceClient      service;
     private final AppContext                  appContext;
+    private final ClasspathContainer          classpathContainer;
     private final JavaLocalizationConstant    locale;
     private final DialogFactory               dialogFactory;
     private final NotificationManager         notificationManager;
@@ -60,16 +65,16 @@ public class ProjectClasspathPresenter implements ProjectClasspathView.ActionDel
     @Inject
     protected ProjectClasspathPresenter(ProjectClasspathView view,
                                         Set<ClasspathPagePresenter> classpathPages,
-                                        ClasspathServiceClient service,
                                         AppContext appContext,
+                                        ClasspathContainer classpathContainer,
                                         JavaLocalizationConstant locale,
                                         DialogFactory dialogFactory,
                                         NotificationManager notificationManager,
                                         ClasspathResolver classpathResolver) {
         this.view = view;
         this.classpathPages = classpathPages;
-        this.service = service;
         this.appContext = appContext;
+        this.classpathContainer = classpathContainer;
         this.locale = locale;
         this.dialogFactory = dialogFactory;
         this.notificationManager = notificationManager;
@@ -86,6 +91,7 @@ public class ProjectClasspathPresenter implements ProjectClasspathView.ActionDel
             if (property.isDirty()) {
                 property.storeChanges();
             }
+            property.clearData();
         }
 
         if ("maven".equals(appContext.getCurrentProject().getProjectConfig().getType())) {
@@ -97,7 +103,6 @@ public class ProjectClasspathPresenter implements ProjectClasspathView.ActionDel
             @Override
             public void apply(Void arg) throws OperationException {
                 view.hideWindow();
-                clearData();
             }
         });
     }
@@ -150,9 +155,9 @@ public class ProjectClasspathPresenter implements ProjectClasspathView.ActionDel
 
         Preconditions.checkState(isJavaProject(project));
 
-        service.getClasspath(project.getLocation().toString()).then(new Operation<List<ClasspathEntryDTO>>() {
+        classpathContainer.getClasspathEntries(project.getLocation().toString()).then(new Operation<List<ClasspathEntryDto>>() {
             @Override
-            public void apply(List<ClasspathEntryDTO> arg) throws OperationException {
+            public void apply(List<ClasspathEntryDto> arg) throws OperationException {
                 classpathResolver.resolveClasspathEntries(arg);
                 if (propertiesMap == null) {
                     propertiesMap = new HashMap<>();

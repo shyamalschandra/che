@@ -23,7 +23,7 @@ import org.eclipse.che.ide.api.resources.Resource;
 import org.eclipse.che.ide.ext.java.client.command.ClasspathContainer;
 import org.eclipse.che.ide.ext.java.client.project.classpath.ClasspathResolver;
 import org.eclipse.che.ide.ext.java.client.util.JavaUtil;
-import org.eclipse.che.ide.ext.java.shared.dto.classpath.ClasspathEntryDTO;
+import org.eclipse.che.ide.ext.java.shared.dto.classpath.ClasspathEntryDto;
 import org.eclipse.che.ide.extension.machine.client.command.valueproviders.CommandPropertyValueProvider;
 
 import java.util.List;
@@ -70,9 +70,9 @@ public class SourcepathProvider implements CommandPropertyValueProvider {
 
             if (JavaUtil.isJavaProject(project)) {
                 return classpathContainer.getClasspathEntries(project.getLocation().toString()).then(
-                        new Function<List<ClasspathEntryDTO>, String>() {
+                        new Function<List<ClasspathEntryDto>, String>() {
                             @Override
-                            public String apply(List<ClasspathEntryDTO> arg) throws FunctionException {
+                            public String apply(List<ClasspathEntryDto> arg) throws FunctionException {
                                 classpathResolver.resolveClasspathEntries(arg);
                                 Set<String> sources = classpathResolver.getSources();
                                 StringBuilder classpath = new StringBuilder("");

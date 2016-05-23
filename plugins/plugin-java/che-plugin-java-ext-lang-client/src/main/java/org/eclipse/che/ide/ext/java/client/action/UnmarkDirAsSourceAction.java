@@ -27,7 +27,7 @@ import org.eclipse.che.ide.ext.java.client.JavaResources;
 import org.eclipse.che.ide.ext.java.client.project.classpath.ClasspathResolver;
 import org.eclipse.che.ide.ext.java.client.project.classpath.service.ClasspathServiceClient;
 import org.eclipse.che.ide.ext.java.client.resource.SourceFolderMarker;
-import org.eclipse.che.ide.ext.java.shared.dto.classpath.ClasspathEntryDTO;
+import org.eclipse.che.ide.ext.java.shared.dto.classpath.ClasspathEntryDto;
 
 import java.util.List;
 
@@ -75,9 +75,9 @@ public class UnmarkDirAsSourceAction extends AbstractPerspectiveAction {
 
         checkState(resource instanceof Container, "Parent should be a container");
 
-        classpathService.getClasspath(resource.getRelatedProject().getLocation().toString()).then(new Operation<List<ClasspathEntryDTO>>() {
+        classpathService.getClasspath(resource.getRelatedProject().getLocation().toString()).then(new Operation<List<ClasspathEntryDto>>() {
             @Override
-            public void apply(List<ClasspathEntryDTO> arg) throws OperationException {
+            public void apply(List<ClasspathEntryDto> arg) throws OperationException {
                 classpathResolver.resolveClasspathEntries(arg);
                 classpathResolver.getSources().remove(resource.getLocation().toString());
                 classpathResolver.updateClasspath();

@@ -29,9 +29,12 @@ import static com.google.common.base.Strings.isNullOrEmpty;
  *
  * @author Valeriy Svydenko
  * @author Vlad Zhukovskyi
+ * @author Roman Nikitenko
  */
 @Singleton
 public class FullTextSearchPresenter implements FullTextSearchView.ActionDelegate {
+    private static final String URL_ENCODED_BACKSLASH = "%5C";
+    private static final String AND_OPERATOR          = "AND";
 
     private final FullTextSearchView  view;
     private final FindResultPresenter findResultPresenter;
@@ -71,7 +74,7 @@ public class FullTextSearchPresenter implements FullTextSearchView.ActionDelegat
                 }
 
                 final Container container = optionalContainer.get();
-                container.search(view.getFileMask(), text).then(new Operation<Resource[]>() {
+                container.search(view.getFileMask(), prepareQuery(text)).then(new Operation<Resource[]>() {
                     @Override
                     public void apply(Resource[] result) throws OperationException {
                         view.close();
@@ -80,6 +83,52 @@ public class FullTextSearchPresenter implements FullTextSearchView.ActionDelegat
                 });
             }
         });
+    }
+
+    //todo move this to the core part of resource manager
+    private String prepareQuery(String text) {
+        StringBuilder sb = new StringBuilder();
+        for (char character : text.toCharArray()) {
+            // Escape those characters that QueryParser expects to be escaped
+            if (character == '\\' ||
+                character == '+' ||
+                character == '-' ||
+                character == '!' ||
+                character == '(' ||
+                character == ')' ||
+                character == ':' ||
+                character == '^' ||
+                character == '[' ||
+                character == ']' ||
+                character == '\"' ||
+                character == '{' ||
+                character == '}' ||
+                character == '~' ||
+                character == '*' ||
+                character == '?' ||
+                character == '|' ||
+                character == '&' ||
+                character == '/') {
+                sb.append(URL_ENCODED_BACKSLASH);
+            }
+            sb.append(character);
+        }
+        String escapedText = sb.toString();
+
+        String[] items = escapedText.trim().split("\\s+");
+        int numberItem = items.length;
+        if (numberItem == 1) {
+            return items[0] + '*';
+        }
+
+        String lastItem = items[numberItem - 1];
+        sb = new StringBuilder();
+        sb.append('"');
+        sb.append(escapedText.substring(0, escapedText.lastIndexOf(lastItem)));
+        sb.append("\" " + AND_OPERATOR + " ");
+        sb.append(lastItem);
+        sb.append('*');
+        return sb.toString();
     }
 
     @Override

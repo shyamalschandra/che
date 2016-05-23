@@ -248,8 +248,8 @@ public interface ProjectServiceClient {
     /**
      * Update project.
      *
-     * @param workspaceId
-     *         id of current workspace
+     * @param devMachine
+     *         of current devMachine
      * @param path
      *         path to the project to get
      * @param descriptor
@@ -282,6 +282,8 @@ public interface ProjectServiceClient {
     /**
      * Get project.
      *
+     * @param devMachine
+     *         of current devMachine
      * @param path
      *         path to the project
      * @return a promise that resolves to the {@link ProjectConfigDto}, or rejects with an error
@@ -293,8 +295,8 @@ public interface ProjectServiceClient {
     /**
      * Get children for the specified path.
      *
-     * @param workspaceId
-     *         id of current workspace
+     * @param devMachine
+     *         of current devMachine
      * @param path
      *         path to get its children
      * @param callback
@@ -336,8 +338,8 @@ public interface ProjectServiceClient {
     /**
      * Get project.
      *
-     * @param workspaceId
-     *         id of current workspace
+     * @param devMachine
+     *         of current devMachine
      * @param path
      *         path to the project to get
      * @param callback
@@ -426,8 +428,8 @@ public interface ProjectServiceClient {
     /**
      * Create new file in the specified folder.
      *
-     * @param workspaceId
-     *         id of current workspace
+     * @param devMachine
+     *         of current devMachine
      * @param parentPath
      *         path to parent for new file
      * @param name
@@ -461,8 +463,8 @@ public interface ProjectServiceClient {
     /**
      * Get file content.
      *
-     * @param workspaceId
-     *         id of current workspace
+     * @param devMachine
+     *         of current devMachine
      * @param path
      *         path to file
      * @param callback
@@ -475,8 +477,8 @@ public interface ProjectServiceClient {
     /**
      * Gets list of {@link SourceEstimation} for all supposed project types.
      *
-     * @param workspaceId
-     *         id of current workspace
+     * @param devMachine
+     *         of current devMachine
      * @param path
      *         path of the project to resolve
      * @param callback
@@ -489,8 +491,8 @@ public interface ProjectServiceClient {
     /**
      * Create new folder in the specified folder.
      *
-     * @param workspaceId
-     *         id of current workspace
+     * @param devMachine
+     *         of current devMachine
      * @param path
      *         path to parent for new folder
      * @param callback
@@ -503,8 +505,8 @@ public interface ProjectServiceClient {
     /**
      * Delete item.
      *
-     * @param workspaceId
-     *         id of current workspace
+     * @param devMachine
+     *         of current devMachine
      * @param path
      *         path to item to delete
      * @param callback
@@ -533,8 +535,8 @@ public interface ProjectServiceClient {
     /**
      * Copy an item with new name to the specified target path. Original item name is used if new name isn't set.
      *
-     * @param workspaceId
-     *         id of current workspace
+     * @param devMachine
+     *         of current devMachine
      * @param path
      *         path to the item to copy
      * @param newParentPath
@@ -551,8 +553,8 @@ public interface ProjectServiceClient {
     /**
      * Move an item to the specified target path. Set new name to rename the resource when moving.
      *
-     * @param workspaceId
-     *         id of current workspace
+     * @param devMachine
+     *         of current devMachine
      * @param path
      *         path to the item to move
      * @param newParentPath
@@ -569,8 +571,8 @@ public interface ProjectServiceClient {
     /**
      * Get folders tree starts from the specified path.
      *
-     * @param workspaceId
-     *         id of current workspace
+     * @param devMachine
+     *         of current devMachine
      * @param path
      *         path to get its folder tree
      * @param depth

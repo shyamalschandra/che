@@ -25,11 +25,8 @@ ENV PATH $JAVA_HOME/bin:$PATH
 
 EXPOSE 8080
 
-ADD /assembly/eclipse-che-* /home/user/che
+ADD /assembly/assembly-main/target/eclipse-che-*/eclipse-che-* /home/user/che
 ENV CHE_HOME /home/user/che
 
-RUN sudo chown -R user:user /home/user
-
-ENTRYPOINT [ "/home/user/che/bin/che.sh", "-l" ]
-
+ENTRYPOINT [ "/home/user/che/bin/che.sh", "-c" ]
 CMD [ "run" ]

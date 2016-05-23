@@ -19,19 +19,18 @@ import org.eclipse.che.api.local.storage.stack.StackLocalStorage;
 import org.eclipse.che.api.workspace.server.model.impl.stack.StackImpl;
 import org.eclipse.che.api.workspace.server.spi.StackDao;
 import org.eclipse.che.api.workspace.shared.stack.Stack;
-
 import org.eclipse.che.commons.annotation.Nullable;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import java.io.IOException;
-
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.stream.Stream;
 
 import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
@@ -111,7 +110,7 @@ public class LocalStackDaoImpl implements StackDao {
     }
 
     @Override
-    public void update(StackImpl update) throws NotFoundException, ServerException {
+    public StackImpl update(StackImpl update) throws NotFoundException, ServerException {
         requireNonNull(update, "Stack required");
         requireNonNull(update.getId(), "Stack id required");
         lock.writeLock().lock();
@@ -121,37 +120,27 @@ public class LocalStackDaoImpl implements StackDao {
                 throw new NotFoundException(format("Stack with id %s was not found", updateId));
             }
             stacks.replace(updateId, update);
+            return new StackImpl(update);
         } finally {
             lock.writeLock().unlock();
         }
     }
 
     @Override
-    public List<StackImpl> getByCreator(String creator, int skipCount, int maxItems) {
-        requireNonNull(creator, "Stack creator required");
+    public List<StackImpl> searchStacks(String user, @Nullable List<String> tags, int skipCount, int maxItems) {
         lock.readLock().lock();
         try {
-            return stacks.values().stream()
-                         .skip(skipCount)
-                         .filter(stack -> creator.equals(stack.getCreator()))
-                         .limit(maxItems)
-                         .map(StackImpl::new)
-                         .collect(toList());
-        } finally {
-            lock.readLock().unlock();
-        }
-    }
+            Stream<StackImpl> stacksStream = stacks.values()
+                                                   .stream()
+                                                   .skip(skipCount)
+                                                   .filter(decoratedStack -> tags == null ||
+                                                                             decoratedStack.getTags().containsAll(tags));
+            if (maxItems != 0) {
+                stacksStream = stacksStream.limit(maxItems);
+            }
 
-    @Override
-    public List<StackImpl> searchStacks(@Nullable List<String> tags, int skipCount, int maxItems) {
-        lock.readLock().lock();
-        try {
-            return stacks.values().stream()
-                         .skip(skipCount)
-                         .filter(decoratedStack -> tags == null || decoratedStack.getTags().containsAll(tags))
-                         .limit(maxItems)
-                         .map(StackImpl::new)
-                         .collect(toList());
+            return stacksStream.map(StackImpl::new)
+                               .collect(toList());
         } finally {
             lock.readLock().unlock();
         }

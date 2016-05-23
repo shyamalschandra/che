@@ -50,7 +50,7 @@ public class JavaSearchServiceRest implements JavaSearchService {
         this.unmarshallerFactory = unmarshallerFactory;
         this.appContext = appContext;
         this.loader = loaderFactory.newLoader();
-        this.pathToService = appContext.getDevMachine().getWsAgentBaseUrl() + "/jdt/" + workspace.getId() + "/search/";
+        this.pathToService = appContext.getDevMachine().getWsAgentBaseUrl() + "/jdt/search/";
     }
 
     @Override

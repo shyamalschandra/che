@@ -59,7 +59,7 @@ public class UploadFolderFromZipPresenter implements UploadFolderFromZipView.Act
     public void showDialog(Container container) {
         this.container = container;
         view.showDialog();
-        view.setAction(devMachine.getWsAgentBaseUrl() + "/project/" + devMachine.getId() + "/upload/zipfolder" + container.getLocation());
+        view.setAction(devMachine.getWsAgentBaseUrl() + "/project/upload/zipfolder" + container.getLocation());
     }
 
     /** {@inheritDoc} */

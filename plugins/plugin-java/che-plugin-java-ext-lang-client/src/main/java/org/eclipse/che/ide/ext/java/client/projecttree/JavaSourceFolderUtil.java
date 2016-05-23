@@ -18,6 +18,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import static org.eclipse.che.ide.ext.java.shared.Constants.SOURCE_FOLDER;
+
 /**
  * @author Vladyslav Zhukovskii
  * @author Anatoliy Bazko
@@ -43,7 +45,7 @@ public class JavaSourceFolderUtil {
         String projectPath = removeEndingPathSeparator(projectConfig.getPath());
         Map<String, List<String>> attributes = projectConfig.getAttributes();
 
-        List<String> sourceFolders = attributes.get(projectBuilder + ".source.folder");
+        List<String> sourceFolders = attributes.get(SOURCE_FOLDER);
         if (sourceFolders != null) {
             for (String sourceFolder : sourceFolders) {
                 allSourceFolders.add(projectPath + addStartingPathSeparator(sourceFolder) + '/');

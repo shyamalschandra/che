@@ -86,6 +86,7 @@ public class ProjectImporterTest {
         when(importRequest.send()).thenReturn(importPromise);
         when(importPromise.thenPromise(any(Function.class))).thenReturn(importPromise);
         when(projectConfig.getPath()).thenReturn("/foo");
+        when(projectConfig.getSource()).thenReturn(source);
         when(subscriberFactory.createSubscriber()).thenReturn(subscriber);
         when(projectConfig.getSource()).thenReturn(source);
         when(importPromise.catchErrorPromise(any(Function.class))).thenReturn(importPromise);

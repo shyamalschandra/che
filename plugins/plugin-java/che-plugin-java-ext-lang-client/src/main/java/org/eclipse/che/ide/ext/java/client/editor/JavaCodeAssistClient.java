@@ -62,14 +62,14 @@ public class JavaCodeAssistClient {
     }
 
     public void computeProposals(String projectPath, String fqn, int offset, String contents, AsyncRequestCallback<Proposals> callback) {
-        String url = appContext.getDevMachine().getWsAgentBaseUrl() + "/jdt/" + appContext.getDevMachine().getId() + "/code-assist/compute/completion" + "/?projectpath=" +
+        String url = appContext.getDevMachine().getWsAgentBaseUrl() + "/jdt/code-assist/compute/completion" + "/?projectpath=" +
                      projectPath + "&fqn=" + fqn + "&offset=" + offset;
         asyncRequestFactory.createPostRequest(url, null).data(contents).send(callback);
     }
 
     public void computeAssistProposals(String projectPath, String fqn, int offset, List<Problem> problems,
                                        AsyncRequestCallback<Proposals> callback) {
-        String url = appContext.getDevMachine().getWsAgentBaseUrl() + "/jdt/" + appContext.getDevMachine().getId() + "/code-assist/compute/assist" + "/?projectpath=" +
+        String url = appContext.getDevMachine().getWsAgentBaseUrl() + "/jdt/code-assist/compute/assist" + "/?projectpath=" +
                      projectPath + "&fqn=" + fqn + "&offset=" + offset;
         List<Problem> prob = new ArrayList<>();
         prob.addAll(problems);
@@ -78,7 +78,7 @@ public class JavaCodeAssistClient {
 
 
     public void applyProposal(String sessionId, int index, boolean insert, final AsyncCallback<ProposalApplyResult> callback) {
-        String url = appContext.getDevMachine().getWsAgentBaseUrl() + "/jdt/" + appContext.getDevMachine().getId() + "/code-assist/apply/completion/?sessionid=" +
+        String url = appContext.getDevMachine().getWsAgentBaseUrl() + "/jdt/code-assist/apply/completion/?sessionid=" +
                      sessionId + "&index=" + index + "&insert=" + insert;
         Unmarshallable<ProposalApplyResult> unmarshaller =
                 unmarshallerFactory.newUnmarshaller(ProposalApplyResult.class);
@@ -96,7 +96,7 @@ public class JavaCodeAssistClient {
     }
 
     public String getProposalDocUrl(int id, String sessionId) {
-        return appContext.getDevMachine().getWsAgentBaseUrl() + "/jdt/" + appContext.getDevMachine().getId() + "/code-assist/compute/info?sessionid=" + sessionId +
+        return appContext.getDevMachine().getWsAgentBaseUrl() + "/jdt/code-assist/compute/info?sessionid=" + sessionId +
                "&index=" + id;
     }
 
@@ -116,7 +116,7 @@ public class JavaCodeAssistClient {
         return newPromise(new AsyncPromiseHelper.RequestCall<List<Change>>() {
             @Override
             public void makeCall(AsyncCallback<List<Change>> callback) {
-                String url = appContext.getDevMachine().getWsAgentBaseUrl() + "/code-formatting/" + appContext.getDevMachine().getId() + "/format?offset=" + offset +
+                String url = appContext.getDevMachine().getWsAgentBaseUrl() + "/code-formatting/format?offset=" + offset +
                              "&length=" + length;
                 asyncRequestFactory.createPostRequest(url, null)
                                    .header(CONTENT_TYPE, MimeType.TEXT_PLAIN)
@@ -146,9 +146,7 @@ public class JavaCodeAssistClient {
      */
     public Promise<List<ConflictImportDTO>> organizeImports(String projectPath, String fqn) {
         String url = appContext.getDevMachine().getWsAgentBaseUrl() +
-                     "/jdt/" +
-                     appContext.getDevMachine().getId() +
-                     "/code-assist/organize-imports?projectpath=" + projectPath +
+                     "/jdt/code-assist/organize-imports?projectpath=" + projectPath +
                      "&fqn=" + fqn;
 
         return asyncRequestFactory.createPostRequest(url, null)
@@ -166,9 +164,7 @@ public class JavaCodeAssistClient {
      */
     public Promise<Void> applyChosenImports(String projectPath, String fqn, ConflictImportDTO chosen) {
         String url = appContext.getDevMachine().getWsAgentBaseUrl() +
-                     "/jdt/" +
-                     appContext.getDevMachine().getId() +
-                     "/code-assist/apply-imports?projectpath=" + projectPath +
+                     "/jdt/code-assist/apply-imports?projectpath=" + projectPath +
                      "&fqn=" + fqn;
 
         return asyncRequestFactory.createPostRequest(url, chosen)
