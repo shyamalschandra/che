@@ -15,7 +15,6 @@ import com.google.inject.Singleton;
 
 import org.eclipse.che.ide.api.action.ActionManager;
 import org.eclipse.che.ide.api.action.DefaultActionGroup;
-import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.constraints.Constraints;
 import org.eclipse.che.ide.api.extension.Extension;
 import org.eclipse.che.ide.api.keybinding.KeyBindingAgent;
@@ -80,8 +79,7 @@ public class GitExtension {
                         CompareWithLatestAction compareWithLatestAction,
                         CompareWithBranchAction compareWithBranchAction,
                         CompareWithRevisionAction compareWithRevisionAction,
-                        KeyBindingAgent keyBinding,
-                        AppContext appContext) {
+                        KeyBindingAgent keyBinding) {
 
         resources.gitCSS().ensureInjected();
 

@@ -13,6 +13,7 @@ package org.eclipse.che.ide.actions;
 import com.google.gwt.core.client.Callback;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.google.web.bindery.event.shared.EventBus;
 
 import org.eclipse.che.api.promises.client.Operation;
 import org.eclipse.che.api.promises.client.OperationException;
@@ -25,6 +26,10 @@ import org.eclipse.che.ide.api.action.AbstractPerspectiveAction;
 import org.eclipse.che.ide.api.action.ActionEvent;
 import org.eclipse.che.ide.api.action.PromisableAction;
 import org.eclipse.che.ide.api.app.AppContext;
+import org.eclipse.che.ide.api.editor.texteditor.TextEditor;
+import org.eclipse.che.ide.api.event.ActivePartChangedEvent;
+import org.eclipse.che.ide.api.event.ActivePartChangedHandler;
+import org.eclipse.che.ide.api.parts.PartPresenter;
 import org.eclipse.che.ide.api.resources.Resource;
 import org.eclipse.che.ide.resources.DeleteResourceManager;
 
@@ -49,12 +54,14 @@ public class DeleteResourceAction extends AbstractPerspectiveAction implements P
     private final AppContext            appContext;
 
     private Callback<Void, Throwable> actionCompletedCallBack;
+    private PartPresenter             partPresenter;
 
     @Inject
     public DeleteResourceAction(Resources resources,
                                 DeleteResourceManager deleteResourceManager,
                                 CoreLocalizationConstant localization,
-                                AppContext appContext) {
+                                AppContext appContext,
+                                EventBus eventBus) {
         super(singletonList(PROJECT_PERSPECTIVE_ID),
               localization.deleteItemActionText(),
               localization.deleteItemActionDescription(),
@@ -62,6 +69,13 @@ public class DeleteResourceAction extends AbstractPerspectiveAction implements P
               resources.delete());
         this.deleteResourceManager = deleteResourceManager;
         this.appContext = appContext;
+
+        eventBus.addHandler(ActivePartChangedEvent.TYPE, new ActivePartChangedHandler() {
+            @Override
+            public void onActivePartChanged(ActivePartChangedEvent event) {
+                partPresenter = event.getActivePart();
+            }
+        });
     }
 
     /** {@inheritDoc} */
@@ -90,7 +104,7 @@ public class DeleteResourceAction extends AbstractPerspectiveAction implements P
         final Resource[] resources = appContext.getResources();
 
         event.getPresentation().setVisible(true);
-        event.getPresentation().setEnabled(resources != null && resources.length > 0);
+        event.getPresentation().setEnabled(resources != null && resources.length > 0 && !(partPresenter instanceof TextEditor));
     }
 
     /** {@inheritDoc} */
