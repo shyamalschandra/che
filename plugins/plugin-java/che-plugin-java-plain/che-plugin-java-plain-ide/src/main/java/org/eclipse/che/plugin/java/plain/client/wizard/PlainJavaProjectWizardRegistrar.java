@@ -30,7 +30,7 @@ import static org.eclipse.che.plugin.java.plain.shared.PlainJavaProjectConstants
  * @author Valeriy Svydenko
  */
 public class PlainJavaProjectWizardRegistrar implements ProjectWizardRegistrar {
-    private final List<Provider<? extends WizardPage<ProjectConfigDto>>> wizardPages;
+    private final List<Provider<? extends WizardPage<MutableProjectConfig>>> wizardPages;
 
     @Inject
     public PlainJavaProjectWizardRegistrar(Provider<PlainJavaPagePresenter> plainJavaPagePresenterProvider) {
