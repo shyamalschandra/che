@@ -13,7 +13,6 @@ package org.eclipse.che.ide.api.resources;
 import com.google.common.annotations.Beta;
 
 import org.eclipse.che.api.promises.client.Promise;
-import org.eclipse.che.ide.api.project.HasProjectConfig;
 import org.eclipse.che.ide.resource.Path;
 
 /**
@@ -44,9 +43,6 @@ public interface File extends Resource, VirtualFile {
 
     /** @see VirtualFile#isReadOnly() */
     boolean isReadOnly();
-
-    /** @see VirtualFile#getProject() */
-    HasProjectConfig getProject();
 
     /** @see VirtualFile#getContentUrl() */
     String getContentUrl();

@@ -16,7 +16,6 @@ import com.google.common.base.Objects;
 
 import org.eclipse.che.api.promises.client.Promise;
 import org.eclipse.che.api.promises.client.PromiseProvider;
-import org.eclipse.che.ide.api.project.HasProjectConfig;
 import org.eclipse.che.ide.resource.Path;
 
 /**
@@ -70,11 +69,6 @@ public class SyntheticFile implements VirtualFile {
     @Override
     public boolean isReadOnly() {
         return true;
-    }
-
-    @Override
-    public HasProjectConfig getProject() {
-        return null;
     }
 
     @Override

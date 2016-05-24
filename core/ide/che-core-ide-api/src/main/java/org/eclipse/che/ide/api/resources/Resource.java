@@ -60,6 +60,7 @@ public interface Resource extends Comparable<Resource> {
      * Type constant that describes {@code File} resource.
      *
      * @see Resource#getResourceType()
+     * @see Resource#isFile()
      * @see File
      * @since 4.0.0-RC14
      */
@@ -69,6 +70,7 @@ public interface Resource extends Comparable<Resource> {
      * Type constant that describes {@code Folder} resource.
      *
      * @see Resource#getResourceType()
+     * @see Resource#isFolder()
      * @see Folder
      * @since 4.0.0-RC14
      */
@@ -78,10 +80,41 @@ public interface Resource extends Comparable<Resource> {
      * Type constant that describes {@code Project} resource.
      *
      * @see Resource#getResourceType()
+     * @see Resource#isProject()
      * @see Project
      * @since 4.0.0-RC14
      */
     int PROJECT = 0x4;
+
+    /**
+     * Returns {@code true} if current represents a file.
+     *
+     * @return true if current resource is file based resource.
+     * @see Resource#getResourceType()
+     * @see Resource#FILE
+     * @since 4.3.0
+     */
+    boolean isFile();
+
+    /**
+     * Returns {@code true} if current represents a folder.
+     *
+     * @return true if current resource is folder based resource.
+     * @see Resource#getResourceType()
+     * @see Resource#FOLDER
+     * @since 4.3.0
+     */
+    boolean isFolder();
+
+    /**
+     * Returns {@code true} if current represents a project.
+     *
+     * @return true if current resource is project based resource.
+     * @see Resource#getResourceType()
+     * @see Resource#PROJECT
+     * @since 4.3.0
+     */
+    boolean isProject();
 
     /**
      * Copies resource to given {@code destination} path. Copy operation performs asynchronously and result of current

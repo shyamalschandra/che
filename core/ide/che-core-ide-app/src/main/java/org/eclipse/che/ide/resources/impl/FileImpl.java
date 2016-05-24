@@ -17,7 +17,6 @@ import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
 
 import org.eclipse.che.api.promises.client.Promise;
-import org.eclipse.che.ide.api.project.HasProjectConfig;
 import org.eclipse.che.ide.api.resources.File;
 import org.eclipse.che.ide.api.resources.marker.Marker;
 import org.eclipse.che.ide.api.resources.marker.PresentableTextMarker;
@@ -61,12 +60,6 @@ class FileImpl extends ResourceImpl implements File {
     @Override
     public boolean isReadOnly() {
         return false;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public HasProjectConfig getProject() {
-        return null;
     }
 
     /** {@inheritDoc} */

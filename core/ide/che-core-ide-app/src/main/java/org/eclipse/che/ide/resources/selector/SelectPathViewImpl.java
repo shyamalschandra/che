@@ -42,7 +42,6 @@ import java.util.Collections;
 import java.util.List;
 
 import static com.google.gwt.dom.client.Style.Overflow.AUTO;
-import static org.eclipse.che.ide.project.node.AbstractProjectBasedNode.CUSTOM_BACKGROUND_FILL;
 import static org.eclipse.che.ide.ui.smartTree.SelectionModel.Mode.SINGLE;
 
 /**
@@ -50,6 +49,8 @@ import static org.eclipse.che.ide.ui.smartTree.SelectionModel.Mode.SINGLE;
  */
 @Singleton
 public class SelectPathViewImpl extends Window implements SelectPathView {
+
+    public static final String CUSTOM_BACKGROUND_FILL = "background";
 
     private final SkipLeafsInterceptor       skipLeafsInterceptor;
 

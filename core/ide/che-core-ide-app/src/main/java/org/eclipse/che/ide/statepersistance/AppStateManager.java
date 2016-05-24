@@ -31,7 +31,6 @@ import org.eclipse.che.ide.api.event.WindowActionHandler;
 import org.eclipse.che.ide.api.parts.PerspectiveManager;
 import org.eclipse.che.ide.api.preferences.PreferencesManager;
 import org.eclipse.che.ide.dto.DtoFactory;
-import org.eclipse.che.ide.project.event.ProjectExplorerLoadedEvent;
 import org.eclipse.che.ide.statepersistance.dto.ActionDescriptor;
 import org.eclipse.che.ide.statepersistance.dto.AppState;
 import org.eclipse.che.ide.statepersistance.dto.WorkspaceState;
@@ -52,8 +51,7 @@ import java.util.Set;
 @Singleton
 public class AppStateManager implements WindowActionHandler,
                                         WorkspaceStoppedHandler,
-                                        WsAgentStateHandler,
-                                        ProjectExplorerLoadedEvent.ProjectExplorerLoadedHandler {
+                                        WsAgentStateHandler {
 
     /** The name of the property for the mappings in user preferences. */
     public static final String PREFERENCE_PROPERTY_NAME = "IdeAppState";
@@ -88,7 +86,6 @@ public class AppStateManager implements WindowActionHandler,
         eventBus.addHandler(WorkspaceStoppedEvent.TYPE, this);
         eventBus.addHandler(WindowActionEvent.TYPE, this);
         eventBus.addHandler(WsAgentStateEvent.TYPE, this);
-        eventBus.addHandler(ProjectExplorerLoadedEvent.getType(), this);
 
         readStateFromPreferences();
     }
@@ -153,11 +150,6 @@ public class AppStateManager implements WindowActionHandler,
                 Log.error(AppStateManager.class, "Failed to store app's state to user's preferences");
             }
         });
-    }
-
-    @Override
-    public void onProjectsLoaded(ProjectExplorerLoadedEvent event) {
-        restoreWorkspaceState();
     }
 
     private void restoreWorkspaceState() {

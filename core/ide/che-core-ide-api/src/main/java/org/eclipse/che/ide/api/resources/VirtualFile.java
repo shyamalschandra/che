@@ -13,7 +13,6 @@ package org.eclipse.che.ide.api.resources;
 import com.google.common.annotations.Beta;
 
 import org.eclipse.che.api.promises.client.Promise;
-import org.eclipse.che.ide.api.project.HasProjectConfig;
 import org.eclipse.che.ide.resource.Path;
 
 /**
@@ -25,7 +24,6 @@ import org.eclipse.che.ide.resource.Path;
  *
  * @author Evgen Vidolob
  * @author Vlad Zhukovskyi
- * @see HasProjectConfig
  */
 public interface VirtualFile {
 
@@ -82,14 +80,6 @@ public interface VirtualFile {
      * @return {@code true} if file is read only, otherwise false.
      */
     boolean isReadOnly();
-
-    /**
-     * Returns {@code HasProjectConfig} holder which contains {@code ProjectConfig} which is related to current virtual file.
-     * {@code HasProjectConfig} should not be a {@code null}, but in the same time {@code ProjectConfig} may be a {@code null}.
-     *
-     * @return {@code HasProjectConfig} holder.
-     */
-    HasProjectConfig getProject();
 
     /**
      * Returns url string where file content may be fetched. Some file type can't represent their content as string.

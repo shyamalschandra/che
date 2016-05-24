@@ -10,8 +10,6 @@
  *******************************************************************************/
 package org.eclipse.che.ide.part.explorer.project;
 
-import org.eclipse.che.api.promises.client.Promise;
-import org.eclipse.che.ide.api.data.HasStorablePath;
 import org.eclipse.che.ide.api.data.tree.Node;
 import org.eclipse.che.ide.api.mvp.View;
 import org.eclipse.che.ide.api.parts.base.BaseActionDelegate;
@@ -70,19 +68,6 @@ public interface ProjectExplorerView extends View<ProjectExplorerView.ActionDele
      *         true - if those files should be shown, otherwise - false
      */
     void showHiddenFilesForAllExpandedNodes(boolean show);
-
-    /**
-     * Search node in the project explorer tree by storable path.
-     *
-     * @param path
-     *         path to node
-     * @param forceUpdate
-     *         force children reload
-     * @param closeMissingFiles
-     *         allow editor to close removed files if they were opened
-     * @return promise object with found node or promise error if node wasn't found
-     */
-    Promise<Node> getNodeByPath(HasStorablePath path, boolean forceUpdate, boolean closeMissingFiles);
 
     /**
      * Set selection on node in project tree.

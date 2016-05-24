@@ -42,7 +42,6 @@ import java.util.List;
 
 import static com.google.gwt.dom.client.Style.Overflow.AUTO;
 import static org.eclipse.che.ide.part.editor.recent.RecentFileStore.getShortPath;
-import static org.eclipse.che.ide.project.node.AbstractProjectBasedNode.CUSTOM_BACKGROUND_FILL;
 import static org.eclipse.che.ide.ui.smartTree.SelectionModel.Mode.SINGLE;
 
 /**
@@ -52,6 +51,8 @@ import static org.eclipse.che.ide.ui.smartTree.SelectionModel.Mode.SINGLE;
  */
 @Singleton
 public class OpenRecentFileViewImpl extends Window implements OpenRecentFilesView {
+
+    public static final String CUSTOM_BACKGROUND_FILL = "background";
 
     interface OpenRecentFileViewImplUiBinder extends UiBinder<Widget, OpenRecentFileViewImpl> {
     }

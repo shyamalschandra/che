@@ -57,6 +57,24 @@ abstract class ResourceImpl implements Resource {
 
     /** {@inheritDoc} */
     @Override
+    public boolean isFile() {
+        return getResourceType() == FILE;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public boolean isFolder() {
+        return getResourceType() == FOLDER;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public boolean isProject() {
+        return getResourceType() == PROJECT;
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public Promise<Resource> copy(Path destination) {
         return copy(destination, false);
     }

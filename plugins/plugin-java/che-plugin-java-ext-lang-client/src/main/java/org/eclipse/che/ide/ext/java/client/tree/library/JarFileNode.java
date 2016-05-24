@@ -19,12 +19,10 @@ import org.eclipse.che.api.promises.client.Function;
 import org.eclipse.che.api.promises.client.FunctionException;
 import org.eclipse.che.api.promises.client.Promise;
 import org.eclipse.che.api.promises.client.js.Promises;
-import org.eclipse.che.commons.annotation.Nullable;
 import org.eclipse.che.ide.api.data.tree.HasAction;
 import org.eclipse.che.ide.api.data.tree.Node;
 import org.eclipse.che.ide.api.data.tree.settings.NodeSettings;
 import org.eclipse.che.ide.api.event.FileEvent;
-import org.eclipse.che.ide.api.project.HasProjectConfig;
 import org.eclipse.che.ide.api.resources.VirtualFile;
 import org.eclipse.che.ide.api.theme.Style;
 import org.eclipse.che.ide.ext.java.client.JavaResources;
@@ -138,13 +136,6 @@ public class JarFileNode extends SyntheticNode<JarEntry> implements VirtualFile,
     @Override
     public boolean isReadOnly() {
         return true;
-    }
-
-    /** {@inheritDoc} */
-    @Nullable
-    @Override
-    public HasProjectConfig getProject() {
-        return null;
     }
 
     /** {@inheritDoc} */

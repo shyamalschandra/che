@@ -150,7 +150,6 @@ import org.eclipse.che.ide.preferences.pages.appearance.AppearanceViewImpl;
 import org.eclipse.che.ide.preferences.pages.extensions.ExtensionManagerPresenter;
 import org.eclipse.che.ide.preferences.pages.extensions.ExtensionManagerView;
 import org.eclipse.che.ide.preferences.pages.extensions.ExtensionManagerViewImpl;
-import org.eclipse.che.ide.project.node.factory.NodeFactory;
 import org.eclipse.che.ide.project.node.icon.DockerfileIconProvider;
 import org.eclipse.che.ide.project.node.icon.FileIconProvider;
 import org.eclipse.che.ide.project.node.icon.NodeIconProvider;
@@ -447,7 +446,6 @@ public class CoreGinModule extends AbstractGinModule {
 
     /** Configure bindings for project's tree. */
     private void configureProjectTree() {
-        install(new GinFactoryModuleBuilder().build(NodeFactory.class));
         bind(SettingsProvider.class).to(DummySettingsProvider.class).in(Singleton.class);
         bind(ProjectExplorerView.class).to(ProjectExplorerViewImpl.class).in(Singleton.class);
         bind(ProjectExplorerPart.class).to(ProjectExplorerPresenter.class).in(Singleton.class);

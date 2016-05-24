@@ -16,11 +16,8 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
-import org.eclipse.che.api.promises.client.Promise;
-import org.eclipse.che.api.promises.client.js.Promises;
 import org.eclipse.che.ide.CoreLocalizationConstant;
 import org.eclipse.che.ide.Resources;
-import org.eclipse.che.ide.api.data.HasStorablePath;
 import org.eclipse.che.ide.api.data.tree.HasAction;
 import org.eclipse.che.ide.api.data.tree.HasAttributes;
 import org.eclipse.che.ide.api.data.tree.Node;
@@ -311,12 +308,5 @@ public class ProjectExplorerViewImpl extends BaseView<ProjectExplorerView.Action
 
             return element;
         }
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Promise<Node> getNodeByPath(HasStorablePath path, boolean forceUpdate, boolean closeMissingFiles) {
-        return Promises.resolve(null);
-//        return projectTreeRevealer.reveal(Path.valueOf(path.getStorablePath()), forceUpdate, closeMissingFiles);
     }
 }
