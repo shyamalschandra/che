@@ -24,4 +24,25 @@ public interface MachineSource {
      * Returns URL or ID
      */
     String getLocation();
+
+    /**
+     * @return content of the machine source. No need to use an external link.
+     */
+    String getContent();
+
+    /**
+     * Defines the new content to use for this machine source.
+     * Alternate way is to provide a location
+     * @param content the content instead of an external link like with location
+     */
+    void setContent(String content);
+
+    /**
+     * Defines the new content to use for this machine source.
+     * Alternate way is to provide a location
+     * @param content the content instead of an external link like with location
+     * @return the current intance of the object
+     */
+    MachineSource withContent(String content);
+
 }

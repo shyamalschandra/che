@@ -14,6 +14,8 @@ import org.eclipse.che.api.core.model.machine.MachineSource;
 
 import java.util.Objects;
 
+import static java.util.Objects.hash;
+
 //TODO move?
 
 /**
@@ -25,15 +27,28 @@ public class MachineSourceImpl implements MachineSource {
 
     private String type;
     private String location;
+    private String content;
+
+    protected MachineSourceImpl() {
+
+    }
 
     public MachineSourceImpl(String type, String location) {
+        this(type, location, null);
+    }
+
+    public MachineSourceImpl(String type, String location, String content) {
         this.type = type;
         this.location = location;
+        this.content = content;
     }
 
     public MachineSourceImpl(MachineSource machineSource) {
-        this.type = machineSource.getType();
-        this.location = machineSource.getLocation();
+        if (machineSource != null) {
+            this.type = machineSource.getType();
+            this.location = machineSource.getLocation();
+            this.content = machineSource.getContent();
+        }
     }
 
     @Override
@@ -51,6 +66,40 @@ public class MachineSourceImpl implements MachineSource {
         return location;
     }
 
+    /**
+     * @return content of the machine source. No need to use an external link.
+     */
+    @Override
+    public String getContent() {
+        return this.content;
+    }
+
+    /**
+     * Defines the new content to use for this machine source.
+     * Alternate way is to provide a location
+     *
+     * @param content
+     *         the content instead of an external link like with location
+     */
+    @Override
+    public void setContent(String content) {
+        this.content = content;
+    }
+
+    /**
+     * Defines the new content to use for this machine source.
+     * Alternate way is to provide a location
+     *
+     * @param content
+     *         the content instead of an external link like with location
+     * @return the current intance of the object
+     */
+    @Override
+    public MachineSource withContent(String content) {
+        this.content = content;
+        return this;
+    }
+
     public MachineSourceImpl setLocation(String location) {
         this.location = location;
         return this;
@@ -61,22 +110,20 @@ public class MachineSourceImpl implements MachineSource {
         if (this == obj) return true;
         if (!(obj instanceof MachineSourceImpl)) return false;
         final MachineSourceImpl other = (MachineSourceImpl)obj;
-        return Objects.equals(type, other.type) && Objects.equals(location, other.location);
+        return Objects.equals(type, other.type) && Objects.equals(location, other.location) && Objects.equals(content, other.content);
     }
 
     @Override
     public int hashCode() {
-        int hash = 7;
-        hash = hash * 31 + Objects.hashCode(type);
-        hash = hash * 31 + Objects.hashCode(location);
-        return hash;
+        return hash(type, location, content);
     }
 
     @Override
     public String toString() {
-        return "MachineSourceImpl{" +
+        return MachineSourceImpl.class.getSimpleName() + "{" +
                "type='" + type + '\'' +
                ", location='" + location + '\'' +
+               ", content='" + content + '\'' +
                '}';
     }
 }

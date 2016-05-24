@@ -10,10 +10,12 @@
  *******************************************************************************/
 package org.eclipse.che.plugin.docker.machine;
 
+import com.google.common.collect.Sets;
+
 import org.eclipse.che.api.core.NotFoundException;
 import org.eclipse.che.api.core.model.machine.Machine;
+import org.eclipse.che.api.core.model.machine.MachineConfig;
 import org.eclipse.che.api.core.model.machine.MachineStatus;
-import org.eclipse.che.api.core.model.machine.Recipe;
 import org.eclipse.che.api.core.model.machine.ServerConf;
 import org.eclipse.che.api.core.util.LineConsumer;
 import org.eclipse.che.api.machine.server.exception.MachineException;
@@ -23,6 +25,7 @@ import org.eclipse.che.api.machine.server.model.impl.MachineImpl;
 import org.eclipse.che.api.machine.server.model.impl.MachineSourceImpl;
 import org.eclipse.che.api.machine.server.model.impl.ServerConfImpl;
 import org.eclipse.che.api.machine.server.recipe.RecipeImpl;
+import org.eclipse.che.api.machine.server.util.RecipeRetriever;
 import org.eclipse.che.commons.env.EnvironmentContext;
 import org.eclipse.che.commons.subject.SubjectImpl;
 import org.eclipse.che.plugin.docker.client.DockerConnector;
@@ -57,6 +60,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static java.util.Arrays.asList;
+import static org.eclipse.che.plugin.docker.machine.DockerInstanceProvider.DOCKER_FILE_TYPE;
+import static org.eclipse.che.plugin.docker.machine.DockerInstanceProvider.DOCKER_IMAGE_TYPE;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
@@ -110,6 +115,9 @@ public class DockerInstanceProviderTest {
     @Captor
     private ArgumentCaptor<ContainerConfig> containerConfigArgumentCaptor;
 
+    @Mock
+    private RecipeRetriever recipeRetriever;
+
     private DockerInstanceProvider dockerInstanceProvider;
 
     @BeforeMethod
@@ -121,6 +129,7 @@ public class DockerInstanceProviderTest {
                                                                 dockerMachineFactory,
                                                                 dockerInstanceStopDetector,
                                                                 containerNameGenerator,
+                                                                recipeRetriever,
                                                                 Collections.emptySet(),
                                                                 Collections.emptySet(),
                                                                 Collections.emptySet(),
@@ -139,6 +148,9 @@ public class DockerInstanceProviderTest {
         envCont.setWorkspaceId(WORKSPACE_ID);
         EnvironmentContext.setCurrent(envCont);
 
+
+        when(recipeRetriever.getRecipe(any(MachineConfig.class))).thenReturn(new RecipeImpl().withType(DOCKER_FILE_TYPE).withScript("FROM codenvy"));
+
         when(dockerMachineFactory.createNode(anyString(), anyString())).thenReturn(dockerNode);
         when(dockerConnector.createContainer(any(ContainerConfig.class), anyString()))
                 .thenReturn(new ContainerCreated(CONTAINER_ID, new String[0]));
@@ -156,7 +168,7 @@ public class DockerInstanceProviderTest {
 
     @Test
     public void shouldReturnRecipeTypesDockerfile() throws Exception {
-        assertEquals(dockerInstanceProvider.getRecipeTypes(), Collections.singleton("dockerfile"));
+        assertEquals(dockerInstanceProvider.getRecipeTypes(), Sets.newHashSet(DOCKER_FILE_TYPE, DOCKER_IMAGE_TYPE));
     }
 
     // TODO add tests for instance snapshot removal
@@ -288,6 +300,7 @@ public class DockerInstanceProviderTest {
                                                                 dockerMachineFactory,
                                                                 dockerInstanceStopDetector,
                                                                 containerNameGenerator,
+                                                                recipeRetriever,
                                                                 Collections.emptySet(),
                                                                 Collections.emptySet(),
                                                                 Collections.emptySet(),
@@ -350,6 +363,8 @@ public class DockerInstanceProviderTest {
                                                     any(LineConsumer.class));
     }
 
+
+
     @Test
     public void shouldCallCreationDockerInstanceWithFactoryOnCreateInstanceFromRecipe() throws Exception {
         String generatedContainerId = "genContainerId";
@@ -358,8 +373,7 @@ public class DockerInstanceProviderTest {
                                                                                           eq(USER_NAME),
                                                                                           eq(MACHINE_NAME));
 
-        final MachineSourceImpl machineSource = new MachineSourceImpl("type", "location");
-        final Recipe recipe = new RecipeImpl().withType("Dockerfile").withScript("FROM busybox");
+        final MachineSourceImpl machineSource = new MachineSourceImpl(DOCKER_FILE_TYPE, "location");
         final MachineImpl machine =
                 new MachineImpl(new MachineConfigImpl(false,
                                                       MACHINE_NAME,
@@ -376,7 +390,7 @@ public class DockerInstanceProviderTest {
                                 MachineStatus.CREATING,
                                 null);
 
-        createInstanceFromRecipe(recipe, machine);
+        createInstanceFromRecipe(machine);
 
 
         verify(dockerMachineFactory).createInstance(eq(machine),
@@ -502,6 +516,7 @@ public class DockerInstanceProviderTest {
                                                             dockerMachineFactory,
                                                             dockerInstanceStopDetector,
                                                             containerNameGenerator,
+                                                            recipeRetriever,
                                                             devServers,
                                                             commonServers,
                                                             Collections.emptySet(),
@@ -541,6 +556,7 @@ public class DockerInstanceProviderTest {
                                                             dockerMachineFactory,
                                                             dockerInstanceStopDetector,
                                                             containerNameGenerator,
+                                                            recipeRetriever,
                                                             Collections.emptySet(),
                                                             commonServers,
                                                             Collections.emptySet(),
@@ -586,6 +602,7 @@ public class DockerInstanceProviderTest {
                                                             dockerMachineFactory,
                                                             dockerInstanceStopDetector,
                                                             containerNameGenerator,
+                                                            recipeRetriever,
                                                             devServers,
                                                             commonServers,
                                                             Collections.emptySet(),
@@ -625,6 +642,7 @@ public class DockerInstanceProviderTest {
                                                             dockerMachineFactory,
                                                             dockerInstanceStopDetector,
                                                             containerNameGenerator,
+                                                            recipeRetriever,
                                                             Collections.emptySet(),
                                                             commonServers,
                                                             Collections.emptySet(),
@@ -665,6 +683,7 @@ public class DockerInstanceProviderTest {
                                                             dockerMachineFactory,
                                                             dockerInstanceStopDetector,
                                                             containerNameGenerator,
+                                                            recipeRetriever,
                                                             Collections.emptySet(),
                                                             Collections.emptySet(),
                                                             Collections.emptySet(),
@@ -708,6 +727,7 @@ public class DockerInstanceProviderTest {
                                                             dockerMachineFactory,
                                                             dockerInstanceStopDetector,
                                                             containerNameGenerator,
+                                                            recipeRetriever,
                                                             Collections.emptySet(),
                                                             Collections.emptySet(),
                                                             Collections.emptySet(),
@@ -751,6 +771,7 @@ public class DockerInstanceProviderTest {
                                                             dockerMachineFactory,
                                                             dockerInstanceStopDetector,
                                                             containerNameGenerator,
+                                                            recipeRetriever,
                                                             Collections.emptySet(),
                                                             Collections.emptySet(),
                                                             Collections.emptySet(),
@@ -794,6 +815,7 @@ public class DockerInstanceProviderTest {
                                                             dockerMachineFactory,
                                                             dockerInstanceStopDetector,
                                                             containerNameGenerator,
+                                                            recipeRetriever,
                                                             Collections.emptySet(),
                                                             Collections.emptySet(),
                                                             Collections.emptySet(),
@@ -832,6 +854,7 @@ public class DockerInstanceProviderTest {
                                                             dockerMachineFactory,
                                                             dockerInstanceStopDetector,
                                                             containerNameGenerator,
+                                                            recipeRetriever,
                                                             Collections.emptySet(),
                                                             Collections.emptySet(),
                                                             Collections.emptySet(),
@@ -870,6 +893,7 @@ public class DockerInstanceProviderTest {
                                                             dockerMachineFactory,
                                                             dockerInstanceStopDetector,
                                                             containerNameGenerator,
+                                                            recipeRetriever,
                                                             Collections.emptySet(),
                                                             Collections.emptySet(),
                                                             Collections.emptySet(),
@@ -907,6 +931,7 @@ public class DockerInstanceProviderTest {
                                                             dockerMachineFactory,
                                                             dockerInstanceStopDetector,
                                                             containerNameGenerator,
+                                                            recipeRetriever,
                                                             Collections.emptySet(),
                                                             Collections.emptySet(),
                                                             Collections.emptySet(),
@@ -944,6 +969,7 @@ public class DockerInstanceProviderTest {
                                                             dockerMachineFactory,
                                                             dockerInstanceStopDetector,
                                                             containerNameGenerator,
+                                                            recipeRetriever,
                                                             Collections.emptySet(),
                                                             Collections.emptySet(),
                                                             Collections.emptySet(),
@@ -988,6 +1014,7 @@ public class DockerInstanceProviderTest {
                                                             dockerMachineFactory,
                                                             dockerInstanceStopDetector,
                                                             containerNameGenerator,
+                                                            recipeRetriever,
                                                             Collections.emptySet(),
                                                             Collections.emptySet(),
                                                             devVolumes,
@@ -1033,6 +1060,7 @@ public class DockerInstanceProviderTest {
                                                             dockerMachineFactory,
                                                             dockerInstanceStopDetector,
                                                             containerNameGenerator,
+                                                            recipeRetriever,
                                                             Collections.emptySet(),
                                                             Collections.emptySet(),
                                                             devVolumes,
@@ -1077,6 +1105,7 @@ public class DockerInstanceProviderTest {
                                                             dockerMachineFactory,
                                                             dockerInstanceStopDetector,
                                                             containerNameGenerator,
+                                                            recipeRetriever,
                                                             Collections.emptySet(),
                                                             Collections.emptySet(),
                                                             devVolumes,
@@ -1119,6 +1148,7 @@ public class DockerInstanceProviderTest {
                                                             dockerMachineFactory,
                                                             dockerInstanceStopDetector,
                                                             containerNameGenerator,
+                                                            recipeRetriever,
                                                             Collections.emptySet(),
                                                             Collections.emptySet(),
                                                             devVolumes,
@@ -1161,6 +1191,7 @@ public class DockerInstanceProviderTest {
                                                             dockerMachineFactory,
                                                             dockerInstanceStopDetector,
                                                             containerNameGenerator,
+                                                            recipeRetriever,
                                                             Collections.emptySet(),
                                                             Collections.emptySet(),
                                                             devVolumes,
@@ -1203,6 +1234,7 @@ public class DockerInstanceProviderTest {
                                                             dockerMachineFactory,
                                                             dockerInstanceStopDetector,
                                                             containerNameGenerator,
+                                                            recipeRetriever,
                                                             Collections.emptySet(),
                                                             Collections.emptySet(),
                                                             devVolumes,
@@ -1245,6 +1277,7 @@ public class DockerInstanceProviderTest {
                                                             dockerMachineFactory,
                                                             dockerInstanceStopDetector,
                                                             containerNameGenerator,
+                                                            recipeRetriever,
                                                             Collections.emptySet(),
                                                             Collections.emptySet(),
                                                             devVolumes,
@@ -1289,6 +1322,7 @@ public class DockerInstanceProviderTest {
                                                             dockerMachineFactory,
                                                             dockerInstanceStopDetector,
                                                             containerNameGenerator,
+                                                            recipeRetriever,
                                                             Collections.emptySet(),
                                                             Collections.emptySet(),
                                                             devVolumes,
@@ -1402,6 +1436,7 @@ public class DockerInstanceProviderTest {
                                                             dockerMachineFactory,
                                                             dockerInstanceStopDetector,
                                                             containerNameGenerator,
+                                                            recipeRetriever,
                                                             Collections.emptySet(),
                                                             Collections.emptySet(),
                                                             Collections.emptySet(),
@@ -1436,6 +1471,7 @@ public class DockerInstanceProviderTest {
                                                             dockerMachineFactory,
                                                             dockerInstanceStopDetector,
                                                             containerNameGenerator,
+                                                            recipeRetriever,
                                                             Collections.emptySet(),
                                                             Collections.emptySet(),
                                                             Collections.emptySet(),
@@ -1475,6 +1511,7 @@ public class DockerInstanceProviderTest {
                                                             dockerMachineFactory,
                                                             dockerInstanceStopDetector,
                                                             containerNameGenerator,
+                                                            recipeRetriever,
                                                             Collections.emptySet(),
                                                             Collections.emptySet(),
                                                             Collections.emptySet(),
@@ -1509,6 +1546,7 @@ public class DockerInstanceProviderTest {
                                                             dockerMachineFactory,
                                                             dockerInstanceStopDetector,
                                                             containerNameGenerator,
+                                                            recipeRetriever,
                                                             Collections.emptySet(),
                                                             Collections.emptySet(),
                                                             Collections.emptySet(),
@@ -1545,6 +1583,7 @@ public class DockerInstanceProviderTest {
                                                             dockerMachineFactory,
                                                             dockerInstanceStopDetector,
                                                             containerNameGenerator,
+                                                            recipeRetriever,
                                                             Collections.emptySet(),
                                                             Collections.emptySet(),
                                                             Collections.emptySet(),
@@ -1589,6 +1628,7 @@ public class DockerInstanceProviderTest {
                                                             dockerMachineFactory,
                                                             dockerInstanceStopDetector,
                                                             containerNameGenerator,
+                                                            recipeRetriever,
                                                             Collections.emptySet(),
                                                             Collections.emptySet(),
                                                             Collections.emptySet(),
@@ -1633,6 +1673,7 @@ public class DockerInstanceProviderTest {
                                                             dockerMachineFactory,
                                                             dockerInstanceStopDetector,
                                                             containerNameGenerator,
+                                                            recipeRetriever,
                                                             Collections.emptySet(),
                                                             Collections.emptySet(),
                                                             Collections.emptySet(),
@@ -1677,6 +1718,7 @@ public class DockerInstanceProviderTest {
                                                             dockerMachineFactory,
                                                             dockerInstanceStopDetector,
                                                             containerNameGenerator,
+                                                            recipeRetriever,
                                                             Collections.emptySet(),
                                                             Collections.emptySet(),
                                                             Collections.emptySet(),
@@ -1733,13 +1775,11 @@ public class DockerInstanceProviderTest {
     }
 
     private void createInstanceFromSnapshot(String repo, String tag, String registry) throws NotFoundException, MachineException {
-        createInstanceFromSnapshot(getMachineBuilder().build(), new DockerInstanceKey(repo, tag, registry, "digest"));
+        createInstanceFromSnapshot(getMachineBuilder().build(), new DockerMachineSource(repo).setTag(tag).setRegistry(registry).setDigest("digest"));
     }
 
     private void createInstanceFromRecipe(Machine machine) throws Exception {
-        dockerInstanceProvider.createInstance(new RecipeImpl().withType("Dockerfile")
-                                                              .withScript("FROM busybox"),
-                                              machine,
+        dockerInstanceProvider.createInstance(machine,
                                               LineConsumer.DEV_NULL);
     }
 
@@ -1766,25 +1806,18 @@ public class DockerInstanceProviderTest {
                                                       .build());
     }
 
-    private void createInstanceFromRecipe(Recipe recipe, Machine machine) throws Exception {
-        dockerInstanceProvider.createInstance(recipe,
-                                              machine,
+    private void createInstanceFromSnapshot(MachineImpl machine) throws NotFoundException, MachineException {
+        DockerMachineSource machineSource = new DockerMachineSource("repo").setRegistry("registry").setDigest("digest");
+        machine.getConfig().setSource(machineSource);
+        dockerInstanceProvider.createInstance(machine,
                                               LineConsumer.DEV_NULL);
     }
 
-    private void createInstanceFromSnapshot(Machine machine) throws NotFoundException, MachineException {
-        dockerInstanceProvider.createInstance(new DockerInstanceKey("repo",
-                                                                    "tag",
-                                                                    "registry",
-                                                                    "digest"),
-                                              machine,
-                                              LineConsumer.DEV_NULL);
-    }
+    private void createInstanceFromSnapshot(MachineImpl machine, DockerMachineSource dockerMachineSource) throws NotFoundException,
+                                                                                                             MachineException {
 
-    private void createInstanceFromSnapshot(Machine machine, DockerInstanceKey dockerInstanceKey) throws NotFoundException,
-                                                                                                         MachineException {
-        dockerInstanceProvider.createInstance(dockerInstanceKey,
-                                              machine,
+        machine.getConfig().setSource(dockerMachineSource);
+        dockerInstanceProvider.createInstance(machine,
                                               LineConsumer.DEV_NULL);
     }
 
@@ -1822,7 +1855,7 @@ public class DockerInstanceProviderTest {
         return MachineConfigImpl.builder().fromConfig(new MachineConfigImpl(false,
                                                                             MACHINE_NAME,
                                                                             "machineType",
-                                                                            new MachineSourceImpl("source type", "source location"),
+                                                                            new MachineSourceImpl(DOCKER_FILE_TYPE, null, "FROM codenvy"),
                                                                             new LimitsImpl(MEMORY_LIMIT_MB),
                                                                             asList(new ServerConfImpl("ref1",
                                                                                                       "8080",
