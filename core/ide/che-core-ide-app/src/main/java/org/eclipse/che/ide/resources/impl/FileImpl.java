@@ -90,7 +90,7 @@ class FileImpl extends ResourceImpl implements File {
 
     /** {@inheritDoc} */
     @Override
-    public String getFileExtension() {
+    public String getExtension() {
         final String entryName = getName();
         int lastDotIndex = entryName.lastIndexOf('.');
         if (lastDotIndex == -1) {
@@ -102,6 +102,18 @@ class FileImpl extends ResourceImpl implements File {
         }
 
         return entryName.substring(lastDotIndex + 1);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public String getNameWithoutExtension() {
+        final String entryName = getName();
+        int lastDotIndex = entryName.lastIndexOf('.');
+        if (lastDotIndex == -1) {
+            return getName();
+        }
+
+        return entryName.substring(0, lastDotIndex);
     }
 
     /** {@inheritDoc} */

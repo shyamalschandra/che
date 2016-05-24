@@ -126,9 +126,42 @@ class ProjectImpl extends ContainerImpl implements Project {
         return getMarker(ProblemProjectMarker.PROBLEM_PROJECT).isPresent();
     }
 
+    /** {@inheritDoc} */
     @Override
     public Promise<List<SourceEstimation>> resolve() {
         return resourceManager.resolve(this);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public boolean isTypeOf(String type) {
+        return getType().equals(type); //TODO implement better mechanism for type detection
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public String getAttribute(String key) {
+        final Map<String, List<String>> attributes = getAttributes();
+
+        if (attributes.containsKey(key)) {
+            final List<String> values = attributes.get(key);
+
+            return values.get(0);
+        }
+
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public List<String> getAttributes(String key) {
+        final Map<String, List<String>> attributes = getAttributes();
+
+        if (attributes.containsKey(key)) {
+            return attributes.get(key);
+        }
+
+        return null;
     }
 
     /** {@inheritDoc} */

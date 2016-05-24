@@ -17,7 +17,6 @@ import org.eclipse.che.ide.api.resources.Resource;
 import org.eclipse.che.ide.api.resources.ResourceInterceptor;
 import org.eclipse.che.ide.api.resources.marker.PresentableTextMarker;
 
-import static org.eclipse.che.ide.api.resources.Resource.FILE;
 import static org.eclipse.che.ide.ext.java.client.util.JavaUtil.isJavaFile;
 
 /**
@@ -33,15 +32,8 @@ public class ClassInterceptor implements ResourceInterceptor {
     /** {@inheritDoc} */
     @Override
     public Resource intercept(Resource resource) {
-        if (resource.getResourceType() != FILE) {
-            return resource;
-        }
-
-        if (isJavaFile(resource)) {
-            final String name = resource.getName();
-            final String extension = ((File)resource).getFileExtension();
-
-            resource.addMarker(new PresentableTextMarker(name.substring(0, name.length() - extension.length() - 1)));
+        if (resource.isFile() && isJavaFile(resource)) {
+            resource.addMarker(new PresentableTextMarker(((File)resource).getNameWithoutExtension()));
         }
 
         return resource;

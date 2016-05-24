@@ -209,7 +209,7 @@ public class MovePresenterTest {
         when(file.getParentWithMarker(eq(SourceFolderMarker.ID))).thenReturn(Optional.of(srcFolder));
         when(file.getLocation()).thenReturn(Path.valueOf("/project/src/a/b/C.java"));
         when(file.getName()).thenReturn("C.java");
-        when(file.getFileExtension()).thenReturn("java");
+        when(file.getExtension()).thenReturn("java");
         when(srcFolder.getLocation()).thenReturn(Path.valueOf("/project/src"));
         when(file.getResourceType()).thenReturn(Resource.FILE);
 

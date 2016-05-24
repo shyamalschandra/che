@@ -153,7 +153,7 @@ public class OpenImplementationPresenterTest {
 //        when(file.getLocation()).thenReturn(Path.valueOf("/a/b/c/d/file.java"));
 //        when(srcFolder.getLocation()).thenReturn(Path.valueOf("/a/b"));
 //        when(file.getResourceType()).thenReturn(Resource.FILE);
-//        when(file.getFileExtension()).thenReturn("java");
+//        when(file.getExtension()).thenReturn("java");
 //        when(file.getName()).thenReturn("file.java");
 //        when(relatedProject.getLocation()).thenReturn(Path.valueOf("/a"));
 //        when(editorPartPresenter.getCursorOffset()).thenReturn(123);
@@ -200,7 +200,7 @@ public class OpenImplementationPresenterTest {
         when(file.getLocation()).thenReturn(Path.valueOf("/a/b/c/d/file.java"));
         when(srcFolder.getLocation()).thenReturn(Path.valueOf("/a/b"));
         when(file.getResourceType()).thenReturn(Resource.FILE);
-        when(file.getFileExtension()).thenReturn("java");
+        when(file.getExtension()).thenReturn("java");
         when(file.getName()).thenReturn("file.java");
         when(relatedProject.getLocation()).thenReturn(Path.valueOf("/a"));
         when(editorPartPresenter.getCursorOffset()).thenReturn(123);
@@ -236,7 +236,7 @@ public class OpenImplementationPresenterTest {
         when(file.getLocation()).thenReturn(Path.valueOf("/a/b/c/d/file.java"));
         when(srcFolder.getLocation()).thenReturn(Path.valueOf("/a/b"));
         when(file.getResourceType()).thenReturn(Resource.FILE);
-        when(file.getFileExtension()).thenReturn("java");
+        when(file.getExtension()).thenReturn("java");
         when(file.getName()).thenReturn("file.java");
         when(relatedProject.getLocation()).thenReturn(Path.valueOf("/a"));
         when(editorPartPresenter.getCursorOffset()).thenReturn(123);

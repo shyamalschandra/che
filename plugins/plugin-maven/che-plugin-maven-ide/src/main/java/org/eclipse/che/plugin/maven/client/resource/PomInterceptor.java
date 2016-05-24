@@ -10,18 +10,18 @@
  *******************************************************************************/
 package org.eclipse.che.plugin.maven.client.resource;
 
+import com.google.common.base.Optional;
 import com.google.inject.Singleton;
 
 import org.eclipse.che.ide.api.resources.Project;
 import org.eclipse.che.ide.api.resources.Resource;
 import org.eclipse.che.ide.api.resources.ResourceInterceptor;
 import org.eclipse.che.ide.api.resources.marker.PresentableTextMarker;
-import org.eclipse.che.plugin.maven.shared.MavenAttributes;
 
-import java.util.List;
-import java.util.Map;
-
-import static org.eclipse.che.ide.api.resources.Resource.FILE;
+import static com.google.common.base.Strings.isNullOrEmpty;
+import static org.eclipse.che.plugin.maven.shared.MavenAttributes.ARTIFACT_ID;
+import static org.eclipse.che.plugin.maven.shared.MavenAttributes.MAVEN_ID;
+import static org.eclipse.che.plugin.maven.shared.MavenAttributes.POM_XML;
 
 /**
  * Intercept java based files (.java), cut extension and adds the marker which is responsible for displaying presentable text
@@ -36,31 +36,19 @@ public class PomInterceptor implements ResourceInterceptor {
     /** {@inheritDoc} */
     @Override
     public Resource intercept(Resource resource) {
-        if (resource.getResourceType() != FILE) {
-            return resource;
+        if (resource.isFile() && POM_XML.equals(resource.getName())) {
+            final Optional<Project> project = resource.getRelatedProject();
+
+            if (project.isPresent() && !project.get().isTypeOf(MAVEN_ID)) {
+                return resource;
+            }
+
+            final String artifact = project.get().getAttribute(ARTIFACT_ID);
+
+            if (!isNullOrEmpty(artifact)) {
+                resource.addMarker(new PresentableTextMarker(artifact));
+            }
         }
-
-        if (!MavenAttributes.POM_XML.equals(resource.getName())) {
-            return resource;
-        }
-
-        final Project project = resource.getRelatedProject().get();
-
-        if (project == null || !project.getType().equals(MavenAttributes.MAVEN_ID)) {
-            return resource;
-        }
-
-        final Map<String, List<String>> attributes = project.getAttributes();
-
-        final String displayName;
-
-        if (attributes != null && attributes.containsKey(MavenAttributes.ARTIFACT_ID)) {
-            displayName = attributes.get(MavenAttributes.ARTIFACT_ID).get(0);
-        } else {
-            displayName = project.getName() + "/" + resource.getName();
-        }
-
-        resource.addMarker(new PresentableTextMarker(displayName));
 
         return resource;
     }

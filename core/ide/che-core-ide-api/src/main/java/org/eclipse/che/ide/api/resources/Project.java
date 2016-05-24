@@ -104,6 +104,39 @@ public interface Project extends Container, ProjectConfig {
     Promise<List<SourceEstimation>> resolve();
 
     /**
+     * Checks whether given project {@code type} is applicable to current project.
+     *
+     * @param type
+     *         the project type to check
+     * @return true if given project type is applicable to current project
+     * @since 4.3.0
+     */
+    boolean isTypeOf(String type);
+
+    /**
+     * Returns the attribute value for given {@code key}.
+     * If such attribute doesn't exist, {@code null} is returned.
+     * If there is more than one value exists for given {@code key}, than first value is returned.
+     *
+     * @param key
+     *         the attribute name
+     * @return first value for the given {@code key} or null if such attribute doesn't exist
+     * @since 4.3.0
+     */
+    String getAttribute(String key);
+
+    /**
+     * Returns the list of attributes for given {@code key}.
+     * If such attribute doesn't exist, {@code null} is returned.
+     *
+     * @param key
+     *         the attribute name
+     * @return the list with values for the given {@code key} or null if such attribute doesn't exist
+     * @since 4.3.0
+     */
+    List<String> getAttributes(String key);
+
+    /**
      * Marker that describe problematic project.
      *
      * @see #isProblem()

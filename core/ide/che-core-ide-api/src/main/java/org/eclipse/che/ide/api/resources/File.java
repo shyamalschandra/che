@@ -60,5 +60,16 @@ public interface File extends Resource, VirtualFile {
      * @see #getName()
      * @since 4.0.0-RC14
      */
-    String getFileExtension();
+    String getExtension();
+
+    /**
+     * Returns the name without the extension. If file name contains '.' the substring till the last '.' is
+     * returned. Otherwise the same value as {@link #getName()} method returns is returned.
+     *
+     * @return the name without extension
+     * @see #getExtension()
+     * @see #getName()
+     * @since 4.3.0
+     */
+    String getNameWithoutExtension();
 }

@@ -165,7 +165,7 @@ public class JavaRefactoringRenameTest {
         when(textEditor.getEditorInput()).thenReturn(editorInput);
         when(editorInput.getFile()).thenReturn(file);
         when(file.getName()).thenReturn("A.java");
-        when(file.getFileExtension()).thenReturn("java");
+        when(file.getExtension()).thenReturn("java");
         when(file.getParentWithMarker(eq(SourceFolderMarker.ID))).thenReturn(Optional.of(srcFolder));
         when(file.getLocation()).thenReturn(Path.valueOf("/project/src/a/b/c/A.java"));
         when(file.getResourceType()).thenReturn(Resource.FILE);

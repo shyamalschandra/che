@@ -10,6 +10,8 @@
  *******************************************************************************/
 package org.eclipse.che.ide.ext.java.client.resource;
 
+import com.google.common.base.Optional;
+
 import org.eclipse.che.ide.api.resources.Project;
 import org.eclipse.che.ide.api.resources.Resource;
 import org.eclipse.che.ide.api.resources.ResourceInterceptor;
@@ -21,11 +23,12 @@ import java.util.Arrays;
 import java.util.List;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static org.eclipse.che.ide.api.resources.Resource.FOLDER;
 import static org.eclipse.che.ide.ext.java.client.util.JavaUtil.isJavaProject;
 import static org.eclipse.che.ide.ext.java.shared.ContentRoot.SOURCE;
 
 /**
+ * Intercepts given resource and sets source folder marker if current resource is folder and its path equals to configured in project.
+ *
  * @author Vlad Zhukovskiy
  */
 public class SourceFolderInterceptor implements ResourceInterceptor {
@@ -34,19 +37,17 @@ public class SourceFolderInterceptor implements ResourceInterceptor {
     public final Resource intercept(Resource resource) {
         checkArgument(resource != null, "Null resource occurred");
 
-        if (resource.getResourceType() != FOLDER) {
-            return resource;
-        }
+        if (resource.isFolder()) {
+            final Optional<Project> project = resource.getRelatedProject();
 
-        final Project project = resource.getRelatedProject().get();
+            if (project.isPresent() && isJavaProject(project.get())) {
+                final Path resourcePath = resource.getLocation();
 
-        if (project != null && isJavaProject(project)) {
-            final Path resourcePath = resource.getLocation();
-
-            for (Path path : getPaths(project, getAttribute())) {
-                if (path.equals(resourcePath)) {
-                    resource.addMarker(new SourceFolderMarker(getContentRoot()));
-                    return resource;
+                for (Path path : getPaths(project.get(), getAttribute())) {
+                    if (path.equals(resourcePath)) {
+                        resource.addMarker(new SourceFolderMarker(getContentRoot()));
+                        return resource;
+                    }
                 }
             }
         }

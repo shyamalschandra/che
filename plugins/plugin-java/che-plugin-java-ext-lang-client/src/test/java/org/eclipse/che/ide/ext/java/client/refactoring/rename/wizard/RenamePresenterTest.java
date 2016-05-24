@@ -173,7 +173,7 @@ public class RenamePresenterTest {
         when(file.getRelatedProject()).thenReturn(Optional.of(project));
         when(file.getParentWithMarker(eq(SourceFolderMarker.ID))).thenReturn(Optional.of(srcFolder));
         when(file.getName()).thenReturn("A.java");
-        when(file.getFileExtension()).thenReturn("java");
+        when(file.getExtension()).thenReturn("java");
         when(file.getLocation()).thenReturn(Path.valueOf("/project/src/a/b/c/A.java"));
         when(file.getResourceType()).thenReturn(Resource.FILE);
         when(srcFolder.getLocation()).thenReturn(Path.valueOf("/project/src"));

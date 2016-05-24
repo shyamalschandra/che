@@ -14,14 +14,15 @@ import org.eclipse.che.ide.api.resources.Project;
 import org.eclipse.che.ide.api.resources.Resource;
 import org.eclipse.che.ide.api.resources.ResourceInterceptor;
 import org.eclipse.che.ide.api.resources.marker.PresentableTextMarker;
-import org.eclipse.che.plugin.maven.shared.MavenAttributes;
 
-import java.util.List;
-import java.util.Map;
-
-import static org.eclipse.che.ide.api.resources.Resource.PROJECT;
+import static com.google.common.base.Strings.isNullOrEmpty;
+import static org.eclipse.che.plugin.maven.shared.MavenAttributes.ARTIFACT_ID;
+import static org.eclipse.che.plugin.maven.shared.MavenAttributes.MAVEN_ID;
 
 /**
+ * Intercepts project based resources with maven project type and checks if artifact id is differs from project folder name than
+ * interceptor adds {@link PresentableTextMarker} with artifact id in presentable text.
+ *
  * @author Vlad Zhukovskiy
  */
 public class MavenProjectInterceptor implements ResourceInterceptor {
@@ -29,21 +30,15 @@ public class MavenProjectInterceptor implements ResourceInterceptor {
     /** {@inheritDoc} */
     @Override
     public Resource intercept(Resource resource) {
-        if (resource.getResourceType() != PROJECT) {
-            return resource;
-        }
+        if (resource.isProject() && ((Project)resource).isTypeOf(MAVEN_ID)) {
 
-        final Map<String, List<String>> attributes = ((Project)resource).getAttributes();
+            final String artifact = ((Project)resource).getAttribute(ARTIFACT_ID);
 
-        if (attributes != null && attributes.containsKey(MavenAttributes.ARTIFACT_ID)) {
-            final String artifactId = attributes.get(MavenAttributes.ARTIFACT_ID).get(0);
-
-            if (!artifactId.equals(resource.getName())) {
-                resource.addMarker(new PresentableTextMarker("[" + artifactId + "]"));
+            if (!isNullOrEmpty(artifact) && !artifact.equals(resource.getName())) {
+                resource.addMarker(new PresentableTextMarker(resource.getName() + " [" + artifact + "]"));
             }
         }
 
         return resource;
     }
-
 }

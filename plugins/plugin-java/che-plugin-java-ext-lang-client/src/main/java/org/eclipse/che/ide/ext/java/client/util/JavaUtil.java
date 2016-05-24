@@ -58,7 +58,7 @@ public class JavaUtil {
         checkArgument(resource != null, "Null resource occurred");
 
         if (resource.getResourceType() == FILE) {
-            final String ext = ((File)resource).getFileExtension();
+            final String ext = ((File)resource).getExtension();
 
             return !isNullOrEmpty(ext) && "java".equals(ext) || "class".equals(ext);
         }
@@ -122,7 +122,7 @@ public class JavaUtil {
         Path path = endPoint.getLocation().removeFirstSegments(startPoint.getLocation().segmentCount());
 
         if (isJavaFile(endPoint)) {
-            final String ext = ((File)endPoint).getFileExtension();
+            final String ext = ((File)endPoint).getExtension();
 
             if (!isNullOrEmpty(ext)) {
                 final String name = endPoint.getName();
