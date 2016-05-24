@@ -13,7 +13,7 @@ package org.eclipse.che.plugin.jdb.ide.debug;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 
-import org.eclipse.che.ide.api.app.AppContext;
+import org.eclipse.che.ide.api.debug.BreakpointManager;
 import org.eclipse.che.ide.api.debug.DebuggerServiceClient;
 import org.eclipse.che.ide.api.project.tree.VirtualFile;
 import org.eclipse.che.ide.debug.DebuggerDescriptor;
@@ -45,9 +45,9 @@ public class JavaDebugger extends AbstractDebugger {
                         LocalStorageProvider localStorageProvider,
                         MessageBusProvider messageBusProvider,
                         EventBus eventBus,
-                        JavaDebuggerFileHandler javaDebuggerFileHandler,//todo maybe this inject should be in the gin module and here interface?
+                        JavaDebuggerFileHandler javaDebuggerFileHandler,
                         DebuggerManager debuggerManager,
-                        AppContext appContext) {
+                        BreakpointManager breakpointManager) {
         super(service,
               dtoFactory,
               localStorageProvider,
@@ -55,8 +55,8 @@ public class JavaDebugger extends AbstractDebugger {
               eventBus,
               javaDebuggerFileHandler,
               debuggerManager,
-              ID,
-              appContext);
+              breakpointManager,
+              ID);
     }
 
     @Override

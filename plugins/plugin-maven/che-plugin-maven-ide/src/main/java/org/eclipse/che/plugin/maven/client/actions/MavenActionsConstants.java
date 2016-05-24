@@ -8,15 +8,13 @@
  * Contributors:
  *   Codenvy, S.A. - initial API and implementation
  *******************************************************************************/
-package org.eclipse.che.api.debug.shared.model.action;
+package org.eclipse.che.plugin.maven.client.actions;
 
-import org.eclipse.che.api.debug.shared.model.Breakpoint;
+/** @author Roman Nikitenko */
+public final class MavenActionsConstants {
+    private MavenActionsConstants() {
+    }
 
-import java.util.List;
-
-/**
- * @author Anatoliy Bazko
- */
-public interface StartAction extends Action {
-    List<? extends Breakpoint> getBreakpoints();
+    public static final String MAVEN_GROUP_CONTEXT_MENU_NAME = "Maven";
+    public static final String MAVEN_GROUP_CONTEXT_MENU_ID   = "mavenGroupContextMenu";
 }

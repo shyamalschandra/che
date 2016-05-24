@@ -29,8 +29,6 @@ import com.sun.jdi.request.EventRequestManager;
 import com.sun.jdi.request.InvalidRequestStateException;
 import com.sun.jdi.request.StepRequest;
 
-import org.eclipse.che.api.debugger.server.Debugger;
-import org.eclipse.che.api.debugger.server.exceptions.DebuggerException;
 import org.eclipse.che.api.debug.shared.dto.BreakpointDto;
 import org.eclipse.che.api.debug.shared.dto.FieldDto;
 import org.eclipse.che.api.debug.shared.dto.StackFrameDumpDto;
@@ -55,6 +53,8 @@ import org.eclipse.che.api.debug.shared.model.impl.VariableImpl;
 import org.eclipse.che.api.debug.shared.model.impl.event.BreakpointActivatedEventImpl;
 import org.eclipse.che.api.debug.shared.model.impl.event.DisconnectEventImpl;
 import org.eclipse.che.api.debug.shared.model.impl.event.SuspendEventImpl;
+import org.eclipse.che.api.debugger.server.Debugger;
+import org.eclipse.che.api.debugger.server.exceptions.DebuggerException;
 import org.eclipse.che.plugin.jdb.server.exceptions.DebuggerAbsentInformationException;
 import org.eclipse.che.plugin.jdb.server.expression.Evaluator;
 import org.eclipse.che.plugin.jdb.server.expression.ExpressionException;
@@ -155,6 +155,7 @@ public class JavaDebugger implements EventsHandler, Debugger {
             try {
                 Thread.sleep(2000);
                 vm = connector.attach(arguments);
+                vm.suspend();
                 break;
             } catch (UnknownHostException | IllegalConnectorArgumentsException e) {
                 throw new DebuggerException(e.getMessage(), e);
@@ -190,6 +191,14 @@ public class JavaDebugger implements EventsHandler, Debugger {
 
     @Override
     public void start(StartAction action) throws DebuggerException {
+        for (Breakpoint b : action.getBreakpoints()) {
+            try {
+                addBreakpoint(b);
+            } catch (DebuggerException e) {
+                // can't add breakpoint, skip it
+            }
+        }
+        vm.resume();
     }
 
     @Override
@@ -249,6 +258,8 @@ public class JavaDebugger implements EventsHandler, Debugger {
         } catch (NativeMethodException | IllegalThreadStateException | InvalidRequestStateException e) {
             throw new DebuggerException(e.getMessage(), e);
         }
+
+        debuggerCallback.onEvent(new BreakpointActivatedEventImpl(breakpoint));
         LOG.debug("Add breakpoint: {}", location);
     }
 
@@ -581,7 +592,6 @@ public class JavaDebugger implements EventsHandler, Debugger {
 
             for (Breakpoint b : breakpointsToAdd) {
                 addBreakpoint(b);
-                debuggerCallback.onEvent(new BreakpointActivatedEventImpl(b));
             }
             deferredBreakpoints.remove(className);
 

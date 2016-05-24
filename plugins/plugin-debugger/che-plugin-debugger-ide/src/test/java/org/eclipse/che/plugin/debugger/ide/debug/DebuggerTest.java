@@ -16,22 +16,20 @@ import com.google.web.bindery.event.shared.EventBus;
 import org.eclipse.che.api.debug.shared.dto.BreakpointDto;
 import org.eclipse.che.api.debug.shared.dto.DebugSessionDto;
 import org.eclipse.che.api.debug.shared.dto.LocationDto;
-import org.eclipse.che.api.debug.shared.dto.StackFrameDumpDto;
 import org.eclipse.che.api.debug.shared.dto.SimpleValueDto;
+import org.eclipse.che.api.debug.shared.dto.StackFrameDumpDto;
 import org.eclipse.che.api.debug.shared.dto.VariableDto;
 import org.eclipse.che.api.debug.shared.dto.VariablePathDto;
 import org.eclipse.che.api.debug.shared.dto.action.ResumeActionDto;
+import org.eclipse.che.api.debug.shared.dto.action.StartActionDto;
 import org.eclipse.che.api.debug.shared.dto.action.StepIntoActionDto;
 import org.eclipse.che.api.debug.shared.dto.action.StepOutActionDto;
 import org.eclipse.che.api.debug.shared.dto.action.StepOverActionDto;
 import org.eclipse.che.api.debug.shared.model.DebuggerInfo;
-import org.eclipse.che.api.debug.shared.model.Location;
-import org.eclipse.che.api.debug.shared.model.StackFrameDump;
 import org.eclipse.che.api.debug.shared.model.SimpleValue;
+import org.eclipse.che.api.debug.shared.model.StackFrameDump;
 import org.eclipse.che.api.debug.shared.model.Variable;
 import org.eclipse.che.api.debug.shared.model.VariablePath;
-import org.eclipse.che.ide.api.machine.events.WsAgentStateEvent;
-import org.eclipse.che.ide.api.machine.events.WsAgentStateHandler;
 import org.eclipse.che.api.promises.client.Function;
 import org.eclipse.che.api.promises.client.Operation;
 import org.eclipse.che.api.promises.client.OperationException;
@@ -39,9 +37,11 @@ import org.eclipse.che.api.promises.client.Promise;
 import org.eclipse.che.api.promises.client.PromiseError;
 import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.debug.Breakpoint;
+import org.eclipse.che.ide.api.debug.BreakpointManager;
 import org.eclipse.che.ide.api.debug.DebuggerServiceClient;
 import org.eclipse.che.ide.api.filetypes.FileType;
-import org.eclipse.che.ide.api.filetypes.FileTypeRegistry;
+import org.eclipse.che.ide.api.machine.events.WsAgentStateEvent;
+import org.eclipse.che.ide.api.machine.events.WsAgentStateHandler;
 import org.eclipse.che.ide.api.project.tree.VirtualFile;
 import org.eclipse.che.ide.debug.DebuggerDescriptor;
 import org.eclipse.che.ide.debug.DebuggerManager;
@@ -53,7 +53,6 @@ import org.eclipse.che.ide.websocket.MessageBusProvider;
 import org.eclipse.che.ide.websocket.rest.SubscriptionHandler;
 import org.eclipse.che.plugin.debugger.ide.BaseTest;
 import org.eclipse.che.plugin.debugger.ide.fqn.FqnResolver;
-import org.eclipse.che.plugin.debugger.ide.fqn.FqnResolverFactory;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -62,7 +61,6 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import javax.validation.constraints.NotNull;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -113,7 +111,7 @@ public class DebuggerTest extends BaseTest {
     @Mock
     private DebuggerManager       debuggerManager;
     @Mock
-    private FileTypeRegistry      fileTypeRegistry;
+    private BreakpointManager     breakpointManager;
 
     @Mock
     private Promise<Void>         promiseVoid;
@@ -124,8 +122,6 @@ public class DebuggerTest extends BaseTest {
 
     @Mock
     private VirtualFile        file;
-    @Mock
-    private FqnResolverFactory fqnResolverFactory;
     @Mock
     private LocalStorage       localStorage;
     @Mock
@@ -174,14 +170,12 @@ public class DebuggerTest extends BaseTest {
         doReturn(DEBUG_INFO).when(localStorage).getItem(AbstractDebugger.LOCAL_STORAGE_DEBUGGER_SESSION_KEY);
         doReturn(debugSessionDto).when(dtoFactory).createDtoFromJson(anyString(), eq(DebugSessionDto.class));
 
-        doReturn(fgnResolver).when(fqnResolverFactory).getResolver(anyString());
         doReturn(FQN).when(fgnResolver).resolveFqn(file);
 
         doReturn(PATH).when(file).getPath();
 
-        debugger = new TestDebugger(service, dtoFactory, localStorageProvider, messageBusProvider, eventBus,
-                                    activeFileHandler, debuggerManager, "id", appContext);
-        doReturn(promiseInfo).when(service).getSessionInfo(SESSION_ID);
+        debugger = new TestDebugger(service, dtoFactory, localStorageProvider, messageBusProvider, eventBus, activeFileHandler,
+                                    debuggerManager, "id");
         doReturn(promiseInfo).when(promiseInfo).then(any(Operation.class));
 
         // setup messageBus
@@ -192,7 +186,6 @@ public class DebuggerTest extends BaseTest {
 
         FileType fileType = mock(FileType.class);
         doReturn("java").when(fileType).getExtension();
-        doReturn(fileType).when(fileTypeRegistry).getFileTypeByFile(eq(file));
     }
 
     @Test
@@ -201,6 +194,7 @@ public class DebuggerTest extends BaseTest {
 
         final String debugSessionJson = "debugSession";
         doReturn(debugSessionJson).when(dtoFactory).toJson(debugSessionDto);
+        doReturn(mock(StartActionDto.class)).when(dtoFactory).createDto(StartActionDto.class);
 
         Map<String, String> connectionProperties = mock(Map.class);
         Promise<DebugSessionDto> promiseDebuggerInfo = mock(Promise.class);
@@ -564,8 +558,7 @@ public class DebuggerTest extends BaseTest {
                             EventBus eventBus,
                             ActiveFileHandler activeFileHandler,
                             DebuggerManager debuggerManager,
-                            String id,
-                            AppContext appContext) {
+                            String id) {
             super(service,
                   dtoFactory,
                   localStorageProvider,
@@ -573,8 +566,8 @@ public class DebuggerTest extends BaseTest {
                   eventBus,
                   activeFileHandler,
                   debuggerManager,
-                  id,
-                  appContext);
+                  breakpointManager,
+                  id);
         }
 
         @Override

@@ -13,7 +13,7 @@ package org.eclipse.che.plugin.gdb.ide;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 
-import org.eclipse.che.ide.api.app.AppContext;
+import org.eclipse.che.ide.api.debug.BreakpointManager;
 import org.eclipse.che.ide.api.debug.DebuggerServiceClient;
 import org.eclipse.che.ide.api.project.tree.VirtualFile;
 import org.eclipse.che.ide.debug.DebuggerDescriptor;
@@ -42,9 +42,9 @@ public class GdbDebugger extends AbstractDebugger {
                        LocalStorageProvider localStorageProvider,
                        MessageBusProvider messageBusProvider,
                        EventBus eventBus,
-                       GdbDebuggerFileHandler activeFileHandler,//todo maybe this inject should be in the gin module and here interface?
+                       GdbDebuggerFileHandler activeFileHandler,
                        DebuggerManager debuggerManager,
-                       AppContext appContext) {
+                       BreakpointManager breakpointManager) {
 
         super(service,
               dtoFactory,
@@ -53,8 +53,8 @@ public class GdbDebugger extends AbstractDebugger {
               eventBus,
               activeFileHandler,
               debuggerManager,
-              ID,
-              appContext);
+              breakpointManager,
+              ID);
     }
 
     @Override

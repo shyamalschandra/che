@@ -10,13 +10,11 @@
  *******************************************************************************/
 package org.eclipse.che.plugin.debugger.ide.debug;
 
-import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.web.bindery.event.shared.EventBus;
 
 import org.eclipse.che.api.debug.shared.dto.SimpleValueDto;
 import org.eclipse.che.api.debug.shared.model.SimpleValue;
-import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.machine.events.WsAgentStateEvent;
 import org.eclipse.che.ide.api.machine.events.WsAgentStateHandler;
 import org.eclipse.che.api.debug.shared.dto.BreakpointDto;
@@ -39,8 +37,8 @@ import org.eclipse.che.api.debug.shared.model.StackFrameDump;
 import org.eclipse.che.api.debug.shared.model.Variable;
 import org.eclipse.che.api.debug.shared.model.VariablePath;
 import org.eclipse.che.api.debug.shared.model.action.Action;
-import org.eclipse.che.api.debug.shared.model.impl.StackFrameDumpImpl;
 import org.eclipse.che.api.debug.shared.model.impl.SimpleValueImpl;
+import org.eclipse.che.api.debug.shared.model.impl.StackFrameDumpImpl;
 import org.eclipse.che.api.promises.client.Function;
 import org.eclipse.che.api.promises.client.FunctionException;
 import org.eclipse.che.api.promises.client.Operation;
@@ -52,6 +50,7 @@ import org.eclipse.che.api.promises.client.js.JsPromiseError;
 import org.eclipse.che.api.promises.client.js.Promises;
 import org.eclipse.che.commons.annotation.Nullable;
 import org.eclipse.che.ide.api.debug.Breakpoint;
+import org.eclipse.che.ide.api.debug.BreakpointManager;
 import org.eclipse.che.ide.api.debug.DebuggerServiceClient;
 import org.eclipse.che.ide.api.project.tree.VirtualFile;
 import org.eclipse.che.ide.debug.Debugger;
@@ -86,7 +85,6 @@ public abstract class AbstractDebugger implements Debugger, DebuggerObservable {
     public static final String LOCAL_STORAGE_DEBUGGER_STATE_KEY   = "che-debugger-state";
 
     protected final DtoFactory         dtoFactory;
-    protected final AppContext         appContext;
 
     private final List<DebuggerObserver> observers;
     private final DebuggerServiceClient  service;
@@ -94,6 +92,7 @@ public abstract class AbstractDebugger implements Debugger, DebuggerObservable {
     private final EventBus               eventBus;
     private final ActiveFileHandler      activeFileHandler;
     private final DebuggerManager        debuggerManager;
+    private final BreakpointManager breakpointManager;
     private final String                 debuggerType;
     private final String                 eventChannel;
 
@@ -110,17 +109,17 @@ public abstract class AbstractDebugger implements Debugger, DebuggerObservable {
                             EventBus eventBus,
                             ActiveFileHandler activeFileHandler,
                             DebuggerManager debuggerManager,
-                            String type,
-                            AppContext appContext) {
+                            BreakpointManager breakpointManager,
+                            String type) {
         this.service = service;
         this.dtoFactory = dtoFactory;
         this.localStorageProvider = localStorageProvider;
         this.eventBus = eventBus;
         this.activeFileHandler = activeFileHandler;
         this.debuggerManager = debuggerManager;
+        this.breakpointManager = breakpointManager;
         this.observers = new ArrayList<>();
         this.debuggerType = type;
-        this.appContext = appContext;
         this.eventChannel = debuggerType + ":events:";
 
         restoreDebuggerState();
@@ -417,7 +416,7 @@ public abstract class AbstractDebugger implements Debugger, DebuggerObservable {
                 setDebugSession(arg);
                 preserveDebuggerState();
                 startCheckingEvents();
-                startDebuggerWithDelay(arg);
+                startDebugger(arg);
 
                 return null;
             }
@@ -436,14 +435,29 @@ public abstract class AbstractDebugger implements Debugger, DebuggerObservable {
         return promise;
     }
 
-    protected void startDebuggerWithDelay(final DebugSessionDto debugSessionDto) {
-        new Timer() {
-            @Override
-            public void run() {
-                StartActionDto action = dtoFactory.createDto(StartActionDto.class).withType(Action.TYPE.START);
-                service.start(debugSessionDto.getId(), action);
+    protected void startDebugger(final DebugSessionDto debugSessionDto) {
+        List<BreakpointDto> breakpoints = new ArrayList<>();
+        for (Breakpoint b : breakpointManager.getBreakpointList()) {
+            LocationDto locationDto = dtoFactory.createDto(LocationDto.class);
+            locationDto.setLineNumber(b.getLineNumber() + 1);
+
+            String target = pathToFqn(b.getFile());
+            if (target != null) {
+                locationDto.setTarget(target);
+
+                BreakpointDto breakpointDto = dtoFactory.createDto(BreakpointDto.class);
+                breakpointDto.setLocation(locationDto);
+                breakpointDto.setEnabled(true);
+
+                breakpoints.add(breakpointDto);
             }
-        }.schedule(2000);
+        }
+
+        StartActionDto action = dtoFactory.createDto(StartActionDto.class);
+        action.setType(Action.TYPE.START);
+        action.setBreakpoints(breakpoints);
+
+        service.start(debugSessionDto.getId(), action);
     }
 
     @Override
@@ -704,7 +718,7 @@ public abstract class AbstractDebugger implements Debugger, DebuggerObservable {
      * Transforms file path to FQN>
      */
     @Nullable
-    abstract protected String pathToFqn(VirtualFile file);//strange name for generic debugger
+    abstract protected String pathToFqn(VirtualFile file);
 
     abstract protected DebuggerDescriptor toDescriptor(Map<String, String> connectionProperties);
 }
