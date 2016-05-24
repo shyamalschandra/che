@@ -80,7 +80,7 @@ public class JavaNavigationServiceImpl implements JavaNavigationService {
 
     @Override
     public Promise<List<Jar>> getExternalLibraries(Path project) {
-        String url = appContext.getDevMachine().getWsAgentBaseUrl() + "/lava/navigation/libraries?projectpath=" + project.toString();
+        String url = appContext.getDevMachine().getWsAgentBaseUrl() + "/java/navigation/libraries?projectpath=" + project.toString();
 
         return requestFactory.createGetRequest(url).send(unmarshallerFactory.newListUnmarshaller(Jar.class));
     }
@@ -168,7 +168,7 @@ public class JavaNavigationServiceImpl implements JavaNavigationService {
 
     @Override
     public Promise<CompilationUnit> getCompilationUnit(Path project, String fqn, boolean showInherited) {
-        final String url = appContext.getDevMachine().getWsAgentBaseUrl() + "/jdt/navigation/compilation-unit" +
+        final String url = appContext.getDevMachine().getWsAgentBaseUrl() + "/java/navigation/compilation-unit" +
                            "?projectpath=" + project + "&fqn=" + fqn + "&showinherited=" + showInherited;
 
         return requestFactory.createGetRequest(url)
