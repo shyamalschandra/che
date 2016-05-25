@@ -82,8 +82,6 @@ describe('CheProfile', function () {
 
       // expecting GETs
       httpBackend.expectGET('/api/profile');
-      httpBackend.expectGET('/api/profile/prefs');
-
       // flush command
       httpBackend.flush();
 
