@@ -39,7 +39,7 @@ public class PomInterceptor implements ResourceInterceptor {
         if (resource.isFile() && POM_XML.equals(resource.getName())) {
             final Optional<Project> project = resource.getRelatedProject();
 
-            if (project.isPresent() && !project.get().isTypeOf(MAVEN_ID)) {
+            if (!project.isPresent() || !project.get().isTypeOf(MAVEN_ID)) {
                 return resource;
             }
 

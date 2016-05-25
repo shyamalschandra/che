@@ -193,14 +193,9 @@ public class ProjectWizardPresenter implements Wizard.UpdateDelegate,
 
     @Override
     public void onProjectTemplateSelected(ProjectTemplateDescriptor projectTemplate) {
-        final MutableProjectConfig prevData = wizard.getDataObject();
-        wizard = importWizard == null ? importWizard = createDefaultWizard(null, IMPORT) : importWizard;
-        wizard.navigateToFirst();
         final MutableProjectConfig dataObject = wizard.getDataObject();
-
-        // some values should be shared between wizards for different project types
-        dataObject.setName(prevData.getName());
-        dataObject.setDescription(prevData.getDescription());
+        wizard = importWizard == null ? importWizard = createDefaultWizard(dataObject, IMPORT) : importWizard;
+        wizard.navigateToFirst();
 
         // set dataObject's values from projectTemplate
         dataObject.setType(projectTemplate.getProjectType());

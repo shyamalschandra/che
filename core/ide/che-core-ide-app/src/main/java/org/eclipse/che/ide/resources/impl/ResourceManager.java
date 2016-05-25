@@ -254,7 +254,7 @@ public final class ResourceManager {
     protected Promise<Project> update(final Path path, final ProjectRequest request) {
 
         final ProjectConfigDto dto = dtoFactory.createDto(ProjectConfigDto.class)
-                                               .withName(path.lastSegment())
+                                               .withName(request.getBody().getName())
                                                .withPath(path.toString())
                                                .withDescription(request.getBody().getDescription())
                                                .withType(request.getBody().getType())
@@ -452,7 +452,7 @@ public final class ResourceManager {
         checkArgument(checkProjectName(importRequest.getBody().getName()), "Invalid project name");
         checkNotNull(importRequest.getBody().getSource(), "Null source configuration occurred");
 
-        final Path path = Path.valueOf(importRequest.getBody().getPath());
+        final Path path = Path.valueOf(importRequest.getBody().getPath()).append(importRequest.getBody().getName());
 
         return findResource(path, true).thenPromise(new Function<Optional<Resource>, Promise<Project>>() {
             @Override
@@ -469,29 +469,19 @@ public final class ResourceManager {
                     @Override
                     public Promise<Project> apply(Void ignored) throws FunctionException {
 
-                        return ps.getProjects(devMachine).then(new Function<List<ProjectConfigDto>, Project>() {
-                            @Override
-                            public Project apply(List<ProjectConfigDto> updatedConfiguration) throws FunctionException {
+                        Resource resource = resourceFactory.newProjectImpl(importRequest.getBody(), ResourceManager.this);
 
-                                //cache new configs
-                                cachedConfigs = updatedConfiguration.toArray(new ProjectConfigDto[updatedConfiguration.size()]);
+                        checkState(resource != null, "Failed to locate imported project's configuration");
 
-                                Project newResource = null;
+                        store.register(resource.getLocation().parent(), resource);
 
-                                for (ProjectConfigDto config : cachedConfigs) {
-                                    if (Path.valueOf(config.getPath()).equals(path)) {
-                                        newResource = resourceFactory.newProjectImpl(config, ResourceManager.this);
-                                        break;
-                                    }
-                                }
+                        for (ResourceInterceptor interceptor : resourceInterceptors) {
+                            resource = interceptor.intercept(resource);
+                        }
 
-                                checkState(newResource != null, "Failed to locate imported project's configuration");
+                        eventBus.fireEvent(new ResourceChangedEvent(new ResourceDeltaImpl(resource, ADDED | DERIVED)));
 
-                                eventBus.fireEvent(new ResourceChangedEvent(new ResourceDeltaImpl(newResource, ADDED | DERIVED)));
-
-                                return newResource;
-                            }
-                        });
+                        return update(resource.getLocation(), importRequest);
                     }
                 });
             }
