@@ -24,7 +24,7 @@ import java.util.regex.Pattern;
  * @author Alexander Andrienko
  */
 public class DockerContainerNameGenerator {
-    private static final String NODE_HOST_GROUP    = "(/|(/[0-9a-z.]+/))?";
+    private static final String NODE_HOST_GROUP    = "(/|(/[0-9a-z.-]+/))?";
     private static final String WORKSPACE_ID_GROUP = "(?<workspaceId>workspace[0-9a-z]+)";
     private static final String MACHINE_ID_GROUP   = "(?<machineId>machine[0-9a-z]+)";
 
