@@ -169,7 +169,6 @@ public final class ResourceManager {
         this.dtoFactory = dtoFactory;
         this.typeRegistry = typeRegistry;
         this.resourceInterceptors = resourceInterceptors;
-//        this.wsAgentPath = wsAgentPath;
         this.store = new InMemoryResourceStore();
 
         this.workspaceRoot = resourceFactory.newFolderImpl(Path.ROOT, this);
@@ -912,6 +911,25 @@ public final class ResourceManager {
                         if (segCount > maxDepth) {
                             maxDepth = segCount;
                         }
+                    }
+                }
+
+                if (container.isProject()) {
+                    final Optional<ProjectConfigDto> config = findProjectConfigDto(container.getLocation());
+
+                    if (config.isPresent()) {
+                        store.dispose(container.getLocation(), false);
+
+                        final ProjectImpl project = resourceFactory.newProjectImpl(config.get(), ResourceManager.this);
+
+                        store.register(project.getLocation().parent(), project);
+
+                        Resource resource = project;
+                        for (ResourceInterceptor interceptor : resourceInterceptors) {
+                            resource = interceptor.intercept(resource);
+                        }
+
+                        eventBus.fireEvent(new ResourceChangedEvent(new ResourceDeltaImpl(resource, UPDATED)));
                     }
                 }
 

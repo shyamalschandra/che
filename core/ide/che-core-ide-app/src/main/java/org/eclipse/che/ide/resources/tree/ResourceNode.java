@@ -153,12 +153,7 @@ public abstract class ResourceNode<R extends Resource> extends AbstractTreeNode 
 
         final Optional<Marker> presentableTextMarker = getData().getMarker(PresentableTextMarker.ID);
         if (presentableTextMarker.isPresent()) {
-            if (getData() instanceof Container) {
-                presentation.setPresentableText(getData().getName());
-                presentation.setInfoText(((PresentableTextMarker)presentableTextMarker.get()).getPresentableText());
-            } else {
-                presentation.setPresentableText(((PresentableTextMarker)presentableTextMarker.get()).getPresentableText());
-            }
+            presentation.setPresentableText(((PresentableTextMarker)presentableTextMarker.get()).getPresentableText());
         } else {
             presentation.setPresentableText(getData().getName());
         }

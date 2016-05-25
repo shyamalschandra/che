@@ -60,7 +60,6 @@ import static com.google.common.collect.Lists.newArrayList;
 import static org.eclipse.che.ide.api.parts.PartStackType.EDITING;
 import static org.eclipse.che.ide.api.resources.Resource.FILE;
 import static org.eclipse.che.ide.api.resources.ResourceDelta.ADDED;
-import static org.eclipse.che.ide.api.resources.ResourceDelta.DERIVED;
 import static org.eclipse.che.ide.api.resources.ResourceDelta.MOVED_FROM;
 import static org.eclipse.che.ide.api.resources.ResourceDelta.MOVED_TO;
 import static org.eclipse.che.ide.api.resources.ResourceDelta.REMOVED;
@@ -239,10 +238,6 @@ public class EditorAgentImpl implements EditorAgent,
     }
 
     protected void onResourceUpdated(ResourceDelta delta) {
-        if ((delta.getFlags()) != DERIVED) {
-            return;
-        }
-
         final Resource resource = delta.getResource();
 
         if (resource.getResourceType() != FILE) {
@@ -254,7 +249,6 @@ public class EditorAgentImpl implements EditorAgent,
         if (editor != null) {
             editor.getEditorInput().setFile((File)resource);
             editor.onFileChanged();
-            eventBus.fireEvent(new FileContentUpdateEvent(resource.getLocation().toString()));
         }
     }
 
