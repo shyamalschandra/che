@@ -14,10 +14,10 @@ import com.google.common.annotations.Beta;
 import com.google.common.base.Optional;
 
 import org.eclipse.che.api.promises.client.Promise;
+import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.resources.Project.ProjectRequest;
 import org.eclipse.che.ide.api.resources.marker.Marker;
 import org.eclipse.che.ide.api.resources.marker.MarkerChangedEvent;
-import org.eclipse.che.ide.api.workspace.Workspace;
 import org.eclipse.che.ide.resource.Path;
 
 /**
@@ -39,8 +39,8 @@ import org.eclipse.che.ide.resource.Path;
  * the last segment (the resource's name) from the resource's full path.</li>
  * </ul>
  * <p/>
- * To obtain already initialized resource in workspace you just need to inject {@link Workspace} into your
- * component and call {@link Workspace#getProjects()} or {@link Workspace#getWorkspaceRoot()}.
+ * To obtain already initialized resource in workspace you just need to inject {@link AppContext} into your
+ * component and call {@link AppContext#getProjects()} or {@link AppContext#getWorkspaceRoot()}.
  * <p/>
  * Note. This interface is not intended to be implemented by clients.
  *
@@ -49,9 +49,8 @@ import org.eclipse.che.ide.resource.Path;
  * @see File
  * @see Folder
  * @see Project
- * @see Workspace
- * @see Workspace#getProjects()
- * @see Workspace#getWorkspaceRoot()
+ * @see AppContext#getProjects()
+ * @see AppContext#getWorkspaceRoot()
  * @since 4.0.0-RC14
  */
 @Beta

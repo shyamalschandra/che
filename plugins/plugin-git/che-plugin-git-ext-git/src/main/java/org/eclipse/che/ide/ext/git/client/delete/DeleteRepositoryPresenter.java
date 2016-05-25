@@ -20,7 +20,6 @@ import org.eclipse.che.ide.api.git.GitServiceClient;
 import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.notification.NotificationManager;
 import org.eclipse.che.ide.api.resources.Project;
-import org.eclipse.che.ide.api.workspace.Workspace;
 import org.eclipse.che.ide.ext.git.client.GitLocalizationConstant;
 import org.eclipse.che.ide.ext.git.client.outputconsole.GitOutputConsole;
 import org.eclipse.che.ide.ext.git.client.outputconsole.GitOutputConsoleFactory;
@@ -45,7 +44,6 @@ public class DeleteRepositoryPresenter {
     private final AppContext              appContext;
     private final NotificationManager     notificationManager;
     private final GitOutputConsoleFactory gitOutputConsoleFactory;
-    private final Workspace workspace;
 
     @Inject
     public DeleteRepositoryPresenter(GitServiceClient service,
@@ -53,16 +51,13 @@ public class DeleteRepositoryPresenter {
                                      GitOutputConsoleFactory gitOutputConsoleFactory,
                                      ConsolesPanelPresenter consolesPanelPresenter,
                                      AppContext appContext,
-                                     NotificationManager notificationManager,
-                                     Workspace workspace) {
+                                     NotificationManager notificationManager) {
         this.service = service;
         this.constant = constant;
         this.gitOutputConsoleFactory = gitOutputConsoleFactory;
         this.consolesPanelPresenter = consolesPanelPresenter;
         this.appContext = appContext;
         this.notificationManager = notificationManager;
-
-        this.workspace = workspace;
     }
 
     /** Delete Git repository. */

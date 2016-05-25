@@ -16,6 +16,7 @@ import com.google.gwtmockito.GwtMockitoTestRunner;
 import com.google.web.bindery.event.shared.EventBus;
 
 import org.eclipse.che.api.core.model.machine.MachineStatus;
+import org.eclipse.che.ide.api.machine.DevMachine;
 import org.eclipse.che.ide.api.machine.MachineServiceClient;
 import org.eclipse.che.ide.api.machine.events.DevMachineStateEvent;
 import org.eclipse.che.api.machine.shared.dto.CommandDto;
@@ -144,7 +145,9 @@ public class ConsolesPanelPresenterTest {
 
     @Before
     public void setUp() {
-        when(appContext.getWorkspaceId()).thenReturn(WORKSPACE_ID);
+        DevMachine devMachine = mock(DevMachine.class);
+        when(devMachine.getId()).thenReturn(WORKSPACE_ID);
+        when(appContext.getDevMachine()).thenReturn(devMachine);
 
         when(machineService.getMachines(anyString())).thenReturn(machinesPromise);
         when(machineService.getMachine(anyString())).thenReturn(machinePromise);
@@ -212,14 +215,14 @@ public class ConsolesPanelPresenterTest {
         List<MachineDto> machines = new ArrayList<>(2);
         machines.add(machineDto);
 
-        when(appContext.getWorkspace()).thenReturn(workspace);
+//        when(appContext.getWorkspace()).thenReturn(workspace);
         DevMachineStateEvent devMachineStateEvent = mock(DevMachineStateEvent.class);
         verify(eventBus, times(4)).addHandler(anyObject(), devMachineStateHandlerCaptor.capture());
 
         DevMachineStateEvent.Handler devMachineStateHandler = devMachineStateHandlerCaptor.getAllValues().get(0);
         devMachineStateHandler.onDevMachineStarted(devMachineStateEvent);
 
-        verify(appContext, times(2)).getWorkspaceId();
+//        verify(appContext, times(2)).getWorkspaceId();
         verify(machineService, times(2)).getMachines(eq(WORKSPACE_ID));
         verify(machinesPromise, times(2)).then(machinesCaptor.capture());
         machinesCaptor.getValue().apply(machines);

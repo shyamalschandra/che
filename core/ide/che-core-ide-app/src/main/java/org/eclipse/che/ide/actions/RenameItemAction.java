@@ -115,7 +115,7 @@ public class RenameItemAction extends AbstractPerspectiveAction {
         final Resource[] resources = appContext.getResources();
 
         e.getPresentation().setVisible(true);
-        e.getPresentation().setEnabled(resources != null && resources.length == 1 && appContext.getCurrentUser().isUserPermanent());
+        e.getPresentation().setEnabled(resources != null && resources.length == 1);
     }
 
     private abstract class AbstractNameValidator implements InputValidator {

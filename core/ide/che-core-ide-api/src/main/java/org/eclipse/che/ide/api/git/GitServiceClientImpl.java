@@ -711,6 +711,13 @@ public class GitServiceClientImpl implements GitServiceClient {
         asyncRequestFactory.createPostRequest(url, remoteAddRequest).loader(loader).send(callback);
     }
 
+    @Override
+    public Promise<Void> remoteAdd(DevMachine devMachine, Path project, String name, String url) {
+        RemoteAddRequest remoteAddRequest = dtoFactory.createDto(RemoteAddRequest.class).withName(name).withUrl(url);
+        String requestUrl = appContext.getDevMachine().getWsAgentBaseUrl() + REMOTE_ADD + "?projectPath=" + project.toString();
+        return asyncRequestFactory.createPostRequest(requestUrl, remoteAddRequest).loader(loader).send();
+    }
+
     /** {@inheritDoc} */
     @Override
     public void remoteDelete(DevMachine devMachine,

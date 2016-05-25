@@ -111,7 +111,7 @@ public class SelectCommandComboBox extends AbstractPerspectiveAction implements 
         this.workspaceServiceClient = workspaceServiceClient;
         this.machineServiceClient = machineServiceClient;
         this.commandTypeRegistry = commandTypeRegistry;
-        this.workspaceId = appContext.getWorkspaceId();
+        this.workspaceId = appContext.getDevMachine().getId();
 
         this.registeredMachineMap = new HashMap<>();
         this.commands = new ArrayList<>();

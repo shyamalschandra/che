@@ -28,7 +28,6 @@ import org.eclipse.che.ide.api.resources.File;
 import org.eclipse.che.ide.api.resources.Folder;
 import org.eclipse.che.ide.api.resources.Project;
 import org.eclipse.che.ide.api.resources.Resource;
-import org.eclipse.che.ide.api.workspace.Workspace;
 import org.eclipse.che.ide.dto.DtoFactory;
 import org.eclipse.che.ide.ext.git.client.outputconsole.GitOutputConsole;
 import org.eclipse.che.ide.ext.git.client.outputconsole.GitOutputConsoleFactory;
@@ -46,6 +45,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import java.util.List;
 
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
@@ -82,8 +82,6 @@ public abstract class BaseTest {
     protected AppContext              appContext;
     @Mock
     protected DevMachine               devMachine;
-    @Mock
-    protected Workspace               workspace;
     @Mock
     protected GitServiceClient        service;
     @Mock
@@ -169,8 +167,6 @@ public abstract class BaseTest {
 
     @Before
     public void disarm() {
-        when(workspace.getId()).thenReturn(WS_ID);
-
         when(project.getName()).thenReturn(PROJECT_NAME);
         when(project.getLocation()).thenReturn(Path.valueOf(PROJECT_PATH));
 
@@ -187,5 +183,9 @@ public abstract class BaseTest {
         when(throwable.getMessage()).thenReturn("error");
 
         when(project.synchronize()).thenReturn(synchronizePromise);
+
+        DevMachine devMachine = mock(DevMachine.class);
+        when(devMachine.getId()).thenReturn("id");
+        when(appContext.getDevMachine()).thenReturn(devMachine);
     }
 }

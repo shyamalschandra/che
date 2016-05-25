@@ -15,7 +15,6 @@ import com.google.inject.Singleton;
 
 import org.eclipse.che.api.promises.client.Promise;
 import org.eclipse.che.ide.api.app.AppContext;
-import org.eclipse.che.ide.api.workspace.Workspace;
 import org.eclipse.che.ide.ext.java.shared.dto.search.FindUsagesRequest;
 import org.eclipse.che.ide.ext.java.shared.dto.search.FindUsagesResponse;
 import org.eclipse.che.ide.rest.AsyncRequestFactory;
@@ -36,7 +35,6 @@ public class JavaSearchServiceRest implements JavaSearchService {
 
     private final AsyncRequestFactory    asyncRequestFactory;
     private final DtoUnmarshallerFactory unmarshallerFactory;
-    private final AppContext appContext;
     private       MessageLoader          loader;
     private final String                 pathToService;
 
@@ -44,11 +42,9 @@ public class JavaSearchServiceRest implements JavaSearchService {
     public JavaSearchServiceRest(AsyncRequestFactory asyncRequestFactory,
                                  DtoUnmarshallerFactory unmarshallerFactory,
                                  LoaderFactory loaderFactory,
-                                 AppContext appContext,
-                                 Workspace workspace) {
+                                 AppContext appContext) {
         this.asyncRequestFactory = asyncRequestFactory;
         this.unmarshallerFactory = unmarshallerFactory;
-        this.appContext = appContext;
         this.loader = loaderFactory.newLoader();
         this.pathToService = appContext.getDevMachine().getWsAgentBaseUrl() + "/jdt/search/";
     }

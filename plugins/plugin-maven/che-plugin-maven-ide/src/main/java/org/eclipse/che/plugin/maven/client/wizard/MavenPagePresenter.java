@@ -18,11 +18,11 @@ import com.google.web.bindery.event.shared.EventBus;
 import org.eclipse.che.api.project.shared.dto.SourceEstimation;
 import org.eclipse.che.api.promises.client.Operation;
 import org.eclipse.che.api.promises.client.OperationException;
+import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.project.MutableProjectConfig;
 import org.eclipse.che.ide.api.project.type.wizard.ProjectWizardMode;
 import org.eclipse.che.ide.api.resources.Container;
 import org.eclipse.che.ide.api.wizard.AbstractWizardPage;
-import org.eclipse.che.ide.api.workspace.Workspace;
 import org.eclipse.che.plugin.maven.client.MavenArchetype;
 import org.eclipse.che.plugin.maven.client.MavenExtension;
 
@@ -56,18 +56,18 @@ import static org.eclipse.che.plugin.maven.shared.MavenAttributes.VERSION;
  */
 public class MavenPagePresenter extends AbstractWizardPage<MutableProjectConfig> implements MavenPageView.ActionDelegate {
 
-    protected final MavenPageView          view;
-    protected final EventBus               eventBus;
-    private final   Workspace              workspace;
+    protected final MavenPageView view;
+    protected final EventBus      eventBus;
+    private final   AppContext    appContext;
 
     @Inject
     public MavenPagePresenter(MavenPageView view,
                               EventBus eventBus,
-                              Workspace workspace) {
+                              AppContext appContext) {
         super();
         this.view = view;
         this.eventBus = eventBus;
-        this.workspace = workspace;
+        this.appContext = appContext;
         view.setDelegate(this);
     }
 
@@ -89,7 +89,7 @@ public class MavenPagePresenter extends AbstractWizardPage<MutableProjectConfig>
 
     private void estimateAndSetAttributes() {
 
-        workspace.getWorkspaceRoot().getContainer(dataObject.getPath()).then(new Operation<Optional<Container>>() {
+        appContext.getWorkspaceRoot().getContainer(dataObject.getPath()).then(new Operation<Optional<Container>>() {
             @Override
             public void apply(Optional<Container> container) throws OperationException {
                 if (!container.isPresent()) {

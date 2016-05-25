@@ -20,7 +20,6 @@ import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.git.GitServiceClient;
 import org.eclipse.che.ide.api.notification.NotificationManager;
 import org.eclipse.che.ide.api.resources.Project;
-import org.eclipse.che.ide.api.workspace.Workspace;
 import org.eclipse.che.ide.ext.git.client.GitLocalizationConstant;
 import org.eclipse.che.ide.ext.git.client.outputconsole.GitOutputConsole;
 import org.eclipse.che.ide.ext.git.client.outputconsole.GitOutputConsoleFactory;
@@ -45,7 +44,6 @@ public class InitRepositoryPresenter {
     private final GitOutputConsoleFactory gitOutputConsoleFactory;
     private final ConsolesPanelPresenter  consolesPanelPresenter;
     private final GitServiceClient        service;
-    private final Workspace               workspace;
     private final GitLocalizationConstant constant;
     private final NotificationManager     notificationManager;
     private final AppContext              appContext;
@@ -56,14 +54,12 @@ public class InitRepositoryPresenter {
                                    GitOutputConsoleFactory gitOutputConsoleFactory,
                                    ConsolesPanelPresenter consolesPanelPresenter,
                                    GitServiceClient service,
-                                   Workspace workspace,
                                    AppContext appContext) {
         this.constant = constant;
         this.notificationManager = notificationManager;
         this.gitOutputConsoleFactory = gitOutputConsoleFactory;
         this.consolesPanelPresenter = consolesPanelPresenter;
         this.service = service;
-        this.workspace = workspace;
         this.appContext = appContext;
     }
 
@@ -74,7 +70,7 @@ public class InitRepositoryPresenter {
             @Override
             public void apply(Void ignored) throws OperationException {
                 console.print(constant.initSuccess());
-                consolesPanelPresenter.addCommandOutput(workspace.getId(), console);
+                consolesPanelPresenter.addCommandOutput(appContext.getDevMachine().getId(), console);
                 notificationManager.notify(constant.initSuccess());
 
                 project.synchronize();
@@ -83,7 +79,7 @@ public class InitRepositoryPresenter {
             @Override
             public void apply(PromiseError error) throws OperationException {
                 handleError(error.getCause(), console);
-                consolesPanelPresenter.addCommandOutput(workspace.getId(), console);
+                consolesPanelPresenter.addCommandOutput(appContext.getDevMachine().getId(), console);
             }
         });
     }

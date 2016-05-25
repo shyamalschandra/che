@@ -22,7 +22,6 @@ import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.notification.NotificationManager;
 import org.eclipse.che.ide.api.resources.Project;
 import org.eclipse.che.ide.api.resources.Resource;
-import org.eclipse.che.ide.api.workspace.Workspace;
 import org.eclipse.che.ide.ext.git.client.GitLocalizationConstant;
 import org.eclipse.che.ide.ext.git.client.outputconsole.GitOutputConsole;
 import org.eclipse.che.ide.ext.git.client.outputconsole.GitOutputConsoleFactory;
@@ -45,7 +44,6 @@ public class AddToIndexPresenter implements AddToIndexView.ActionDelegate {
     protected static final  String ADD_TO_INDEX_COMMAND_NAME = "Git add to index";
 
     private final AddToIndexView          view;
-    private final Workspace               workspace;
     private final GitServiceClient        service;
     private final GitLocalizationConstant constant;
     private final AppContext              appContext;
@@ -61,10 +59,8 @@ public class AddToIndexPresenter implements AddToIndexView.ActionDelegate {
                                GitOutputConsoleFactory gitOutputConsoleFactory,
                                ConsolesPanelPresenter consolesPanelPresenter,
                                GitServiceClient service,
-                               NotificationManager notificationManager,
-                               Workspace workspace) {
+                               NotificationManager notificationManager) {
         this.view = view;
-        this.workspace = workspace;
         this.view.setDelegate(this);
         this.service = service;
         this.constant = constant;

@@ -14,6 +14,7 @@ import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.web.bindery.event.shared.EventBus;
 
 import org.eclipse.che.api.core.model.machine.MachineStatus;
+import org.eclipse.che.ide.api.machine.DevMachine;
 import org.eclipse.che.ide.api.machine.MachineServiceClient;
 import org.eclipse.che.api.machine.shared.dto.MachineConfigDto;
 import org.eclipse.che.api.machine.shared.dto.MachineDto;
@@ -26,7 +27,6 @@ import org.eclipse.che.ide.api.workspace.event.WorkspaceStoppedEvent;
 import org.eclipse.che.api.workspace.shared.dto.ProjectConfigDto;
 import org.eclipse.che.api.workspace.shared.dto.WorkspaceDto;
 import org.eclipse.che.ide.api.app.AppContext;
-import org.eclipse.che.ide.api.app.CurrentProject;
 import org.eclipse.che.ide.api.dialogs.InputCallback;
 import org.eclipse.che.ide.api.event.ActivePartChangedEvent;
 import org.eclipse.che.ide.extension.machine.client.MachineLocalizationConstant;
@@ -94,8 +94,6 @@ public class MachinePanelPresenterTest {
     @Mock
     private Promise<MachineDto>       machinePromise;
     @Mock
-    private CurrentProject            currentProject;
-    @Mock
     private ProjectConfigDto          projectConfig;
     @Mock
     private MachineDto                machineDtoFromAPI1;
@@ -139,6 +137,10 @@ public class MachinePanelPresenterTest {
 
     @Before
     public void setUp() {
+        DevMachine devMachine = mock(DevMachine.class);
+        when(devMachine.getId()).thenReturn("id");
+        when(appContext.getDevMachine()).thenReturn(devMachine);
+
         when(entityFactory.createMachine(machineDtoFromAPI1)).thenReturn(machine1);
         when(entityFactory.createMachine(machineDtoFromAPI2)).thenReturn(machine2);
 
@@ -167,9 +169,6 @@ public class MachinePanelPresenterTest {
 
         when(service.getMachine(anyString())).thenReturn(machinePromise);
         when(machinePromise.then(Matchers.<Operation<MachineDto>>anyObject())).thenReturn(machinePromise);
-
-        when(appContext.getWorkspace()).thenReturn(usersWorkspaceDto);
-        when(usersWorkspaceDto.getId()).thenReturn(TEXT);
     }
 
     @Test
@@ -355,7 +354,6 @@ public class MachinePanelPresenterTest {
         presenter.onActivePartChanged(event);
 
         verify(event).getActivePart();
-        verify(appContext).getWorkspace();
         verify(service).getMachines(anyString());
 
         verify(machinesPromise).then(operationMachineStateCaptor.capture());

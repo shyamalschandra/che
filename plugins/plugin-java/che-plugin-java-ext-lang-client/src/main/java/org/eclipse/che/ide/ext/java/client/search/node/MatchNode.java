@@ -33,7 +33,6 @@ import org.eclipse.che.ide.api.resources.Project;
 import org.eclipse.che.ide.api.resources.Resource;
 import org.eclipse.che.ide.api.resources.SyntheticFile;
 import org.eclipse.che.ide.api.resources.VirtualFile;
-import org.eclipse.che.ide.api.workspace.Workspace;
 import org.eclipse.che.ide.ext.java.client.JavaResources;
 import org.eclipse.che.ide.ext.java.client.navigation.service.JavaNavigationService;
 import org.eclipse.che.ide.ext.java.shared.dto.ClassContent;
@@ -65,7 +64,6 @@ public class MatchNode extends AbstractPresentationNode implements HasAction {
     private       Match                 match;
     private       CompilationUnit       compilationUnit;
     private       ClassFile             classFile;
-    private final Workspace             workspace;
     private final JavaNavigationService service;
     private final PromiseProvider       promises;
 
@@ -77,7 +75,6 @@ public class MatchNode extends AbstractPresentationNode implements HasAction {
                      @Assisted Match match,
                      @Nullable @Assisted CompilationUnit compilationUnit,
                      @Nullable @Assisted ClassFile classFile,
-                     Workspace workspace,
                      JavaNavigationService service,
                      PromiseProvider promises) {
         this.styles = styles;
@@ -87,7 +84,6 @@ public class MatchNode extends AbstractPresentationNode implements HasAction {
         this.match = match;
         this.compilationUnit = compilationUnit;
         this.classFile = classFile;
-        this.workspace = workspace;
         this.service = service;
         this.promises = promises;
     }
@@ -150,7 +146,7 @@ public class MatchNode extends AbstractPresentationNode implements HasAction {
                 return;
             }
 
-            workspace.getWorkspaceRoot().getFile(compilationUnit.getPath()).then(new Operation<Optional<File>>() {
+            appContext.getWorkspaceRoot().getFile(compilationUnit.getPath()).then(new Operation<Optional<File>>() {
                 @Override
                 public void apply(Optional<File> file) throws OperationException {
                     if (file.isPresent()) {

@@ -15,6 +15,7 @@ import com.google.inject.Inject;
 
 import org.eclipse.che.api.project.shared.dto.ProjectTypeDto;
 import org.eclipse.che.api.project.templates.shared.dto.ProjectTemplateDescriptor;
+import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.project.type.ProjectTemplateRegistry;
 import org.eclipse.che.ide.api.project.type.ProjectTypeRegistry;
 import org.eclipse.che.ide.api.project.type.wizard.PreSelectedProjectTypeManager;
@@ -23,7 +24,6 @@ import org.eclipse.che.ide.api.project.type.wizard.ProjectWizardRegistry;
 import org.eclipse.che.ide.api.resources.Resource;
 import org.eclipse.che.ide.api.wizard.AbstractWizardPage;
 import org.eclipse.che.ide.api.project.MutableProjectConfig;
-import org.eclipse.che.ide.api.workspace.Workspace;
 import org.eclipse.che.ide.resource.Path;
 import org.eclipse.che.ide.resources.selector.SelectPathPresenter;
 import org.eclipse.che.ide.resources.selector.SelectionPathHandler;
@@ -56,7 +56,7 @@ public class CategoriesPagePresenter extends AbstractWizardPage<MutableProjectCo
     private final ProjectWizardRegistry            wizardRegistry;
     private final PreSelectedProjectTypeManager    preSelectedProjectTypeManager;
     private final SelectPathPresenter              selectPathPresenter;
-    private final Workspace                        workspace;
+    private final AppContext                       appContext;
     private       ProjectTypeDto                   selectedProjectType;
     private       ProjectTemplateDescriptor        selectedProjectTemplate;
     private       ProjectTypeSelectionListener     projectTypeSelectionListener;
@@ -70,7 +70,7 @@ public class CategoriesPagePresenter extends AbstractWizardPage<MutableProjectCo
                                    ProjectWizardRegistry wizardRegistry,
                                    PreSelectedProjectTypeManager preSelectedProjectTypeManager,
                                    SelectPathPresenter selectPathPresenter,
-                                   Workspace workspace) {
+                                   AppContext appContext) {
         super();
         this.view = view;
         this.projectTypeRegistry = projectTypeRegistry;
@@ -78,7 +78,7 @@ public class CategoriesPagePresenter extends AbstractWizardPage<MutableProjectCo
         this.wizardRegistry = wizardRegistry;
         this.preSelectedProjectTypeManager = preSelectedProjectTypeManager;
         this.selectPathPresenter = selectPathPresenter;
-        this.workspace = workspace;
+        this.appContext = appContext;
 
         view.setDelegate(this);
         loadProjectTypesAndTemplates();
@@ -183,7 +183,7 @@ public class CategoriesPagePresenter extends AbstractWizardPage<MutableProjectCo
 
     @Override
     public void selectPathClicked() {
-        selectPathPresenter.show(new Resource[]{workspace.getWorkspaceRoot()}, false, new SelectionPathHandler() {
+        selectPathPresenter.show(new Resource[]{appContext.getWorkspaceRoot()}, false, new SelectionPathHandler() {
             @Override
             public void onPathSelected(Path path) {
                 dataObject.setPath(path.toString());

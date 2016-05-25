@@ -11,6 +11,7 @@
 package org.eclipse.che.ide.ext.git.client.init;
 
 import org.eclipse.che.api.promises.client.Operation;
+import org.eclipse.che.ide.api.machine.DevMachine;
 import org.eclipse.che.ide.api.notification.StatusNotification;
 import org.eclipse.che.ide.ext.git.client.BaseTest;
 import org.eclipse.che.ide.resource.Path;
@@ -45,7 +46,6 @@ public class InitRepositoryPresenterTest extends BaseTest {
                                                 gitOutputConsoleFactory,
                                                 consolesPanelPresenter,
                                                 service,
-                                                workspace,
                                                 appContext);
 
         when(service.init(anyObject(), any(Path.class), anyBoolean())).thenReturn(voidPromise);

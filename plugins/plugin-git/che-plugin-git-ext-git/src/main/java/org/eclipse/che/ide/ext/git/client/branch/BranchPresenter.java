@@ -23,7 +23,6 @@ import org.eclipse.che.api.promises.client.PromiseError;
 import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.notification.NotificationManager;
 import org.eclipse.che.ide.api.resources.Project;
-import org.eclipse.che.ide.api.workspace.Workspace;
 import org.eclipse.che.ide.dto.DtoFactory;
 import org.eclipse.che.ide.ext.git.client.GitLocalizationConstant;
 import org.eclipse.che.ide.ext.git.client.outputconsole.GitOutputConsole;
@@ -60,7 +59,6 @@ public class BranchPresenter implements BranchView.ActionDelegate {
     private final GitOutputConsoleFactory gitOutputConsoleFactory;
     private final ConsolesPanelPresenter  consolesPanelPresenter;
     private final DialogFactory           dialogFactory;
-    private final Workspace               workspace;
     private final GitServiceClient        service;
     private final GitLocalizationConstant constant;
     private final AppContext              appContext;
@@ -79,14 +77,12 @@ public class BranchPresenter implements BranchView.ActionDelegate {
                            NotificationManager notificationManager,
                            GitOutputConsoleFactory gitOutputConsoleFactory,
                            ConsolesPanelPresenter consolesPanelPresenter,
-                           DialogFactory dialogFactory,
-                           Workspace workspace) {
+                           DialogFactory dialogFactory) {
         this.view = view;
         this.dtoFactory = dtoFactory;
         this.gitOutputConsoleFactory = gitOutputConsoleFactory;
         this.consolesPanelPresenter = consolesPanelPresenter;
         this.dialogFactory = dialogFactory;
-        this.workspace = workspace;
         this.view.setDelegate(this);
         this.service = service;
         this.constant = constant;

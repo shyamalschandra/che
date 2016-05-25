@@ -16,6 +16,7 @@ import org.eclipse.che.api.core.model.project.ProjectConfig;
 import org.eclipse.che.api.promises.client.Operation;
 import org.eclipse.che.api.promises.client.Promise;
 import org.eclipse.che.api.promises.client.PromiseError;
+import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.project.MutableProjectConfig;
 import org.eclipse.che.ide.api.project.type.wizard.ProjectWizardMode;
 import org.eclipse.che.ide.api.resources.Container;
@@ -23,7 +24,6 @@ import org.eclipse.che.ide.api.resources.Folder;
 import org.eclipse.che.ide.api.resources.Project;
 import org.eclipse.che.ide.api.resources.Resource;
 import org.eclipse.che.ide.api.wizard.Wizard;
-import org.eclipse.che.ide.api.workspace.Workspace;
 import org.eclipse.che.ide.resource.Path;
 import org.junit.Before;
 import org.junit.Test;
@@ -56,7 +56,7 @@ public class ProjectWizardTest {
     @Mock
     private Wizard.CompleteCallback      completeCallback;
     @Mock
-    private Workspace                    workspace;
+    private AppContext                   appContext;
     @Mock
     private Container                    workspaceRoot;
     @Mock
@@ -88,7 +88,7 @@ public class ProjectWizardTest {
 
     @Before
     public void setUp() {
-        when(workspace.getWorkspaceRoot()).thenReturn(workspaceRoot);
+        when(appContext.getWorkspaceRoot()).thenReturn(workspaceRoot);
         when(dataObject.getPath()).thenReturn(Path.valueOf(PROJECT_NAME).toString());
     }
 
@@ -111,7 +111,7 @@ public class ProjectWizardTest {
     }
 
     private void prepareWizard(ProjectWizardMode mode) {
-        wizard = new ProjectWizard(dataObject, mode, workspace);
+        wizard = new ProjectWizard(dataObject, mode, appContext);
     }
 
     @Test

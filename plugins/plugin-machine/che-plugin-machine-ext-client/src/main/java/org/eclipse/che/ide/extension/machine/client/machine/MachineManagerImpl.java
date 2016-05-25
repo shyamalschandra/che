@@ -34,10 +34,12 @@ import org.eclipse.che.ide.api.workspace.event.WorkspaceStoppedEvent;
 import org.eclipse.che.ide.api.workspace.event.WorkspaceStoppedHandler;
 import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.parts.PerspectiveManager;
+import org.eclipse.che.ide.context.AppContextImpl;
 import org.eclipse.che.ide.dto.DtoFactory;
 import org.eclipse.che.ide.extension.machine.client.inject.factories.EntityFactory;
 import org.eclipse.che.ide.extension.machine.client.machine.MachineStatusNotifier.RunningListener;
 import org.eclipse.che.ide.extension.machine.client.machine.console.MachineConsolePresenter;
+import org.eclipse.che.ide.resource.Path;
 import org.eclipse.che.ide.rest.DtoUnmarshallerFactory;
 import org.eclipse.che.ide.ui.loaders.initialization.InitialLoadingInfo;
 import org.eclipse.che.ide.util.loging.Log;
@@ -258,7 +260,7 @@ public class MachineManagerImpl implements MachineManager, WorkspaceStoppedHandl
                                                .withLimits(limitsDto)
                                                .withType(machineType);
 
-        Promise<MachineDto> machinePromise = workspaceServiceClient.createMachine(appContext.getWorkspace().getId(), configDto);
+        Promise<MachineDto> machinePromise = workspaceServiceClient.createMachine(appContext.getDevMachine().getId(), configDto);
 
         machinePromise.then(new Operation<MachineDto>() {
             @Override
@@ -293,8 +295,12 @@ public class MachineManagerImpl implements MachineManager, WorkspaceStoppedHandl
             @Override
             public void apply(MachineDto machineDto) throws OperationException {
                 DevMachine devMachine = new DevMachine(machineDto);
-                appContext.setDevMachine(devMachine);
-                appContext.setProjectsRoot(machineDto.getRuntime().projectsRoot());
+
+                if (appContext instanceof AppContextImpl) {
+                    ((AppContextImpl)appContext).setDevMachine(devMachine);
+                    ((AppContextImpl)appContext).setProjectsRoot(Path.valueOf(machineDto.getRuntime().projectsRoot()));
+                }
+
                 wsAgentStateController.initialize(devMachine);
             }
         });
@@ -320,8 +326,8 @@ public class MachineManagerImpl implements MachineManager, WorkspaceStoppedHandl
                 machineStatusNotifier.trackMachine(machineState, DESTROY);
 
                 final DevMachine devMachine = appContext.getDevMachine();
-                if (devMachine != null && machineState.getId().equals(devMachine.getId())) {
-                    appContext.setDevMachine(null);
+                if (devMachine != null && machineState.getId().equals(devMachine.getId()) && appContext instanceof AppContextImpl) {
+                    ((AppContextImpl)appContext).setDevMachine(null);
                 }
             }
         });
@@ -345,7 +351,7 @@ public class MachineManagerImpl implements MachineManager, WorkspaceStoppedHandl
             }
         }
         if (outputChannel != null && statusChannel != null) {
-            wsAgentLogChannel = "workspace:" + appContext.getWorkspaceId() + ":ext-server:output";
+            wsAgentLogChannel = "workspace:" + appContext.getDevMachine().getId() + ":ext-server:output";
             subscribeToChannel(wsAgentLogChannel, outputHandler);
             subscribeToChannel(outputChannel, outputHandler);
             subscribeToChannel(statusChannel, statusHandler);

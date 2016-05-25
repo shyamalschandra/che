@@ -18,13 +18,13 @@ import com.google.inject.Singleton;
 import com.google.web.bindery.event.shared.EventBus;
 
 import org.eclipse.che.api.project.shared.dto.ItemReference;
+import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.machine.events.WsAgentStateEvent;
 import org.eclipse.che.ide.api.machine.events.WsAgentStateHandler;
 import org.eclipse.che.api.promises.client.Operation;
 import org.eclipse.che.api.promises.client.OperationException;
 import org.eclipse.che.ide.api.event.FileEvent;
 import org.eclipse.che.ide.api.resources.File;
-import org.eclipse.che.ide.api.workspace.Workspace;
 import org.eclipse.che.ide.resource.Path;
 import org.eclipse.che.ide.rest.DtoUnmarshallerFactory;
 import org.eclipse.che.ide.websocket.Message;
@@ -53,23 +53,23 @@ import static org.eclipse.che.ide.rest.HTTPHeader.ACCEPT;
 @Singleton
 public class NavigateToFilePresenter implements NavigateToFileView.ActionDelegate, WsAgentStateHandler {
 
-    private final MessageBusProvider       messageBusProvider;
-    private final EventBus eventBus;
-    private final DtoUnmarshallerFactory   dtoUnmarshallerFactory;
-    private final NavigateToFileView       view;
-    private final Workspace workspace;
+    private final MessageBusProvider     messageBusProvider;
+    private final EventBus               eventBus;
+    private final DtoUnmarshallerFactory dtoUnmarshallerFactory;
+    private final NavigateToFileView     view;
+    private final AppContext             appContext;
 
-    private String                     SEARCH_URL;
-    private MessageBus                 wsMessageBus;
+    private String     SEARCH_URL;
+    private MessageBus wsMessageBus;
 
     @Inject
     public NavigateToFilePresenter(NavigateToFileView view,
                                    EventBus eventBus,
                                    DtoUnmarshallerFactory dtoUnmarshallerFactory,
                                    MessageBusProvider messageBusProvider,
-                                   Workspace workspace) {
+                                   AppContext appContext) {
         this.view = view;
-        this.workspace = workspace;
+        this.appContext = appContext;
         this.dtoUnmarshallerFactory = dtoUnmarshallerFactory;
         this.messageBusProvider = messageBusProvider;
         this.eventBus = eventBus;
@@ -82,7 +82,7 @@ public class NavigateToFilePresenter implements NavigateToFileView.ActionDelegat
     @Override
     public void onWsAgentStarted(WsAgentStateEvent event) {
         wsMessageBus = messageBusProvider.getMachineMessageBus();
-        SEARCH_URL = "/project/" + workspace.getId() + "/search";
+        SEARCH_URL = "/project/" + appContext.getDevMachine().getId() + "/search";
     }
 
     @Override
@@ -128,7 +128,7 @@ public class NavigateToFilePresenter implements NavigateToFileView.ActionDelegat
     public void onFileSelected(Path path) {
         view.close();
 
-        workspace.getWorkspaceRoot().getFile(path).then(new Operation<Optional<File>>() {
+        appContext.getWorkspaceRoot().getFile(path).then(new Operation<Optional<File>>() {
             @Override
             public void apply(Optional<File> optFile) throws OperationException {
                 if (optFile.isPresent()) {

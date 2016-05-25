@@ -45,12 +45,6 @@ public class ClearConsoleAction extends Action {
 
     /** {@inheritDoc} */
     @Override
-    public void update(ActionEvent e) {
-        e.getPresentation().setEnabledAndVisible(appContext.getCurrentProject() != null);
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public void actionPerformed(ActionEvent e) {
 
         presenter.clear();

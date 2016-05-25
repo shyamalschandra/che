@@ -68,7 +68,7 @@ public class CurrentProjectPathProvider implements CommandPropertyValueProvider,
         final Resource[] resources = appContext.getResources();
 
         if (resources != null && resources.length == 1) {
-            value = appContext.getProjectsRoot() + resources[0].getLocation().toString();
+            value = appContext.getProjectsRoot().append(resources[0].getLocation()).toString();
             return;
         }
 

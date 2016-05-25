@@ -90,11 +90,6 @@ public class ProjectClasspathPresenter implements ProjectClasspathView.ActionDel
             property.clearData();
         }
 
-        if ("maven".equals(appContext.getCurrentProject().getProjectConfig().getType())) {
-            view.hideWindow();
-            return;
-        }
-
         classpathResolver.updateClasspath().then(new Operation<Void>() {
             @Override
             public void apply(Void arg) throws OperationException {

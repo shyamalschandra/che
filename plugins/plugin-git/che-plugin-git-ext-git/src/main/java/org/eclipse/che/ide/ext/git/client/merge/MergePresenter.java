@@ -23,7 +23,6 @@ import org.eclipse.che.api.promises.client.PromiseError;
 import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.notification.NotificationManager;
 import org.eclipse.che.ide.api.resources.Project;
-import org.eclipse.che.ide.api.workspace.Workspace;
 import org.eclipse.che.ide.commons.exception.ServerException;
 import org.eclipse.che.ide.ext.git.client.GitLocalizationConstant;
 import org.eclipse.che.ide.ext.git.client.outputconsole.GitOutputConsole;
@@ -56,18 +55,17 @@ public class MergePresenter implements MergeView.ActionDelegate {
     public static final String LOCAL_BRANCHES_TITLE  = "Local Branches";
     public static final String REMOTE_BRANCHES_TITLE = "Remote Branches";
 
-    private final MergeView                view;
-    private final DialogFactory            dialogFactory;
-    private final GitOutputConsoleFactory  gitOutputConsoleFactory;
-    private final ConsolesPanelPresenter   consolesPanelPresenter;
-    private final Workspace                workspace;
-    private final GitServiceClient         service;
-    private final GitLocalizationConstant  constant;
-    private final AppContext               appContext;
-    private final NotificationManager      notificationManager;
+    private final MergeView               view;
+    private final DialogFactory           dialogFactory;
+    private final GitOutputConsoleFactory gitOutputConsoleFactory;
+    private final ConsolesPanelPresenter  consolesPanelPresenter;
+    private final GitServiceClient        service;
+    private final GitLocalizationConstant constant;
+    private final AppContext              appContext;
+    private final NotificationManager     notificationManager;
 
     private Reference selectedReference;
-    private Project project;
+    private Project   project;
 
     @Inject
     public MergePresenter(MergeView view,
@@ -77,13 +75,11 @@ public class MergePresenter implements MergeView.ActionDelegate {
                           NotificationManager notificationManager,
                           DialogFactory dialogFactory,
                           GitOutputConsoleFactory gitOutputConsoleFactory,
-                          ConsolesPanelPresenter consolesPanelPresenter,
-                          Workspace workspace) {
+                          ConsolesPanelPresenter consolesPanelPresenter) {
         this.view = view;
         this.dialogFactory = dialogFactory;
         this.gitOutputConsoleFactory = gitOutputConsoleFactory;
         this.consolesPanelPresenter = consolesPanelPresenter;
-        this.workspace = workspace;
         this.view.setDelegate(this);
         this.service = service;
         this.constant = constant;
@@ -158,16 +154,17 @@ public class MergePresenter implements MergeView.ActionDelegate {
 
         final GitOutputConsole console = gitOutputConsoleFactory.create(MERGE_COMMAND_NAME);
 
-        service.merge(appContext.getDevMachine(), project.getLocation(), selectedReference.getDisplayName()).then(new Operation<MergeResult>() {
-            @Override
-            public void apply(MergeResult result) throws OperationException {
-                console.print(formMergeMessage(result));
-                consolesPanelPresenter.addCommandOutput(appContext.getDevMachine().getId(), console);
-                notificationManager.notify(formMergeMessage(result));
+        service.merge(appContext.getDevMachine(), project.getLocation(), selectedReference.getDisplayName())
+               .then(new Operation<MergeResult>() {
+                   @Override
+                   public void apply(MergeResult result) throws OperationException {
+                       console.print(formMergeMessage(result));
+                       consolesPanelPresenter.addCommandOutput(appContext.getDevMachine().getId(), console);
+                       notificationManager.notify(formMergeMessage(result));
 
-                project.synchronize();
-            }
-        }).catchError(new Operation<PromiseError>() {
+                       project.synchronize();
+                   }
+               }).catchError(new Operation<PromiseError>() {
             @Override
             public void apply(PromiseError error) throws OperationException {
                 if (error.getCause() instanceof ServerException &&

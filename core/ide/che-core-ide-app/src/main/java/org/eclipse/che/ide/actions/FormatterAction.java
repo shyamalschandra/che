@@ -76,6 +76,5 @@ public class FormatterAction extends AbstractPerspectiveAction {
         }
 
         event.getPresentation().setEnabled(isCanDoOperation);
-        event.getPresentation().setVisible(appContext.getCurrentProject() != null);
     }
 }

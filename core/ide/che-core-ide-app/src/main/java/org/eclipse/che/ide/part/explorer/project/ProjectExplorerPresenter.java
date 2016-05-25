@@ -265,16 +265,6 @@ public class ProjectExplorerPresenter extends BasePresenter implements ActionDel
         view.setGoIntoModeOn(node);
     }
 
-    @Deprecated
-    public void reloadChildren() {
-        view.reloadChildren(null, true);
-    }
-
-    @Deprecated
-    public void reloadChildren(Node node) {
-        view.reloadChildren(node);
-    }
-
     /**
      * Get "Go Into" state on current tree.
      *

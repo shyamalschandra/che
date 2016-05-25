@@ -15,7 +15,6 @@ import org.eclipse.che.api.git.shared.MergeResult;
 import org.eclipse.che.api.promises.client.Operation;
 import org.eclipse.che.api.promises.client.Promise;
 import org.eclipse.che.api.promises.client.PromiseError;
-import org.eclipse.che.ide.api.notification.StatusNotification;
 import org.eclipse.che.ide.api.resources.VirtualFile;
 import org.eclipse.che.ide.ext.git.client.BaseTest;
 import org.eclipse.che.ide.resource.Path;
@@ -30,15 +29,12 @@ import java.util.List;
 import static org.eclipse.che.api.git.shared.BranchListRequest.LIST_LOCAL;
 import static org.eclipse.che.api.git.shared.BranchListRequest.LIST_REMOTE;
 import static org.eclipse.che.api.git.shared.MergeResult.MergeStatus.ALREADY_UP_TO_DATE;
-import static org.eclipse.che.ide.ext.git.client.merge.MergePresenter.MERGE_COMMAND_NAME;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -80,8 +76,7 @@ public class MergePresenterTest extends BaseTest {
                                        notificationManager,
                                        dialogFactory,
                                        gitOutputConsoleFactory,
-                                       consolesPanelPresenter,
-                                       workspace);
+                                       consolesPanelPresenter);
 
         when(mergeResult.getMergeStatus()).thenReturn(ALREADY_UP_TO_DATE);
         when(selectedReference.getDisplayName()).thenReturn(DISPLAY_NAME);
@@ -116,65 +111,10 @@ public class MergePresenterTest extends BaseTest {
     }
 
     @Test
-    public void testShowDialogWhenAllOperationsAreFailed() throws Exception {
-//        presenter.showDialog(project);
-//
-//        verify(branchListPromise).catchError(promiseErrorCaptor.capture());
-//        promiseErrorCaptor.getValue().apply(promiseError);
-//
-//        verify(remoteListBranchPromise).catchError(secondPromiseErrorCaptor.capture());
-//        secondPromiseErrorCaptor.getValue().apply(promiseError);
-//
-//        verify(gitOutputConsoleFactory).create(MERGE_COMMAND_NAME);
-//        verify(console, times(2)).printError(anyString());
-//        verify(consolesPanelPresenter, times(2)).addCommandOutput(anyString(), eq(console));
-//        verify(notificationManager, times(2)).notify(anyString(), any(StatusNotification.Status.class), anyObject());
-    }
-
-    @Test
     public void testOnCancelClicked() throws Exception {
         presenter.onCancelClicked();
 
         verify(view).close();
-    }
-
-    @Test
-    public void testOnMergeClickedWhenMergeRequestIsSuccessful() throws Exception {
-//        when(service.merge(anyObject(), any(Path.class), anyString())).thenReturn(mergeResultPromise);
-//        when(mergeResultPromise.then(any(Operation.class))).thenReturn(mergeResultPromise);
-//        when(mergeResultPromise.catchError(any(Operation.class))).thenReturn(mergeResultPromise);
-//
-//        presenter.showDialog(project);
-//        presenter.onReferenceSelected(selectedReference);
-//        presenter.onMergeClicked();
-//
-//        verify(mergeResultPromise).then(mergeResultCaptor.capture());
-//        mergeResultCaptor.getValue().apply(mergeResult);
-//
-//        verify(view).close();
-//        verify(gitOutputConsoleFactory, times(2)).create(MERGE_COMMAND_NAME);
-//        verify(console).print(anyString());
-//        verify(consolesPanelPresenter).addCommandOutput(anyString(), eq(console));
-//        verify(notificationManager).notify(anyString());
-    }
-
-    @Test
-    public void testOnMergeClickedWhenMergeRequestIsFailed() throws Exception {
-//        when(selectedReference.getDisplayName()).thenReturn(DISPLAY_NAME);
-//        when(service.merge(anyObject(), any(Path.class), anyString())).thenReturn(mergeResultPromise);
-//        when(mergeResultPromise.then(any(Operation.class))).thenReturn(mergeResultPromise);
-//        when(mergeResultPromise.catchError(any(Operation.class))).thenReturn(mergeResultPromise);
-//
-//        presenter.showDialog(project);
-//        presenter.onReferenceSelected(selectedReference);
-//        presenter.onMergeClicked();
-//
-//        verify(mergeResultPromise).catchError(promiseErrorCaptor.capture());
-//        promiseErrorCaptor.getValue().apply(promiseError);
-//
-//        verify(console).printError(anyString());
-//        verify(consolesPanelPresenter).addCommandOutput(anyString(), eq(console));
-//        verify(notificationManager).notify(anyString(), any(StatusNotification.Status.class), anyObject());
     }
 
     @Test

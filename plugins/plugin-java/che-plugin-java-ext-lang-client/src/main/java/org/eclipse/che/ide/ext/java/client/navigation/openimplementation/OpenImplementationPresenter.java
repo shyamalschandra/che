@@ -28,7 +28,6 @@ import org.eclipse.che.ide.api.resources.Project;
 import org.eclipse.che.ide.api.resources.Resource;
 import org.eclipse.che.ide.api.resources.SyntheticFile;
 import org.eclipse.che.ide.api.resources.VirtualFile;
-import org.eclipse.che.ide.api.workspace.Workspace;
 import org.eclipse.che.ide.dto.DtoFactory;
 import org.eclipse.che.ide.ext.java.client.JavaLocalizationConstant;
 import org.eclipse.che.ide.ext.java.client.JavaResources;
@@ -60,7 +59,6 @@ public class OpenImplementationPresenter {
     private final JavaNavigationService    service;
     private final AppContext               context;
     private final EditorAgent              editorAgent;
-    private final Workspace                workspace;
     private final PromiseProvider          promises;
     private final DtoFactory               dtoFactory;
     private final JavaResources            javaResources;
@@ -77,7 +75,6 @@ public class OpenImplementationPresenter {
                                        PopupResources popupResources,
                                        JavaLocalizationConstant locale,
                                        EditorAgent editorAgent,
-                                       Workspace workspace,
                                        PromiseProvider promises) {
         this.service = javaNavigationService;
         this.context = context;
@@ -86,7 +83,6 @@ public class OpenImplementationPresenter {
         this.popupResources = popupResources;
         this.locale = locale;
         this.editorAgent = editorAgent;
-        this.workspace = workspace;
         this.promises = promises;
     }
 
@@ -173,7 +169,7 @@ public class OpenImplementationPresenter {
                        }
                    });
         } else {
-            workspace.getWorkspaceRoot().getFile(member.getRootPath()).then(new Operation<Optional<File>>() {
+            context.getWorkspaceRoot().getFile(member.getRootPath()).then(new Operation<Optional<File>>() {
                 @Override
                 public void apply(Optional<File> file) throws OperationException {
                     if (file.isPresent()) {

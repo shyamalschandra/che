@@ -16,8 +16,8 @@ import com.google.common.base.Optional;
 import org.eclipse.che.api.core.model.project.type.ProjectType;
 import org.eclipse.che.api.project.shared.dto.SourceEstimation;
 import org.eclipse.che.api.promises.client.Promise;
+import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.resources.Project.ProjectRequest;
-import org.eclipse.che.ide.api.workspace.Workspace;
 import org.eclipse.che.ide.resource.Path;
 import org.eclipse.che.ide.util.NameUtils;
 
@@ -25,8 +25,8 @@ import org.eclipse.che.ide.util.NameUtils;
  * Interface for resource which may contain other resources (termed its members).
  * <p/>
  * If {@code location} of current container is equals to {@link Path#ROOT} then it means that current container
- * represent the workspace root. To obtain the workspace root {@link Workspace} should be injected into third-
- * party component and method {@link Workspace#getWorkspaceRoot()} should be called. Only {@link Project}s are
+ * represent the workspace root. To obtain the workspace root {@link AppContext} should be injected into third-
+ * party component and method {@link AppContext#getWorkspaceRoot()} should be called. Only {@link Project}s are
  * allowed to be created in workspace root.
  * <p/>
  * Note. This interface is not intended to be implemented by clients.
@@ -34,8 +34,8 @@ import org.eclipse.che.ide.util.NameUtils;
  * @author Vlad Zhukovskyi
  * @see Project
  * @see Folder
- * @see Workspace
- * @see Workspace#getWorkspaceRoot()
+ * @see AppContext
+ * @see AppContext#getWorkspaceRoot()
  * @since 4.0.0-RC14
  */
 @Beta
@@ -294,7 +294,7 @@ public interface Container extends Resource {
      * <p/>
      * The supplied argument {@code name} should be a valid and pass validation within {@link NameUtils#checkFolderName(String)}.
      * <p/>
-     * Note. That folders can not be created in workspace root (obtained by {@link Workspace#getWorkspaceRoot()}).
+     * Note. That folders can not be created in workspace root (obtained by {@link AppContext#getWorkspaceRoot()}).
      * Creating folder in this container will be failed.
      * <p/>
      * Example of usage:
@@ -341,7 +341,7 @@ public interface Container extends Resource {
      * <p/>
      * The supplied argument {@code name} should be a valid and pass validation within {@link NameUtils#checkFileName(String)} (String)}.
      * <p/>
-     * Note. That files can not be created in workspace root (obtained by {@link Workspace#getWorkspaceRoot()}).
+     * Note. That files can not be created in workspace root (obtained by {@link AppContext#getWorkspaceRoot()}).
      * Creating folder in this container will be failed.
      * <p/>
      * The file content may be a {@code null} or empty.
@@ -386,7 +386,7 @@ public interface Container extends Resource {
      * Synchronizes the cached container and its children with the local file system.
      * <p/>
      * For refreshing entire workspace root this method should be called on the container, which obtained
-     * from {@link Workspace#getWorkspaceRoot()}.
+     * from {@link AppContext#getWorkspaceRoot()}.
      * <p/>
      * Fires following events:
      * {@link ResourceChangedEvent} when the synchronized resource has changed.
@@ -402,7 +402,7 @@ public interface Container extends Resource {
      * Synchronizes the given {@code deltas} with already cached resources.
      * Method is useful for third-party components which performs changes with resources outside of client side resource management.
      * <p/>
-     * Method should be called on the workspace root {@link Workspace#getWorkspaceRoot()}.
+     * Method should be called on the workspace root {@link AppContext#getWorkspaceRoot()}.
      *
      * @param deltas
      *         the deltas which should be resolved

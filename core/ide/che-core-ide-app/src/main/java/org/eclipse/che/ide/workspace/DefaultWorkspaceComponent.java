@@ -29,7 +29,6 @@ import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.notification.NotificationManager;
 import org.eclipse.che.ide.api.preferences.PreferencesManager;
 import org.eclipse.che.ide.api.component.Component;
-import org.eclipse.che.ide.api.workspace.Workspace;
 import org.eclipse.che.ide.dto.DtoFactory;
 import org.eclipse.che.ide.rest.DtoUnmarshallerFactory;
 import org.eclipse.che.ide.statepersistance.dto.AppState;
@@ -73,8 +72,7 @@ public class DefaultWorkspaceComponent extends WorkspaceComponent implements Com
                                      PreferencesManager preferencesManager,
                                      DtoFactory dtoFactory,
                                      InitialLoadingInfo initialLoadingInfo,
-                                     WorkspaceSnapshotCreator snapshotCreator,
-                                     Workspace workspace) {
+                                     WorkspaceSnapshotCreator snapshotCreator) {
         super(workspaceServiceClient,
               createWorkspacePresenter,
               startWorkspacePresenter,
@@ -91,8 +89,7 @@ public class DefaultWorkspaceComponent extends WorkspaceComponent implements Com
               preferencesManager,
               dtoFactory,
               initialLoadingInfo,
-              snapshotCreator,
-              workspace);
+              snapshotCreator);
     }
 
     /** {@inheritDoc} */

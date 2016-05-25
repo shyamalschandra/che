@@ -15,8 +15,8 @@ import com.google.common.annotations.Beta;
 import org.eclipse.che.api.core.model.project.ProjectConfig;
 import org.eclipse.che.api.project.shared.dto.SourceEstimation;
 import org.eclipse.che.api.promises.client.Promise;
+import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.resources.marker.Marker;
-import org.eclipse.che.ide.api.workspace.Workspace;
 
 import java.util.List;
 
@@ -30,12 +30,12 @@ import java.util.List;
  * </ul>
  * Project also extends {@link ProjectConfig} which contains the meta-data required to define a project.
  * <p/>
- * To get list of currently of all loaded projects in the IDE, use {@link Workspace#getProjects()}
+ * To get list of currently of all loaded projects in the IDE, use {@link AppContext#getProjects()}
  * <p/>
  * Note. This interface is not intended to be implemented by clients.
  *
  * @author Vlad Zhukovskyi
- * @see Workspace#getProjects()
+ * @see AppContext#getProjects()
  * @since 4.0.0-RC14
  */
 @Beta

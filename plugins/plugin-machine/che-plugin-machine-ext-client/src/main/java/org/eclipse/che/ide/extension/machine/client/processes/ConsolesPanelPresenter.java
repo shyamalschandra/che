@@ -242,7 +242,7 @@ public class ConsolesPanelPresenter extends BasePresenter implements ConsolesPan
 
     /** Get the list of all available machines. */
     public void fetchMachines() {
-        String workspaceId = appContext.getWorkspaceId();
+        String workspaceId = appContext.getDevMachine().getId();
 
         machineService.getMachines(workspaceId).then(new Operation<List<MachineDto>>() {
             @Override

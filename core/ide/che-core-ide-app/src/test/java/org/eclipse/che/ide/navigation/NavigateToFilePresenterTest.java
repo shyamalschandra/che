@@ -13,11 +13,12 @@ package org.eclipse.che.ide.navigation;
 import com.google.common.base.Optional;
 import com.google.web.bindery.event.shared.EventBus;
 
+import org.eclipse.che.ide.api.app.AppContext;
+import org.eclipse.che.ide.api.machine.DevMachine;
 import org.eclipse.che.ide.api.machine.events.WsAgentStateEvent;
 import org.eclipse.che.api.promises.client.Promise;
 import org.eclipse.che.ide.api.resources.Container;
 import org.eclipse.che.ide.api.resources.File;
-import org.eclipse.che.ide.api.workspace.Workspace;
 import org.eclipse.che.ide.resource.Path;
 import org.eclipse.che.ide.rest.DtoUnmarshallerFactory;
 import org.eclipse.che.ide.websocket.MessageBus;
@@ -30,6 +31,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -44,15 +46,13 @@ import static org.mockito.Mockito.when;
 public class NavigateToFilePresenterTest {
 
     @Mock
-    private NavigateToFileView       view;
+    private NavigateToFileView      view;
     @Mock
-    private EventBus                 eventBus;
+    private EventBus                eventBus;
     @Mock
-    private MessageBusProvider       messageBusProvider;
+    private MessageBusProvider      messageBusProvider;
     @Mock
-    private Workspace workspace;
-    @Mock
-    private Container container;
+    private Container               container;
     @Mock
     private MessageBus              messageBus;
     @Mock
@@ -61,13 +61,17 @@ public class NavigateToFilePresenterTest {
     private WsAgentStateEvent       wsAgentStateEvent;
     @Mock
     private Promise<Optional<File>> optFilePromise;
+    @Mock
+    private AppContext              appContext;
 
     private NavigateToFilePresenter presenter;
 
     @Before
     public void setUp() {
-        when(workspace.getId()).thenReturn("workspace123");
-        when(workspace.getWorkspaceRoot()).thenReturn(container);
+        DevMachine devMachine = mock(DevMachine.class);
+        when(devMachine.getId()).thenReturn("id");
+        when(appContext.getDevMachine()).thenReturn(devMachine);
+        when(appContext.getWorkspaceRoot()).thenReturn(container);
         when(container.getFile(any(Path.class))).thenReturn(optFilePromise);
         when(messageBusProvider.getMachineMessageBus()).thenReturn(messageBus);
 
@@ -75,7 +79,7 @@ public class NavigateToFilePresenterTest {
                                                 eventBus,
                                                 dtoUnmarshallerFactory,
                                                 messageBusProvider,
-                                                workspace);
+                                                appContext);
 
         presenter.onWsAgentStarted(wsAgentStateEvent);
     }

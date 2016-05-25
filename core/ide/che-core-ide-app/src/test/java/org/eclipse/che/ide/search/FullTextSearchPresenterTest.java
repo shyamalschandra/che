@@ -16,9 +16,9 @@ import com.google.gwtmockito.GwtMockitoTestRunner;
 import org.eclipse.che.api.promises.client.Operation;
 import org.eclipse.che.api.promises.client.Promise;
 import org.eclipse.che.api.promises.client.PromiseError;
+import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.resources.Container;
 import org.eclipse.che.ide.api.resources.Resource;
-import org.eclipse.che.ide.api.workspace.Workspace;
 import org.eclipse.che.ide.resource.Path;
 import org.eclipse.che.ide.search.presentation.FindResultPresenter;
 import org.junit.Before;
@@ -49,7 +49,7 @@ public class FullTextSearchPresenterTest {
     @Mock
     private FindResultPresenter                            findResultPresenter;
     @Mock
-    private Workspace                                      workspace;
+    private AppContext                                     appContext;
     @Mock
     private Container                                      workspaceRoot;
     @Mock
@@ -73,7 +73,7 @@ public class FullTextSearchPresenterTest {
     public void setUp() throws Exception {
         fullTextSearchPresenter = new FullTextSearchPresenter(view,
                                                               findResultPresenter,
-                                                              workspace);
+                                                              appContext);
     }
 
     @Test
@@ -89,7 +89,7 @@ public class FullTextSearchPresenterTest {
     @Test
     public void searchShouldBeSuccessfullyFinished() throws Exception {
         when(view.getPathToSearch()).thenReturn("/search");
-        when(workspace.getWorkspaceRoot()).thenReturn(workspaceRoot);
+        when(appContext.getWorkspaceRoot()).thenReturn(workspaceRoot);
         when(workspaceRoot.getContainer(any(Path.class))).thenReturn(optionalContainerPromise);
         when(searchContainer.search(anyString(), anyString())).thenReturn(searchResultPromise);
 
@@ -109,7 +109,7 @@ public class FullTextSearchPresenterTest {
     @Test
     public void searchHasDoneWithSomeError() throws Exception {
         when(view.getPathToSearch()).thenReturn("/search");
-        when(workspace.getWorkspaceRoot()).thenReturn(workspaceRoot);
+        when(appContext.getWorkspaceRoot()).thenReturn(workspaceRoot);
         when(workspaceRoot.getContainer(any(Path.class))).thenReturn(optionalContainerPromise);
 
         fullTextSearchPresenter.search(SEARCHED_TEXT);
@@ -128,7 +128,7 @@ public class FullTextSearchPresenterTest {
         when(view.isAcceptButtonInFocus()).thenReturn(true);
 
         when(view.getPathToSearch()).thenReturn("/search");
-        when(workspace.getWorkspaceRoot()).thenReturn(workspaceRoot);
+        when(appContext.getWorkspaceRoot()).thenReturn(workspaceRoot);
         when(workspaceRoot.getContainer(any(Path.class))).thenReturn(optionalContainerPromise);
         when(searchContainer.search(anyString(), anyString())).thenReturn(searchResultPromise);
         Resource[] result = new Resource[0];

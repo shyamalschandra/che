@@ -28,6 +28,7 @@
     <inherits name="org.eclipse.che.api.workspace.Workspace"/>
     <inherits name="org.eclipse.che.api.project.Project"/>
     <inherits name="org.eclipse.che.api.git.Git"/>
+    <inherits name="org.eclipse.che.api.user.User"/>
 
     <source path="api"/>
 </module>

@@ -13,11 +13,11 @@ package org.eclipse.che.ide.ext.java.client.command.mainclass;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
+import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.data.tree.Node;
 import org.eclipse.che.ide.api.data.tree.settings.SettingsProvider;
 import org.eclipse.che.ide.api.resources.Project;
 import org.eclipse.che.ide.api.resources.Resource;
-import org.eclipse.che.ide.api.workspace.Workspace;
 import org.eclipse.che.ide.ext.java.client.command.JavaCommandPagePresenter;
 import org.eclipse.che.ide.resources.tree.ResourceNode;
 
@@ -35,7 +35,7 @@ public class SelectNodePresenter implements SelectNodeView.ActionDelegate {
     private final SelectNodeView           view;
     private final ResourceNode.NodeFactory nodeFactory;
     private final SettingsProvider         settingsProvider;
-    private final Workspace workspace;
+    private final AppContext               appContext;
 
     private JavaCommandPagePresenter delegate;
 
@@ -43,11 +43,11 @@ public class SelectNodePresenter implements SelectNodeView.ActionDelegate {
     public SelectNodePresenter(SelectNodeView view,
                                ResourceNode.NodeFactory nodeFactory,
                                SettingsProvider settingsProvider,
-                               Workspace workspace) {
+                               AppContext appContext) {
         this.view = view;
         this.nodeFactory = nodeFactory;
         this.settingsProvider = settingsProvider;
-        this.workspace = workspace;
+        this.appContext = appContext;
         this.view.setDelegate(this);
     }
 
@@ -61,7 +61,7 @@ public class SelectNodePresenter implements SelectNodeView.ActionDelegate {
         this.delegate = presenter;
 
         final List<Node> nodes = new ArrayList<>();
-        for (Project project : workspace.getProjects()) {
+        for (Project project : appContext.getProjects()) {
             nodes.add(nodeFactory.newContainerNode(project, settingsProvider.getSettings()));
         }
 

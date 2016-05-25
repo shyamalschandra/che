@@ -19,17 +19,16 @@ import com.google.web.bindery.event.shared.EventBus;
 import org.eclipse.che.api.promises.client.Operation;
 import org.eclipse.che.api.promises.client.OperationException;
 import org.eclipse.che.api.promises.client.PromiseError;
+import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.editor.EditorAgent;
 import org.eclipse.che.ide.api.editor.EditorPartPresenter;
 import org.eclipse.che.ide.api.event.FileEvent;
 import org.eclipse.che.ide.api.resources.File;
 import org.eclipse.che.ide.api.resources.VirtualFile;
-import org.eclipse.che.ide.api.workspace.Workspace;
 import org.eclipse.che.plugin.debugger.ide.debug.ActiveFileHandler;
 import org.eclipse.che.ide.api.editor.document.Document;
 import org.eclipse.che.ide.api.editor.text.TextPosition;
 import org.eclipse.che.ide.api.editor.texteditor.TextEditorPresenter;
-import org.eclipse.che.ide.util.loging.Log;
 
 import javax.validation.constraints.NotNull;
 import java.util.List;
@@ -43,17 +42,17 @@ import static org.eclipse.che.ide.api.event.FileEvent.FileOperation.OPEN;
  */
 public class GdbDebuggerFileHandler implements ActiveFileHandler {
 
-    private final EditorAgent              editorAgent;
-    private final EventBus                 eventBus;
-    private final Workspace workspace;
+    private final EditorAgent editorAgent;
+    private final EventBus    eventBus;
+    private final AppContext  appContext;
 
     @Inject
     public GdbDebuggerFileHandler(EditorAgent editorAgent,
                                   EventBus eventBus,
-                                  Workspace workspace) {
+                                  AppContext appContext) {
         this.editorAgent = editorAgent;
         this.eventBus = eventBus;
-        this.workspace = workspace;
+        this.appContext = appContext;
     }
 
     @Override
@@ -101,7 +100,7 @@ public class GdbDebuggerFileHandler implements ActiveFileHandler {
 
         String filePath = filePaths.get(pathNumber);
 
-        workspace.getWorkspaceRoot().getFile(filePath).then(new Operation<Optional<File>>() {
+        appContext.getWorkspaceRoot().getFile(filePath).then(new Operation<Optional<File>>() {
             @Override
             public void apply(Optional<File> file) throws OperationException {
                 if (file.isPresent()) {

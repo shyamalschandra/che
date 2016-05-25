@@ -22,7 +22,6 @@ import org.eclipse.che.ide.api.project.wizard.ProjectNotificationSubscriber;
 import org.eclipse.che.ide.api.resources.Container;
 import org.eclipse.che.ide.api.resources.Project;
 import org.eclipse.che.ide.api.wizard.Wizard;
-import org.eclipse.che.ide.api.workspace.Workspace;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -59,8 +58,6 @@ public class ProjectImporterTest {
     @Mock
     private MutableProjectConfig                      projectConfig;
     @Mock
-    private Workspace                                 workspace;
-    @Mock
     private MutableProjectConfig.MutableSourceStorage source;
     @Mock
     private Wizard.CompleteCallback                   completeCallback;
@@ -80,7 +77,7 @@ public class ProjectImporterTest {
 
     @Before
     public void setUp() {
-        when(workspace.getWorkspaceRoot()).thenReturn(workspaceRoot);
+        when(appContext.getWorkspaceRoot()).thenReturn(workspaceRoot);
         when(workspaceRoot.importProject()).thenReturn(importRequest);
         when(importRequest.withBody(any(ProjectConfig.class))).thenReturn(importRequest);
         when(importRequest.send()).thenReturn(importPromise);
@@ -98,8 +95,7 @@ public class ProjectImporterTest {
                                        appContext,
                                        resolver,
                                        null,
-                                       null,
-                                       workspace);
+                                       null);
     }
 
     @Test

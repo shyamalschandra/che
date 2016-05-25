@@ -102,7 +102,7 @@ class MachineStatusNotifier {
      */
     void trackMachine(final Machine machine, final RunningListener runningListener, final MachineOperationType operationType) {
         final String machineName = machine.getConfig().getName();
-        final String workspaceId = appContext.getWorkspace().getId();
+        final String workspaceId = appContext.getDevMachine().getId();
         final String wsChannel = MACHINE_STATUS_WS_CHANNEL + workspaceId + ":" + machineName;
 
         final StatusNotification notification = notificationManager.notify("", PROGRESS, NOT_EMERGE_MODE);

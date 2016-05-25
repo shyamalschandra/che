@@ -23,6 +23,7 @@ import org.eclipse.che.api.promises.client.Promise;
 import org.eclipse.che.api.promises.client.PromiseProvider;
 import org.eclipse.che.api.workspace.shared.dto.ProjectConfigDto;
 import org.eclipse.che.commons.annotation.Nullable;
+import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.debug.Breakpoint;
 import org.eclipse.che.ide.api.debug.Breakpoint.Type;
 import org.eclipse.che.ide.api.debug.BreakpointManager;
@@ -45,7 +46,6 @@ import org.eclipse.che.ide.api.resources.Resource;
 import org.eclipse.che.ide.api.resources.ResourceChangedEvent;
 import org.eclipse.che.ide.api.resources.ResourceDelta;
 import org.eclipse.che.ide.api.resources.VirtualFile;
-import org.eclipse.che.ide.api.workspace.Workspace;
 import org.eclipse.che.ide.debug.dto.BreakpointDto;
 import org.eclipse.che.ide.dto.DtoFactory;
 import org.eclipse.che.ide.resource.Path;
@@ -78,7 +78,7 @@ public class BreakpointManagerImpl implements BreakpointManager,
 
     private final Map<String, List<Breakpoint>>   breakpoints;
     private final EditorAgent                     editorAgent;
-    private final Workspace                       workspace;
+    private final AppContext                      appContext;
     private final PromiseProvider                 promises;
     private final DebuggerManager                 debuggerManager;
     private final DtoFactory                      dtoFactory;
@@ -91,10 +91,10 @@ public class BreakpointManagerImpl implements BreakpointManager,
                                  DebuggerManager debuggerManager,
                                  EventBus eventBus,
                                  DtoFactory dtoFactory,
-                                 Workspace workspace,
+                                 AppContext appContext,
                                  PromiseProvider promises) {
         this.editorAgent = editorAgent;
-        this.workspace = workspace;
+        this.appContext = appContext;
         this.promises = promises;
         this.breakpoints = new HashMap<>();
         this.debuggerManager = debuggerManager;
@@ -544,7 +544,7 @@ public class BreakpointManagerImpl implements BreakpointManager,
             bpPromise.thenPromise(new Function<Void, Promise<Void>>() {
                 @Override
                 public Promise<Void> apply(Void ignored) throws FunctionException {
-                    return workspace.getWorkspaceRoot().getFile(dto.getPath()).then(new Function<Optional<File>, Void>() {
+                    return appContext.getWorkspaceRoot().getFile(dto.getPath()).then(new Function<Optional<File>, Void>() {
                         @Override
                         public Void apply(Optional<File> file) throws FunctionException {
                             if (dto.getType() == Type.CURRENT) {

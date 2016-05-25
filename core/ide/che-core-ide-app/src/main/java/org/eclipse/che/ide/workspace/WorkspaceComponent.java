@@ -38,8 +38,6 @@ import org.eclipse.che.ide.api.event.HttpSessionDestroyedEvent;
 import org.eclipse.che.ide.api.notification.NotificationManager;
 import org.eclipse.che.ide.api.notification.StatusNotification;
 import org.eclipse.che.ide.api.preferences.PreferencesManager;
-import org.eclipse.che.ide.api.workspace.Workspace;
-import org.eclipse.che.ide.api.workspace.WorkspaceConfigChangedEvent;
 import org.eclipse.che.ide.context.BrowserQueryFieldRenderer;
 import org.eclipse.che.ide.api.component.Component;
 import org.eclipse.che.ide.dto.DtoFactory;
@@ -103,7 +101,6 @@ public abstract class WorkspaceComponent implements Component, WsAgentStateHandl
     private final MessageBusProvider       messageBusProvider;
     private final InitialLoadingInfo       initialLoadingInfo;
     private final WorkspaceSnapshotCreator snapshotCreator;
-    private final Workspace                workspace;
 
     protected Callback<Component, Exception> callback;
     protected boolean                        needToReloadComponents;
@@ -125,8 +122,7 @@ public abstract class WorkspaceComponent implements Component, WsAgentStateHandl
                               PreferencesManager preferencesManager,
                               DtoFactory dtoFactory,
                               InitialLoadingInfo initialLoadingInfo,
-                              WorkspaceSnapshotCreator snapshotCreator,
-                              Workspace workspace) {
+                              WorkspaceSnapshotCreator snapshotCreator) {
         this.workspaceServiceClient = workspaceServiceClient;
         this.createWorkspacePresenter = createWorkspacePresenter;
         this.startWorkspacePresenter = startWorkspacePresenter;
@@ -144,7 +140,6 @@ public abstract class WorkspaceComponent implements Component, WsAgentStateHandl
         this.dtoFactory = dtoFactory;
         this.initialLoadingInfo = initialLoadingInfo;
         this.snapshotCreator = snapshotCreator;
-        this.workspace = workspace;
 
         this.needToReloadComponents = true;
 
@@ -173,8 +168,6 @@ public abstract class WorkspaceComponent implements Component, WsAgentStateHandl
      */
     public void setCurrentWorkspace(WorkspaceDto workspace) {
         appContext.setWorkspace(workspace); //TODO remove it in nearest future
-
-        eventBus.fireEvent(new WorkspaceConfigChangedEvent(workspace.getId(), workspace, workspace.isTemporary()));
 
         if (needToReloadComponents) {
             callback.onSuccess(WorkspaceComponent.this);

@@ -16,9 +16,9 @@ import com.google.inject.Singleton;
 
 import org.eclipse.che.api.promises.client.Operation;
 import org.eclipse.che.api.promises.client.OperationException;
+import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.resources.Container;
 import org.eclipse.che.ide.api.resources.Resource;
-import org.eclipse.che.ide.api.workspace.Workspace;
 import org.eclipse.che.ide.resource.Path;
 import org.eclipse.che.ide.search.presentation.FindResultPresenter;
 
@@ -38,16 +38,16 @@ public class FullTextSearchPresenter implements FullTextSearchView.ActionDelegat
 
     private final FullTextSearchView  view;
     private final FindResultPresenter findResultPresenter;
-    private final Workspace           workspace;
+    private final AppContext          appContext;
     private       Path                defaultStartPoint;
 
     @Inject
     public FullTextSearchPresenter(FullTextSearchView view,
                                    FindResultPresenter findResultPresenter,
-                                   Workspace workspace) {
+                                   AppContext appContext) {
         this.view = view;
         this.findResultPresenter = findResultPresenter;
-        this.workspace = workspace;
+        this.appContext = appContext;
 
         this.view.setDelegate(this);
     }
@@ -65,7 +65,7 @@ public class FullTextSearchPresenter implements FullTextSearchView.ActionDelegat
     public void search(final String text) {
         final Path startPoint = isNullOrEmpty(view.getPathToSearch()) ? defaultStartPoint : Path.valueOf(view.getPathToSearch());
 
-        workspace.getWorkspaceRoot().getContainer(startPoint).then(new Operation<Optional<Container>>() {
+        appContext.getWorkspaceRoot().getContainer(startPoint).then(new Operation<Optional<Container>>() {
             @Override
             public void apply(Optional<Container> optionalContainer) throws OperationException {
                 if (!optionalContainer.isPresent()) {

@@ -14,11 +14,12 @@ import com.google.gwtmockito.GwtMockitoTestRunner;
 
 import org.eclipse.che.api.promises.client.Operation;
 import org.eclipse.che.api.promises.client.Promise;
+import org.eclipse.che.ide.api.app.AppContext;
+import org.eclipse.che.ide.api.machine.DevMachine;
 import org.eclipse.che.ide.api.workspace.WorkspaceServiceClient;
 import org.eclipse.che.ide.CoreLocalizationConstant;
 import org.eclipse.che.ide.api.action.ActionEvent;
 import org.eclipse.che.ide.api.notification.NotificationManager;
-import org.eclipse.che.ide.api.workspace.Workspace;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Answers;
@@ -28,6 +29,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -41,7 +43,7 @@ public class StopWorkspaceActionTest {
     @Mock
     private CoreLocalizationConstant locale;
     @Mock
-    private Workspace                workspace;
+    private AppContext               appContext;
     @Mock
     private WorkspaceServiceClient   workspaceService;
     @Mock
@@ -68,14 +70,15 @@ public class StopWorkspaceActionTest {
     public void actionShouldBeUpdated() {
         action.updateInPerspective(actionEvent);
 
-        verify(workspace).getId();
         verify(actionEvent, times(2)).getPresentation();
     }
 
     @Test
     public void actionShouldBePerformed() throws Exception {
-        when(workspace.getId()).thenReturn("id");
         when(workspaceService.stop(anyString())).thenReturn(voidPromise);
+        DevMachine devMachine = mock(DevMachine.class);
+        when(devMachine.getId()).thenReturn("id");
+        when(appContext.getDevMachine()).thenReturn(devMachine);
 
         action.actionPerformed(actionEvent);
 

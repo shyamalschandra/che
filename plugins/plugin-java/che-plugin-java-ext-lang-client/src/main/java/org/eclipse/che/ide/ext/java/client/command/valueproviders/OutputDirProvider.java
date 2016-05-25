@@ -57,9 +57,9 @@ public class OutputDirProvider implements CommandPropertyValueProvider {
             final Optional<Project> project = resource.getRelatedProject();
 
             if (JavaUtil.isJavaProject(project.get()) && project.get().getAttributes().containsKey(OUTPUT_FOLDER)) {
-                return promises.resolve(appContext.getProjectsRoot() + project.get().getAttributes().get(OUTPUT_FOLDER).get(0));
+                return promises.resolve(appContext.getProjectsRoot().append(project.get().getAttributes().get(OUTPUT_FOLDER).get(0)).toString());
             } else {
-                return promises.resolve(appContext.getProjectsRoot() + project.get().getLocation());
+                return promises.resolve(appContext.getProjectsRoot().append(project.get().getLocation()).toString());
             }
         }
 

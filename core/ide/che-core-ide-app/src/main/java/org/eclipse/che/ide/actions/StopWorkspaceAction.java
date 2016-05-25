@@ -12,11 +12,11 @@ package org.eclipse.che.ide.actions;
 
 import com.google.inject.Inject;
 
+import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.workspace.WorkspaceServiceClient;
 import org.eclipse.che.ide.CoreLocalizationConstant;
 import org.eclipse.che.ide.api.action.AbstractPerspectiveAction;
 import org.eclipse.che.ide.api.action.ActionEvent;
-import org.eclipse.che.ide.api.workspace.Workspace;
 
 import javax.validation.constraints.NotNull;
 
@@ -35,28 +35,28 @@ import static org.eclipse.che.ide.workspace.perspectives.project.ProjectPerspect
 public class StopWorkspaceAction extends AbstractPerspectiveAction {
 
     private final WorkspaceServiceClient workspaceService;
-    private final Workspace workspace;
+    private final AppContext             appContext;
 
     @Inject
     public StopWorkspaceAction(CoreLocalizationConstant locale,
                                WorkspaceServiceClient workspaceService,
-                               Workspace workspace) {
+                               AppContext appContext) {
         super(singletonList(PROJECT_PERSPECTIVE_ID), locale.stopWsTitle(), locale.stopWsDescription(), null, null);
-        this.workspace = workspace;
+        this.appContext = appContext;
         this.workspaceService = workspaceService;
     }
 
     @Override
     public void updateInPerspective(@NotNull ActionEvent event) {
         event.getPresentation().setVisible(true);
-        event.getPresentation().setEnabled(!isNullOrEmpty(workspace.getId()));
+        event.getPresentation().setEnabled(appContext.getDevMachine() != null);
     }
 
     /** {@inheritDoc} */
     @Override
     public void actionPerformed(ActionEvent event) {
-        checkNotNull(workspace.getId(), "Workspace id should not be null");
+        checkNotNull(appContext.getDevMachine().getId(), "Workspace id should not be null");
 
-        workspaceService.stop(workspace.getId());
+        workspaceService.stop(appContext.getDevMachine().getId());
     }
 }

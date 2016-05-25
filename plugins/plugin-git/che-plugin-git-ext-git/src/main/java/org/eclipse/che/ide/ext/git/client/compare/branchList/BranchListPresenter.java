@@ -23,7 +23,6 @@ import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.notification.NotificationManager;
 import org.eclipse.che.ide.api.resources.File;
 import org.eclipse.che.ide.api.resources.Project;
-import org.eclipse.che.ide.api.workspace.Workspace;
 import org.eclipse.che.ide.ext.git.client.GitLocalizationConstant;
 import org.eclipse.che.ide.ext.git.client.compare.ComparePresenter;
 import org.eclipse.che.ide.ext.git.client.compare.FileStatus.Status;
@@ -58,7 +57,6 @@ public class BranchListPresenter implements BranchListView.ActionDelegate {
     private final ChangedListPresenter     changedListPresenter;
     private final GitOutputConsoleFactory  gitOutputConsoleFactory;
     private final ConsolesPanelPresenter   consolesPanelPresenter;
-    private final Workspace                workspace;
     private final BranchListView           view;
     private final DialogFactory            dialogFactory;
     private final GitServiceClient         service;
@@ -79,8 +77,7 @@ public class BranchListPresenter implements BranchListView.ActionDelegate {
                                NotificationManager notificationManager,
                                DialogFactory dialogFactory,
                                GitOutputConsoleFactory gitOutputConsoleFactory,
-                               ConsolesPanelPresenter consolesPanelPresenter,
-                               Workspace workspace) {
+                               ConsolesPanelPresenter consolesPanelPresenter) {
         this.view = view;
         this.comparePresenter = comparePresenter;
         this.changedListPresenter = changedListPresenter;
@@ -91,7 +88,6 @@ public class BranchListPresenter implements BranchListView.ActionDelegate {
         this.notificationManager = notificationManager;
         this.gitOutputConsoleFactory = gitOutputConsoleFactory;
         this.consolesPanelPresenter = consolesPanelPresenter;
-        this.workspace = workspace;
 
         this.view.setDelegate(this);
     }

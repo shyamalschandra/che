@@ -37,7 +37,7 @@ import org.eclipse.che.ide.api.preferences.PreferencesManager;
 import org.eclipse.che.ide.api.workspace.WorkspaceServiceClient;
 import org.eclipse.che.ide.collections.Jso;
 import org.eclipse.che.ide.collections.js.JsoArray;
-import org.eclipse.che.ide.api.workspace.Workspace;
+import org.eclipse.che.ide.context.AppContextImpl;
 import org.eclipse.che.ide.context.BrowserQueryFieldRenderer;
 import org.eclipse.che.ide.dto.DtoFactory;
 import org.eclipse.che.ide.rest.DtoUnmarshallerFactory;
@@ -84,8 +84,7 @@ public class FactoryWorkspaceComponent extends WorkspaceComponent implements Com
                                      PreferencesManager preferencesManager,
                                      DtoFactory dtoFactory,
                                      InitialLoadingInfo initialLoadingInfo,
-                                     WorkspaceSnapshotCreator snapshotCreator,
-                                     Workspace workspace) {
+                                     WorkspaceSnapshotCreator snapshotCreator) {
         super(workspaceServiceClient,
               createWorkspacePresenter,
               startWorkspacePresenter,
@@ -102,8 +101,7 @@ public class FactoryWorkspaceComponent extends WorkspaceComponent implements Com
               preferencesManager,
               dtoFactory,
               initialLoadingInfo,
-              snapshotCreator,
-              workspace);
+              snapshotCreator);
         this.factoryServiceClient = factoryServiceClient;
     }
 
@@ -132,10 +130,13 @@ public class FactoryWorkspaceComponent extends WorkspaceComponent implements Com
             factoryPromise = factoryServiceClient.resolveFactory(factoryParameters, true);
         }
 
-        Promise<Void> promise = factoryPromise.then(new Function<Factory, Void>() {
+        factoryPromise.then(new Function<Factory, Void>() {
             @Override
             public Void apply(final Factory factory) throws FunctionException {
-                appContext.setFactory(factory);
+
+                if (appContext instanceof AppContextImpl) {
+                    ((AppContextImpl)appContext).setFactory(factory);
+                }
 
                 // get workspace
                 tryStartWorkspace();

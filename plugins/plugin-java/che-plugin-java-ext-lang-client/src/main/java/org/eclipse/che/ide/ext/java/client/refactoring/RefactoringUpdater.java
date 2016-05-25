@@ -13,8 +13,8 @@ package org.eclipse.che.ide.ext.java.client.refactoring;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
+import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.resources.ExternalResourceDelta;
-import org.eclipse.che.ide.api.workspace.Workspace;
 import org.eclipse.che.ide.ext.java.shared.dto.refactoring.ChangeInfo;
 import org.eclipse.che.ide.resource.Path;
 
@@ -37,11 +37,11 @@ import static org.eclipse.che.ide.api.resources.ResourceDelta.UPDATED;
 @Singleton
 public class RefactoringUpdater {
 
-    private final Workspace workspace;
+    private final AppContext appContext;
 
     @Inject
-    public RefactoringUpdater(Workspace workspace) {
-        this.workspace = workspace;
+    public RefactoringUpdater(AppContext appContext) {
+        this.appContext = appContext;
     }
 
     /**
@@ -91,7 +91,7 @@ public class RefactoringUpdater {
         }
 
         if (deltas.length > 0) {
-            workspace.getWorkspaceRoot().synchronize(deltas);
+            appContext.getWorkspaceRoot().synchronize(deltas);
         }
     }
 }

@@ -57,7 +57,6 @@ public class CheckoutReferenceTest extends BaseTest {
                                                    notificationManager,
                                                    gitOutputConsoleFactory,
                                                    consolesPanelPresenter,
-                                                   workspace,
                                                    dtoFactory);
     }
 
@@ -126,32 +125,5 @@ public class CheckoutReferenceTest extends BaseTest {
         verify(service).checkout(anyObject(), any(Path.class), any(CheckoutRequest.class));
         verify(checkoutRequest).withName(CORRECT_REFERENCE);
         verifyNoMoreInteractions(checkoutRequest);
-    }
-
-    @Test
-    public void testOnCheckoutClickedWhenCheckoutIsFailed() throws Exception {
-//        reset(service);
-//        when(dtoFactory.createDto(CheckoutRequest.class)).thenReturn(checkoutRequest);
-//        when(checkoutRequest.withName(anyString())).thenReturn(checkoutRequest);
-//        when(checkoutRequest.withCreateNew(anyBoolean())).thenReturn(checkoutRequest);
-//        when(service.checkout(anyObject(), any(Path.class), any(CheckoutRequest.class))).thenReturn(voidPromise);
-//        when(voidPromise.then(any(Operation.class))).thenReturn(voidPromise);
-//        when(voidPromise.catchError(any(Operation.class))).thenReturn(voidPromise);
-//
-//        when(view.getReference()).thenReturn(CORRECT_REFERENCE);
-//
-//        presenter.showDialog(project);
-//        presenter.onEnterClicked();
-//
-//        verify(voidPromise).catchError(promiseErrorCaptor.capture());
-//        promiseErrorCaptor.getValue().apply(promiseError);
-//
-//        verify(checkoutRequest).withName(CORRECT_REFERENCE);
-//        verifyNoMoreInteractions(checkoutRequest);
-//        verify(view).close();
-//        verify(gitOutputConsoleFactory).create(CHECKOUT_COMMAND_NAME);
-//        verify(console).printError(anyString());
-//        verify(consolesPanelPresenter).addCommandOutput(anyString(), eq(console));
-//        verify(notificationManager).notify(anyString(), anyObject(), any(StatusNotification.DisplayMode.class));
     }
 }

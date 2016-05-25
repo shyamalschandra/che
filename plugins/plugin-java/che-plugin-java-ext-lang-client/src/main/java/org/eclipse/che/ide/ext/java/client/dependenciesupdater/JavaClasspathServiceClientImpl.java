@@ -16,7 +16,6 @@ import com.google.inject.Singleton;
 import org.eclipse.che.ide.api.machine.WsAgentStateController;
 import org.eclipse.che.api.promises.client.Operation;
 import org.eclipse.che.api.promises.client.OperationException;
-import org.eclipse.che.ide.api.workspace.Workspace;
 import org.eclipse.che.ide.ext.java.shared.dto.ClassPathBuilderResult;
 import org.eclipse.che.ide.websocket.Message;
 import org.eclipse.che.ide.websocket.MessageBuilder;
@@ -42,8 +41,7 @@ public class JavaClasspathServiceClientImpl implements JavaClasspathServiceClien
     private final String                 baseHttpUrl;
 
     @Inject
-    protected JavaClasspathServiceClientImpl(Workspace workspace,
-                                             WsAgentStateController wsAgentStateController) {
+    protected JavaClasspathServiceClientImpl(WsAgentStateController wsAgentStateController) {
         this.wsAgentStateController = wsAgentStateController;
         this.baseHttpUrl = "/java/";
     }

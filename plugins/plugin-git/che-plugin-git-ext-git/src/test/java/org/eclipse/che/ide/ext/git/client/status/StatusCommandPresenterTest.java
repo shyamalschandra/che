@@ -23,7 +23,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.times;
@@ -58,8 +57,7 @@ public class StatusCommandPresenterTest extends BaseTest {
                                                gitOutputConsoleFactory,
                                                consolesPanelPresenter,
                                                constant,
-                                               notificationManager,
-                                               workspace);
+                                               notificationManager);
 
         when(service.statusText(anyObject(), any(Path.class), any(StatusFormat.class))).thenReturn(stringPromise);
         when(stringPromise.then(any(Operation.class))).thenReturn(stringPromise);

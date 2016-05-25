@@ -21,7 +21,6 @@ import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.notification.NotificationManager;
 import org.eclipse.che.ide.api.resources.Project;
 import org.eclipse.che.ide.api.theme.Style;
-import org.eclipse.che.ide.api.workspace.Workspace;
 import org.eclipse.che.ide.ext.git.client.GitLocalizationConstant;
 import org.eclipse.che.ide.ext.git.client.outputconsole.GitOutputConsole;
 import org.eclipse.che.ide.ext.git.client.outputconsole.GitOutputConsoleFactory;
@@ -50,7 +49,6 @@ public class StatusCommandPresenter {
     private final ConsolesPanelPresenter  consolesPanelPresenter;
     private final GitLocalizationConstant constant;
     private final NotificationManager     notificationManager;
-    private final Workspace               workspace;
 
     /**
      * Create presenter.
@@ -61,15 +59,13 @@ public class StatusCommandPresenter {
                                   GitOutputConsoleFactory gitOutputConsoleFactory,
                                   ConsolesPanelPresenter consolesPanelPresenter,
                                   GitLocalizationConstant constant,
-                                  NotificationManager notificationManager,
-                                  Workspace workspace) {
+                                  NotificationManager notificationManager) {
         this.service = service;
         this.appContext = appContext;
         this.gitOutputConsoleFactory = gitOutputConsoleFactory;
         this.consolesPanelPresenter = consolesPanelPresenter;
         this.constant = constant;
         this.notificationManager = notificationManager;
-        this.workspace = workspace;
     }
 
     /** Show status. */
@@ -114,6 +110,6 @@ public class StatusCommandPresenter {
             console.print(line);
         }
 
-        consolesPanelPresenter.addCommandOutput(workspace.getId(), console);
+        consolesPanelPresenter.addCommandOutput(appContext.getDevMachine().getId(), console);
     }
 }

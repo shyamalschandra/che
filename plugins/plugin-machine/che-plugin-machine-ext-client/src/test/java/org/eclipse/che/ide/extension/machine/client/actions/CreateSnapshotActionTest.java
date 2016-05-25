@@ -15,7 +15,8 @@ import org.eclipse.che.ide.CoreLocalizationConstant;
 import org.eclipse.che.ide.actions.WorkspaceSnapshotCreator;
 import org.eclipse.che.ide.api.action.ActionEvent;
 import org.eclipse.che.ide.api.action.Presentation;
-import org.eclipse.che.ide.api.workspace.Workspace;
+import org.eclipse.che.ide.api.app.AppContext;
+import org.eclipse.che.ide.api.machine.DevMachine;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Answers;
@@ -24,6 +25,7 @@ import org.mockito.Mock;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -41,11 +43,11 @@ public class CreateSnapshotActionTest {
     @Mock
     private CoreLocalizationConstant coreLocalizationConstant;
 
-    @Mock(answer = Answers.RETURNS_MOCKS)
-    private ActionEvent event;
+    @Mock
+    private AppContext appContext;
 
     @Mock(answer = Answers.RETURNS_MOCKS)
-    private Workspace workspace;
+    private ActionEvent event;
 
     @InjectMocks
     private CreateSnapshotAction createSnapshotAction;
@@ -78,10 +80,14 @@ public class CreateSnapshotActionTest {
 
     @Test
     public void shouldCreateSnapshotWithWorkspaceIdFromAppContextWhenActionPerformed() {
-        when(workspace.getId()).thenReturn("workspace123");
+        DevMachine devMachine = mock(DevMachine.class);
+        when(devMachine.getId()).thenReturn("workspace123");
+        when(appContext.getDevMachine()).thenReturn(devMachine);
 
         createSnapshotAction.actionPerformed(event);
 
         verify(snapshotCreator).createSnapshot("workspace123");
     }
+
+
 }

@@ -19,6 +19,7 @@ import com.google.web.bindery.event.shared.EventBus;
 import org.eclipse.che.api.promises.client.Operation;
 import org.eclipse.che.api.promises.client.OperationException;
 import org.eclipse.che.api.promises.client.PromiseProvider;
+import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.editor.EditorAgent;
 import org.eclipse.che.ide.api.editor.EditorPartPresenter;
 import org.eclipse.che.ide.api.event.FileEvent;
@@ -28,7 +29,6 @@ import org.eclipse.che.ide.api.resources.Project;
 import org.eclipse.che.ide.api.resources.Resource;
 import org.eclipse.che.ide.api.resources.SyntheticFile;
 import org.eclipse.che.ide.api.resources.VirtualFile;
-import org.eclipse.che.ide.api.workspace.Workspace;
 import org.eclipse.che.ide.ext.java.client.navigation.service.JavaNavigationService;
 import org.eclipse.che.ide.ext.java.client.resource.SourceFolderMarker;
 import org.eclipse.che.ide.ext.java.client.util.JavaUtil;
@@ -51,19 +51,19 @@ public class OpenDeclarationFinder {
 
     private final EditorAgent           editorAgent;
     private final JavaNavigationService navigationService;
-    private final Workspace             workspace;
+    private final AppContext            appContext;
     private final EventBus              eventBus;
     private final PromiseProvider       promises;
 
     @Inject
     public OpenDeclarationFinder(EditorAgent editorAgent,
                                  JavaNavigationService navigationService,
-                                 Workspace workspace,
+                                 AppContext appContext,
                                  EventBus eventBus,
                                  PromiseProvider promises) {
         this.editorAgent = editorAgent;
         this.navigationService = navigationService;
-        this.workspace = workspace;
+        this.appContext = appContext;
         this.eventBus = eventBus;
         this.promises = promises;
     }
@@ -130,7 +130,7 @@ public class OpenDeclarationFinder {
                                  }
                              });
         } else {
-            workspace.getWorkspaceRoot().getFile(Path.valueOf(descriptor.getPath())).then(new Operation<Optional<File>>() {
+            appContext.getWorkspaceRoot().getFile(Path.valueOf(descriptor.getPath())).then(new Operation<Optional<File>>() {
                 @Override
                 public void apply(Optional<File> file) throws OperationException {
                     if (file.isPresent()) {

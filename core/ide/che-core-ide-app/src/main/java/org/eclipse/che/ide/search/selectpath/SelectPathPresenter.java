@@ -13,10 +13,10 @@ package org.eclipse.che.ide.search.selectpath;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
+import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.data.tree.Node;
 import org.eclipse.che.ide.api.data.tree.settings.SettingsProvider;
 import org.eclipse.che.ide.api.resources.Project;
-import org.eclipse.che.ide.api.workspace.Workspace;
 import org.eclipse.che.ide.resources.tree.ResourceNode;
 import org.eclipse.che.ide.search.FullTextSearchView;
 
@@ -32,19 +32,19 @@ import static com.google.common.collect.Lists.newArrayList;
 @Singleton
 public class SelectPathPresenter implements SelectPathView.ActionDelegate {
     private final SelectPathView           view;
-    private final Workspace                workspace;
+    private final AppContext               appContext;
     private final ResourceNode.NodeFactory nodeFactory;
-    private final SettingsProvider settingsProvider;
+    private final SettingsProvider         settingsProvider;
 
     private FullTextSearchView.ActionDelegate searcher;
 
     @Inject
     public SelectPathPresenter(SelectPathView view,
-                               Workspace workspace,
+                               AppContext appContext,
                                ResourceNode.NodeFactory nodeFactory,
                                SettingsProvider settingsProvider) {
         this.view = view;
-        this.workspace = workspace;
+        this.appContext = appContext;
         this.nodeFactory = nodeFactory;
         this.settingsProvider = settingsProvider;
         this.view.setDelegate(this);
@@ -61,7 +61,7 @@ public class SelectPathPresenter implements SelectPathView.ActionDelegate {
 
         List<Node> rootNodes = newArrayList();
 
-        for (Project project : workspace.getProjects()) {
+        for (Project project : appContext.getProjects()) {
             rootNodes.add(nodeFactory.newContainerNode(project, settingsProvider.getSettings()));
         }
 

@@ -12,6 +12,7 @@ package org.eclipse.che.ide.extension.machine.client.machine;
 
 import com.google.web.bindery.event.shared.EventBus;
 
+import org.eclipse.che.ide.api.machine.DevMachine;
 import org.eclipse.che.ide.api.machine.MachineManager;
 import org.eclipse.che.api.machine.shared.dto.MachineConfigDto;
 import org.eclipse.che.api.machine.shared.dto.MachineDto;
@@ -96,6 +97,9 @@ public class MachineStateNotifierTest {
 
     @Before
     public void setUp() {
+        DevMachine devMachine = mock(DevMachine.class);
+        when(devMachine.getId()).thenReturn("id");
+        when(appContext.getDevMachine()).thenReturn(devMachine);
         when(dtoUnmarshallerFactory.newWSUnmarshaller(MachineStatusEvent.class)).thenReturn(unmarshaller);
 
         when(locale.notificationCreatingMachine(SOME_TEXT)).thenReturn(SOME_TEXT);
@@ -112,7 +116,6 @@ public class MachineStateNotifierTest {
     @Test
     public void machineShouldBeTrackedWhenMachineStateIsCreating() throws Exception {
         WorkspaceDto workspace = mock(WorkspaceDto.class);
-        when(appContext.getWorkspace()).thenReturn(workspace);
         when(workspace.getId()).thenReturn(SOME_TEXT);
         when(machineConfig.getName()).thenReturn(SOME_TEXT);
         when(notificationManager.notify(anyString(), eq(PROGRESS), anyObject())).thenReturn(notification);
@@ -129,7 +132,6 @@ public class MachineStateNotifierTest {
     @Test
     public void machineShouldBeTrackedWhenMachineStateIsDestroying() throws Exception {
         WorkspaceDto workspace = mock(WorkspaceDto.class);
-        when(appContext.getWorkspace()).thenReturn(workspace);
         when(workspace.getId()).thenReturn(SOME_TEXT);
         when(machineConfig.getName()).thenReturn(SOME_TEXT);
         when(notificationManager.notify(anyString(), eq(PROGRESS), anyObject())).thenReturn(notification);

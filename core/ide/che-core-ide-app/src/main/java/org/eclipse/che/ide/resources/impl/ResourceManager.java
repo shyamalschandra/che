@@ -30,6 +30,7 @@ import org.eclipse.che.api.promises.client.PromiseProvider;
 import org.eclipse.che.api.workspace.shared.dto.ProjectConfigDto;
 import org.eclipse.che.api.workspace.shared.dto.ProjectProblemDto;
 import org.eclipse.che.api.workspace.shared.dto.SourceStorageDto;
+import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.machine.DevMachine;
 import org.eclipse.che.ide.api.project.ProjectServiceClient;
 import org.eclipse.che.ide.api.project.QueryExpression;
@@ -46,12 +47,9 @@ import org.eclipse.che.ide.api.resources.ResourceDelta;
 import org.eclipse.che.ide.api.resources.ResourceInterceptor;
 import org.eclipse.che.ide.api.resources.marker.Marker;
 import org.eclipse.che.ide.api.resources.marker.MarkerChangedEvent;
-import org.eclipse.che.ide.api.workspace.Workspace;
-import org.eclipse.che.ide.api.workspace.WorkspaceConfigChangedEvent;
+import org.eclipse.che.ide.context.AppContextImpl;
 import org.eclipse.che.ide.dto.DtoFactory;
 import org.eclipse.che.ide.resource.Path;
-import org.eclipse.che.ide.workspace.WorkspaceComponent;
-import org.eclipse.che.ide.workspace.WorkspaceImpl;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -85,19 +83,13 @@ import static org.eclipse.che.ide.util.NameUtils.checkProjectName;
  * Main necessity of this manager is to encapsulate business logic which serves resources from
  * the interfaces.
  * <p/>
- * Each instance of {@link ResourceManager} is bound to own workspace id. So, when {@link WorkspaceComponent}
- * starts, it handles workspace configuration and sends {@link WorkspaceConfigChangedEvent}
- * event which implementation of {@link Workspace} handles. Based on this configuration it creates
- * new instance of {@link ResourceManager} and requests project lists from the server by calling
- * {@link #getWorkspaceProjects()} and storing received project lists in workspace context.
- * <p/>
  * This manager is not intended to be operated with third-party components. Only resources can
- * operate with it. To operate with resources use {@link Workspace#getWorkspaceRoot()} and
- * {@link Workspace#getProjects()}.
+ * operate with it. To operate with resources use {@link AppContext#getWorkspaceRoot()} and
+ * {@link AppContext#getProjects()}.
  *
  * @author Vlad Zhukovskiy
- * @see Workspace
- * @see WorkspaceImpl
+ * @see AppContext
+ * @see AppContextImpl
  * @since 4.0.0-RC14
  */
 @Beta

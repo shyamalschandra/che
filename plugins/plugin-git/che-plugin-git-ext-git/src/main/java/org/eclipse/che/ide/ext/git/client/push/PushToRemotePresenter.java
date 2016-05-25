@@ -26,7 +26,6 @@ import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.notification.NotificationManager;
 import org.eclipse.che.ide.api.notification.StatusNotification;
 import org.eclipse.che.ide.api.resources.Project;
-import org.eclipse.che.ide.api.workspace.Workspace;
 import org.eclipse.che.ide.commons.exception.UnauthorizedException;
 import org.eclipse.che.ide.dto.DtoFactory;
 import org.eclipse.che.ide.ext.git.client.BranchFilterByRemote;
@@ -66,7 +65,6 @@ public class PushToRemotePresenter implements PushToRemoteView.ActionDelegate {
     private final GitOutputConsoleFactory gitOutputConsoleFactory;
     private final ConsolesPanelPresenter  consolesPanelPresenter;
     private final DtoFactory              dtoFactory;
-    private final Workspace               workspace;
     private final BranchSearcher          branchSearcher;
     private final PushToRemoteView        view;
     private final GitServiceClient        service;
@@ -84,12 +82,10 @@ public class PushToRemotePresenter implements PushToRemoteView.ActionDelegate {
                                  NotificationManager notificationManager,
                                  BranchSearcher branchSearcher,
                                  GitOutputConsoleFactory gitOutputConsoleFactory,
-                                 ConsolesPanelPresenter consolesPanelPresenter,
-                                 Workspace workspace) {
+                                 ConsolesPanelPresenter consolesPanelPresenter) {
         this.dtoFactory = dtoFactory;
         this.branchSearcher = branchSearcher;
         this.view = view;
-        this.workspace = workspace;
         this.view.setDelegate(this);
         this.service = service;
         this.appContext = appContext;

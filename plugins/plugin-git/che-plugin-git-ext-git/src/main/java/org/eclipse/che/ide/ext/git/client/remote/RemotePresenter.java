@@ -22,7 +22,6 @@ import org.eclipse.che.api.promises.client.PromiseError;
 import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.notification.NotificationManager;
 import org.eclipse.che.ide.api.resources.Project;
-import org.eclipse.che.ide.api.workspace.Workspace;
 import org.eclipse.che.ide.ext.git.client.GitLocalizationConstant;
 import org.eclipse.che.ide.ext.git.client.outputconsole.GitOutputConsole;
 import org.eclipse.che.ide.ext.git.client.outputconsole.GitOutputConsoleFactory;
@@ -45,10 +44,8 @@ import static org.eclipse.che.ide.api.notification.StatusNotification.Status.FAI
 public class RemotePresenter implements RemoteView.ActionDelegate {
     public static final String REMOTE_REPO_COMMAND_NAME = "Git list of remotes";
 
-    private final GitOutputConsoleFactory gitOutputConsoleFactory;
-    private final ConsolesPanelPresenter  consolesPanelPresenter;
-    private final Workspace               workspace;
-
+    private final GitOutputConsoleFactory      gitOutputConsoleFactory;
+    private final ConsolesPanelPresenter       consolesPanelPresenter;
     private final RemoteView                   view;
     private final GitServiceClient             service;
     private final AppContext                   appContext;
@@ -67,12 +64,10 @@ public class RemotePresenter implements RemoteView.ActionDelegate {
                            AddRemoteRepositoryPresenter addRemoteRepositoryPresenter,
                            NotificationManager notificationManager,
                            GitOutputConsoleFactory gitOutputConsoleFactory,
-                           ConsolesPanelPresenter consolesPanelPresenter,
-                           Workspace workspace) {
+                           ConsolesPanelPresenter consolesPanelPresenter) {
         this.view = view;
         this.gitOutputConsoleFactory = gitOutputConsoleFactory;
         this.consolesPanelPresenter = consolesPanelPresenter;
-        this.workspace = workspace;
         this.view.setDelegate(this);
         this.service = service;
         this.appContext = appContext;

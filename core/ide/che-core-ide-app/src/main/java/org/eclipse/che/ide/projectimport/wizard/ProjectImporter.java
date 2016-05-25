@@ -34,7 +34,6 @@ import org.eclipse.che.ide.api.project.wizard.ImportProjectNotificationSubscribe
 import org.eclipse.che.ide.api.project.wizard.ProjectNotificationSubscriber;
 import org.eclipse.che.ide.api.resources.Project;
 import org.eclipse.che.ide.api.wizard.Wizard.CompleteCallback;
-import org.eclipse.che.ide.api.workspace.Workspace;
 import org.eclipse.che.ide.resource.Path;
 import org.eclipse.che.ide.rest.RestContext;
 import org.eclipse.che.ide.util.ExceptionUtils;
@@ -59,7 +58,6 @@ import static org.eclipse.che.ide.util.ExceptionUtils.getErrorCode;
 public class ProjectImporter extends AbstractImporter {
 
     private final CoreLocalizationConstant    localizationConstant;
-    private final Workspace                   workspace;
     private final ProjectResolver             projectResolver;
     private final String                      restContext;
     private final OAuth2AuthenticatorRegistry oAuth2AuthenticatorRegistry;
@@ -71,14 +69,12 @@ public class ProjectImporter extends AbstractImporter {
                            AppContext appContext,
                            ProjectResolver projectResolver,
                            @RestContext String restContext,
-                           OAuth2AuthenticatorRegistry oAuth2AuthenticatorRegistry,
-                           Workspace workspace) {
+                           OAuth2AuthenticatorRegistry oAuth2AuthenticatorRegistry) {
         super(appContext, subscriberFactory);
         this.localizationConstant = localizationConstant;
         this.projectResolver = projectResolver;
         this.restContext = restContext;
         this.oAuth2AuthenticatorRegistry = oAuth2AuthenticatorRegistry;
-        this.workspace = workspace;
     }
 
     public void importProject(final CompleteCallback callback, MutableProjectConfig projectConfig) {
@@ -120,44 +116,44 @@ public class ProjectImporter extends AbstractImporter {
         importConfig.setPath(path.toString());
         importConfig.setSource(sourceStorage);
 
-        return workspace.getWorkspaceRoot()
-                        .importProject()
-                        .withBody(importConfig)
-                        .send()
-                        .thenPromise(new Function<Project, Promise<Project>>() {
-                            @Override
-                            public Promise<Project> apply(Project project) throws FunctionException {
-                                subscriber.onSuccess();
+        return appContext.getWorkspaceRoot()
+                         .importProject()
+                         .withBody(importConfig)
+                         .send()
+                         .thenPromise(new Function<Project, Promise<Project>>() {
+                             @Override
+                             public Promise<Project> apply(Project project) throws FunctionException {
+                                 subscriber.onSuccess();
 
-                                return projectResolver.resolve(project);
-                            }
-                        })
-                        .catchErrorPromise(new Function<PromiseError, Promise<Project>>() {
-                            @Override
-                            public Promise<Project> apply(PromiseError exception) throws FunctionException {
-                                subscriber.onFailure(exception.getCause().getMessage());
+                                 return projectResolver.resolve(project);
+                             }
+                         })
+                         .catchErrorPromise(new Function<PromiseError, Promise<Project>>() {
+                             @Override
+                             public Promise<Project> apply(PromiseError exception) throws FunctionException {
+                                 subscriber.onFailure(exception.getCause().getMessage());
 
-                                switch (getErrorCode(exception.getCause())) {
-                                    case UNABLE_GET_PRIVATE_SSH_KEY:
-                                        throw new IllegalStateException(localizationConstant.importProjectMessageUnableGetSshKey());
-                                    case UNAUTHORIZED_GIT_OPERATION:
-                                        final Map<String, String> attributes = ExceptionUtils.getAttributes(exception.getCause());
-                                        final String providerName = attributes.get(PROVIDER_NAME);
-                                        final String authenticateUrl = attributes.get(AUTHENTICATE_URL);
-                                        if (!Strings.isNullOrEmpty(providerName) && !Strings.isNullOrEmpty(authenticateUrl)) {
-                                            return authUserAndRecallImport(providerName,
-                                                                           authenticateUrl,
-                                                                           path,
-                                                                           sourceStorage,
-                                                                           subscriber);
-                                        } else {
-                                            throw new IllegalStateException(localizationConstant.oauthFailedToGetAuthenticatorText());
-                                        }
-                                    default:
-                                        throw new IllegalStateException(exception.getCause());
-                                }
-                            }
-                        });
+                                 switch (getErrorCode(exception.getCause())) {
+                                     case UNABLE_GET_PRIVATE_SSH_KEY:
+                                         throw new IllegalStateException(localizationConstant.importProjectMessageUnableGetSshKey());
+                                     case UNAUTHORIZED_GIT_OPERATION:
+                                         final Map<String, String> attributes = ExceptionUtils.getAttributes(exception.getCause());
+                                         final String providerName = attributes.get(PROVIDER_NAME);
+                                         final String authenticateUrl = attributes.get(AUTHENTICATE_URL);
+                                         if (!Strings.isNullOrEmpty(providerName) && !Strings.isNullOrEmpty(authenticateUrl)) {
+                                             return authUserAndRecallImport(providerName,
+                                                                            authenticateUrl,
+                                                                            path,
+                                                                            sourceStorage,
+                                                                            subscriber);
+                                         } else {
+                                             throw new IllegalStateException(localizationConstant.oauthFailedToGetAuthenticatorText());
+                                         }
+                                     default:
+                                         throw new IllegalStateException(exception.getCause());
+                                 }
+                             }
+                         });
     }
 
     private Promise<Project> authUserAndRecallImport(final String providerName,

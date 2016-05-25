@@ -17,7 +17,6 @@ import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.data.tree.Node;
 import org.eclipse.che.ide.api.data.tree.settings.SettingsProvider;
 import org.eclipse.che.ide.api.resources.Project;
-import org.eclipse.che.ide.api.workspace.Workspace;
 import org.eclipse.che.ide.ext.java.client.project.classpath.valueproviders.pages.ClasspathPagePresenter;
 import org.eclipse.che.ide.ext.java.client.project.classpath.valueproviders.selectnode.interceptors.ClasspathNodeInterceptor;
 import org.eclipse.che.ide.ext.java.client.project.classpath.valueproviders.selectnode.interceptors.JarNodeInterceptor;
@@ -41,7 +40,6 @@ public class SelectNodePresenter implements SelectNodeView.ActionDelegate {
     private final ResourceNode.NodeFactory nodeFactory;
     private final SettingsProvider         settingsProvider;
     private final AppContext               appContext;
-    private final Workspace                workspace;
 
     private ClasspathPagePresenter   classpathPagePresenter;
     private ClasspathNodeInterceptor interceptor;
@@ -50,13 +48,11 @@ public class SelectNodePresenter implements SelectNodeView.ActionDelegate {
     public SelectNodePresenter(SelectNodeView view,
                                ResourceNode.NodeFactory nodeFactory,
                                SettingsProvider settingsProvider,
-                               AppContext appContext,
-                               Workspace workspace) {
+                               AppContext appContext) {
         this.view = view;
         this.nodeFactory = nodeFactory;
         this.settingsProvider = settingsProvider;
         this.appContext = appContext;
-        this.workspace = workspace;
         this.view.setDelegate(this);
     }
 
@@ -79,7 +75,7 @@ public class SelectNodePresenter implements SelectNodeView.ActionDelegate {
             view.setStructure(Collections.<Node>singletonList(nodeFactory.newContainerNode(project, settingsProvider.getSettings())), interceptor);
         } else {
             final List<Node> nodes = new ArrayList<>();
-            for (Project project : workspace.getProjects()) {
+            for (Project project : appContext.getProjects()) {
                 nodes.add(nodeFactory.newContainerNode(project, settingsProvider.getSettings()));
             }
 

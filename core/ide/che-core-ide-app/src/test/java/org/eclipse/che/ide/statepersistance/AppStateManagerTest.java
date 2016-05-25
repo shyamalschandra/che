@@ -95,7 +95,6 @@ public class AppStateManagerTest {
     @Before
     public void setUp() {
         WorkspaceDto usersWorkspaceDto = mock(WorkspaceDto.class);
-        when(appContext.getWorkspace()).thenReturn(usersWorkspaceDto);
         when(usersWorkspaceDto.getId()).thenReturn(WS_ID);
         when(preferencesManager.getValue(PREFERENCE_PROPERTY_NAME)).thenReturn(JSON);
         when(dtoFactory.createDtoFromJson(JSON, AppState.class)).thenReturn(appState);

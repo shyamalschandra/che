@@ -32,7 +32,6 @@ import org.eclipse.che.ide.api.parts.WorkspaceAgent;
 import org.eclipse.che.ide.api.parts.base.BasePresenter;
 import org.eclipse.che.ide.api.resources.Project;
 import org.eclipse.che.ide.api.resources.Resource;
-import org.eclipse.che.ide.api.workspace.Workspace;
 import org.eclipse.che.ide.ext.git.client.DateTimeFormatter;
 import org.eclipse.che.ide.ext.git.client.GitLocalizationConstant;
 import org.eclipse.che.ide.ext.git.client.GitResources;
@@ -75,7 +74,6 @@ public class HistoryPresenter extends BasePresenter implements HistoryView.Actio
     private final DateTimeFormatter       dateTimeFormatter;
     private final GitOutputConsoleFactory gitOutputConsoleFactory;
     private final ConsolesPanelPresenter  consolesPanelPresenter;
-    private final Workspace               workspace;
     /** If <code>true</code> then show all changes in project, if <code>false</code> then show changes of the selected resource. */
     private       boolean                 showChangesInProject;
     private       DiffWith                diffType;
@@ -97,14 +95,12 @@ public class HistoryPresenter extends BasePresenter implements HistoryView.Actio
                             DialogFactory dialogFactory,
                             DateTimeFormatter dateTimeFormatter,
                             GitOutputConsoleFactory gitOutputConsoleFactory,
-                            ConsolesPanelPresenter consolesPanelPresenter,
-                            Workspace workspace) {
+                            ConsolesPanelPresenter consolesPanelPresenter) {
         this.view = view;
         this.dialogFactory = dialogFactory;
         this.dateTimeFormatter = dateTimeFormatter;
         this.gitOutputConsoleFactory = gitOutputConsoleFactory;
         this.consolesPanelPresenter = consolesPanelPresenter;
-        this.workspace = workspace;
         this.view.setDelegate(this);
         this.view.setTitle(constant.historyTitle());
         this.resources = resources;

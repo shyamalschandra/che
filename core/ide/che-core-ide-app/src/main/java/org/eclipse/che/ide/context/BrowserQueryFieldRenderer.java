@@ -10,12 +10,12 @@
  *******************************************************************************/
 package org.eclipse.che.ide.context;
 
+import com.google.common.base.Strings;
 import com.google.gwt.user.client.Window;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
 
-import org.eclipse.che.api.workspace.shared.dto.WorkspaceDto;
 import org.eclipse.che.ide.api.ProductInfoDataProvider;
 import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.collections.Jso;
@@ -117,12 +117,7 @@ public class BrowserQueryFieldRenderer {
      *         name which will be set. Can be null or empty if workspace does not contain any projects
      */
     public void setProjectName(String projectName) {
-        String workspaceName = "";
-        WorkspaceDto workspaceDto = appContextProvider.get().getWorkspace();
-        if (workspaceDto != null) {
-            workspaceName = workspaceDto.getConfig().getName();
-        }
-        setQueryField(workspaceName, projectName);
+        setQueryField(Strings.nullToEmpty(appContextProvider.get().getWorkspaceName()), projectName);
     }
 
     /**

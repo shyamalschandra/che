@@ -17,12 +17,12 @@ import com.google.inject.assistedinject.Assisted;
 import org.eclipse.che.api.promises.client.Operation;
 import org.eclipse.che.api.promises.client.OperationException;
 import org.eclipse.che.api.promises.client.PromiseError;
+import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.project.MutableProjectConfig;
 import org.eclipse.che.ide.api.project.type.wizard.ProjectWizardMode;
 import org.eclipse.che.ide.api.resources.Container;
 import org.eclipse.che.ide.api.resources.Project;
 import org.eclipse.che.ide.api.wizard.AbstractWizard;
-import org.eclipse.che.ide.api.workspace.Workspace;
 import org.eclipse.che.ide.resource.Path;
 
 import javax.validation.constraints.NotNull;
@@ -45,15 +45,15 @@ import static org.eclipse.che.ide.api.resources.Resource.PROJECT;
 public class ProjectWizard extends AbstractWizard<MutableProjectConfig> {
 
     private final ProjectWizardMode mode;
-    private final Workspace         workspace;
+    private final AppContext        appContext;
 
     @Inject
     public ProjectWizard(@Assisted MutableProjectConfig dataObject,
                          @Assisted ProjectWizardMode mode,
-                         Workspace workspace) {
+                         AppContext appContext) {
         super(dataObject);
         this.mode = mode;
-        this.workspace = workspace;
+        this.appContext = appContext;
 
         context.put(WIZARD_MODE_KEY, mode.toString());
         context.put(PROJECT_NAME_KEY, dataObject.getName());
@@ -63,14 +63,14 @@ public class ProjectWizard extends AbstractWizard<MutableProjectConfig> {
     @Override
     public void complete(@NotNull final CompleteCallback callback) {
         if (mode == CREATE) {
-            workspace.getWorkspaceRoot()
-                     .newProject()
-                     .withBody(dataObject)
-                     .send()
-                     .then(onComplete(callback))
-                     .catchError(onFailure(callback));
+            appContext.getWorkspaceRoot()
+                      .newProject()
+                      .withBody(dataObject)
+                      .send()
+                      .then(onComplete(callback))
+                      .catchError(onFailure(callback));
         } else if (mode == UPDATE) {
-            workspace.getWorkspaceRoot().getContainer(Path.valueOf(dataObject.getPath())).then(new Operation<Optional<Container>>() {
+            appContext.getWorkspaceRoot().getContainer(Path.valueOf(dataObject.getPath())).then(new Operation<Optional<Container>>() {
                 @Override
                 public void apply(Optional<Container> optContainer) throws OperationException {
                     checkState(optContainer.isPresent(), "Failed to update non existed path");
@@ -86,12 +86,12 @@ public class ProjectWizard extends AbstractWizard<MutableProjectConfig> {
                 }
             });
         } else if (mode == IMPORT) {
-            workspace.getWorkspaceRoot()
-                     .importProject()
-                     .withBody(dataObject)
-                     .send()
-                     .then(onComplete(callback))
-                     .catchError(onFailure(callback));
+            appContext.getWorkspaceRoot()
+                      .importProject()
+                      .withBody(dataObject)
+                      .send()
+                      .then(onComplete(callback))
+                      .catchError(onFailure(callback));
         }
     }
 

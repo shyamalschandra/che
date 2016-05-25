@@ -15,6 +15,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.web.bindery.event.shared.EventBus;
 
+import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.machine.WsAgentStateController;
 import org.eclipse.che.ide.api.machine.events.WsAgentStateEvent;
 import org.eclipse.che.ide.api.machine.events.WsAgentStateHandler;
@@ -23,7 +24,6 @@ import org.eclipse.che.api.promises.client.OperationException;
 import org.eclipse.che.ide.api.notification.NotificationManager;
 import org.eclipse.che.ide.api.notification.StatusNotification;
 import org.eclipse.che.ide.api.resources.Container;
-import org.eclipse.che.ide.api.workspace.Workspace;
 import org.eclipse.che.ide.collections.Jso;
 import org.eclipse.che.ide.dto.DtoFactory;
 import org.eclipse.che.plugin.maven.client.comunnication.progressor.background.BackgroundLoaderPresenter;
@@ -57,7 +57,7 @@ public class MavenMessagesHandler {
     private final NotificationManager       notificationManager;
     private final BackgroundLoaderPresenter dependencyResolver;
     private final PomEditorReconciler       pomEditorReconciler;
-    private final Workspace                 workspace;
+    private final AppContext                appContext;
 
     @Inject
     public MavenMessagesHandler(EventBus eventBus,
@@ -66,13 +66,13 @@ public class MavenMessagesHandler {
                                 BackgroundLoaderPresenter dependencyResolver,
                                 PomEditorReconciler pomEditorReconciler,
                                 WsAgentStateController agentStateController,
-                                Workspace workspace) {
+                                AppContext appContext) {
         this.eventBus = eventBus;
 
         this.notificationManager = notificationManager;
         this.dependencyResolver = dependencyResolver;
         this.pomEditorReconciler = pomEditorReconciler;
-        this.workspace = workspace;
+        this.appContext = appContext;
 
         handleOperations(factory, agentStateController);
     }
@@ -138,7 +138,7 @@ public class MavenMessagesHandler {
         List<String> updatedProjects = dto.getUpdatedProjects();
         Set<String> projectToRefresh = computeUniqueHiLevelProjects(updatedProjects);
         for (final String path : projectToRefresh) {
-              workspace.getWorkspaceRoot().getContainer(path).then(new Operation<Optional<Container>>() {
+            appContext.getWorkspaceRoot().getContainer(path).then(new Operation<Optional<Container>>() {
                   @Override
                   public void apply(Optional<Container> container) throws OperationException {
                       if (container.isPresent()) {

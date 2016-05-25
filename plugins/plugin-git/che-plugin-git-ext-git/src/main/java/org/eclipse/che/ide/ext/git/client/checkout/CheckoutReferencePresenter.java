@@ -22,7 +22,6 @@ import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.notification.NotificationManager;
 import org.eclipse.che.ide.api.resources.Project;
 import org.eclipse.che.ide.api.resources.Resource;
-import org.eclipse.che.ide.api.workspace.Workspace;
 import org.eclipse.che.ide.dto.DtoFactory;
 import org.eclipse.che.ide.ext.git.client.GitLocalizationConstant;
 import org.eclipse.che.ide.ext.git.client.outputconsole.GitOutputConsole;
@@ -47,7 +46,6 @@ public class CheckoutReferencePresenter implements CheckoutReferenceView.ActionD
     private final AppContext              appContext;
     private final GitLocalizationConstant constant;
     private final CheckoutReferenceView   view;
-    private final Workspace               workspace;
     private final DtoFactory              dtoFactory;
     private final GitOutputConsoleFactory gitOutputConsoleFactory;
     private final ConsolesPanelPresenter  consolesPanelPresenter;
@@ -62,10 +60,8 @@ public class CheckoutReferencePresenter implements CheckoutReferenceView.ActionD
                                       NotificationManager notificationManager,
                                       GitOutputConsoleFactory gitOutputConsoleFactory,
                                       ConsolesPanelPresenter consolesPanelPresenter,
-                                      Workspace workspace,
                                       DtoFactory dtoFactory) {
         this.view = view;
-        this.workspace = workspace;
         this.dtoFactory = dtoFactory;
         this.view.setDelegate(this);
         this.service = service;

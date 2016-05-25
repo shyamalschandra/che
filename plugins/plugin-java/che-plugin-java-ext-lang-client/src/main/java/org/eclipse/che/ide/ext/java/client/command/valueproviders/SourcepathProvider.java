@@ -82,7 +82,7 @@ public class SourcepathProvider implements CommandPropertyValueProvider {
                                 }
 
                                 if (classpath.toString().isEmpty()) {
-                                    classpath.append(appContext.getProjectsRoot()).append(project.get().getLocation().toString());
+                                    classpath.append(appContext.getProjectsRoot().toString()).append(project.get().getLocation().toString());
                                 }
 
                                 classpath.append(':');

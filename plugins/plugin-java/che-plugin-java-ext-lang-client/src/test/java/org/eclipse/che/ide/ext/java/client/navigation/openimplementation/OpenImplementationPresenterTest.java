@@ -24,7 +24,6 @@ import org.eclipse.che.ide.api.resources.File;
 import org.eclipse.che.ide.api.resources.Project;
 import org.eclipse.che.ide.api.resources.Resource;
 import org.eclipse.che.ide.api.resources.VirtualFile;
-import org.eclipse.che.ide.api.workspace.Workspace;
 import org.eclipse.che.ide.dto.DtoFactory;
 import org.eclipse.che.ide.ext.java.client.JavaLocalizationConstant;
 import org.eclipse.che.ide.ext.java.client.JavaResources;
@@ -78,38 +77,36 @@ public class OpenImplementationPresenterTest {
     @Mock
     private JavaLocalizationConstant locale;
     @Mock
-    private Workspace                workspace;
-    @Mock
     private PromiseProvider          promiseProvider;
 
     //other mocks
 
     @Mock
-    private TextEditorPresenter                   editorPartPresenter;
+    private TextEditorPresenter          editorPartPresenter;
     @Mock
-    private EditorInput                        editorInput;
+    private EditorInput                  editorInput;
     @Mock
-    private File                               file;
+    private File                         file;
     @Mock
-    private Project                            relatedProject;
+    private Project                      relatedProject;
     @Mock
-    private Container                          srcFolder;
+    private Container                    srcFolder;
     @Mock
-    private ImplementationsDescriptorDTO       implementationDescriptor;
+    private ImplementationsDescriptorDTO implementationDescriptor;
     @Mock
-    private Type                               type1;
+    private Type                         type1;
     @Mock
-    private Type                               type2;
+    private Type                         type2;
     @Mock
-    private JarEntry                           jarEntry;
+    private JarEntry                     jarEntry;
     @Mock
-    private Container                          workspaceRoot;
+    private Container                    workspaceRoot;
     @Mock
-    private PositionConverter                  positionConverter;
+    private PositionConverter            positionConverter;
     @Mock
-    private SVGResource svgResource;
+    private SVGResource                  svgResource;
     @Mock
-    private OMSVGSVGElement omsvgsvgElement;
+    private OMSVGSVGElement              omsvgsvgElement;
 
     @Mock
     private Promise<ImplementationsDescriptorDTO> implementationsPromise;
@@ -140,55 +137,7 @@ public class OpenImplementationPresenterTest {
                                                     popupResources,
                                                     locale,
                                                     editorAgent,
-                                                    workspace,
                                                     promiseProvider);
-    }
-
-    @Test
-    public void testShouldDisplayOneImplementationIsBinary() throws Exception {
-//        when(editorPartPresenter.getEditorInput()).thenReturn(editorInput);
-//        when(editorInput.getFile()).thenReturn(file);
-//        when(file.getRelatedProject()).thenReturn(relatedProject);
-//        when(file.getParentWithMarker(eq(SourceFolderMarker.ID))).thenReturn(Optional.of(srcFolder));
-//        when(file.getLocation()).thenReturn(Path.valueOf("/a/b/c/d/file.java"));
-//        when(srcFolder.getLocation()).thenReturn(Path.valueOf("/a/b"));
-//        when(file.getResourceType()).thenReturn(Resource.FILE);
-//        when(file.getExtension()).thenReturn("java");
-//        when(file.getName()).thenReturn("file.java");
-//        when(relatedProject.getLocation()).thenReturn(Path.valueOf("/a"));
-//        when(editorPartPresenter.getCursorOffset()).thenReturn(123);
-//        when(implementationsPromise.then(any(Operation.class))).thenReturn(implementationsPromise);
-//        when(javaNavigationService.getImplementations(eq(Path.valueOf("/a")), eq("c.d.file"), eq(123))).thenReturn(implementationsPromise);
-//
-//        when(implementationDescriptor.getImplementations()).thenReturn(Collections.singletonList(type1));
-//        when(implementationDescriptor.getMemberName()).thenReturn("memberName");
-//        when(locale.openImplementationWindowTitle(eq("memberName"), eq(1))).thenReturn("foo");
-//
-//        when(type1.isBinary()).thenReturn(true);
-//        when(appContext.getResource()).thenReturn(file);
-//        when(type1.getLibId()).thenReturn(123);
-//        when(type1.getRootPath()).thenReturn("/foo/bar");
-//        when(javaNavigationService.getEntry(eq(Path.valueOf("/a")), eq(123), eq("/foo/bar"))).thenReturn(jarEntryPromise);
-//        when(jarEntryPromise.then(any(Operation.class))).thenReturn(jarEntryPromise);
-//
-//        when(jarEntry.getPath()).thenReturn("/foo/bar/a/b/c");
-////        when(javaNavigationService.getContent(eq(Path.valueOf("/a")), eq(123), eq(Path.valueOf("/foo/bar/a/b/c"))))
-////                .thenReturn(contentPromise);
-//        when(contentPromise.then(any(Operation.class))).thenReturn(contentPromise);
-//        when(jarEntry.getName()).thenReturn("jarEntry");
-//
-//
-//        presenter.show(editorPartPresenter);
-//        verify(implementationsPromise).then(implementationsOperation.capture());
-//        implementationsOperation.getValue().apply(implementationDescriptor);
-//
-//        verify(jarEntryPromise).then(jarEntryOperation.capture());
-//        jarEntryOperation.getValue().apply(jarEntry);
-//
-//        verify(contentPromise).then(contentOperation.capture());
-//        contentOperation.getValue().apply("content");
-//
-//        verify(editorAgent).openEditor(any(VirtualFile.class), any(EditorAgent.OpenEditorCallback.class));
     }
 
     @Test
@@ -213,7 +162,7 @@ public class OpenImplementationPresenterTest {
 
         when(type1.isBinary()).thenReturn(false);
         when(type1.getRootPath()).thenReturn("/memberPath");
-        when(workspace.getWorkspaceRoot()).thenReturn(workspaceRoot);
+        when(appContext.getWorkspaceRoot()).thenReturn(workspaceRoot);
         when(workspaceRoot.getFile(anyString())).thenReturn(realFilePromise);
         when(realFilePromise.then(any(Operation.class))).thenReturn(realFilePromise);
 

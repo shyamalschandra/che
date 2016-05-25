@@ -14,7 +14,6 @@ import com.google.gwt.user.client.ui.AcceptsOneWidget;
 
 import org.eclipse.che.api.workspace.shared.dto.ProjectConfigDto;
 import org.eclipse.che.ide.api.app.AppContext;
-import org.eclipse.che.ide.api.app.CurrentProject;
 import org.eclipse.che.ide.ext.java.client.command.mainclass.SelectNodePresenter;
 import org.eclipse.che.ide.extension.machine.client.command.CommandConfigurationPage;
 import org.junit.Before;
@@ -54,8 +53,6 @@ public class JavaCommandPagePresenterTest {
     @Mock
     private CommandConfigurationPage.FieldStateActionDelegate fieldStateDelegate;
     @Mock
-    private CurrentProject                                    currentProject;
-    @Mock
     private ProjectConfigDto                                  projectConfigDto;
 
     @InjectMocks
@@ -66,8 +63,6 @@ public class JavaCommandPagePresenterTest {
         when(configuration.getCommandLine()).thenReturn(COMMAND_LINE);
         when(configuration.getMainClass()).thenReturn(MAIN_CLASS_PATH);
         when(configuration.getMainClassFqn()).thenReturn(MAIN_CLASS_FQN);
-        when(appContext.getCurrentProject()).thenReturn(currentProject);
-        when(currentProject.getProjectConfig()).thenReturn(projectConfigDto);
         when(projectConfigDto.getPath()).thenReturn(PROJECT_PATH);
     }
 

@@ -20,7 +20,6 @@ import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.notification.NotificationManager;
 import org.eclipse.che.ide.api.resources.Project;
 import org.eclipse.che.ide.api.resources.Resource;
-import org.eclipse.che.ide.api.workspace.Workspace;
 import org.eclipse.che.ide.ext.git.client.GitLocalizationConstant;
 import org.eclipse.che.ide.ext.git.client.outputconsole.GitOutputConsole;
 import org.eclipse.che.ide.ext.git.client.outputconsole.GitOutputConsoleFactory;
@@ -50,7 +49,6 @@ public class RemoveFromIndexPresenter implements RemoveFromIndexView.ActionDeleg
     private final NotificationManager     notificationManager;
     private final GitOutputConsoleFactory gitOutputConsoleFactory;
     private final ConsolesPanelPresenter  consolesPanelPresenter;
-    private final Workspace               workspace;
 
     private Project project;
 
@@ -61,12 +59,10 @@ public class RemoveFromIndexPresenter implements RemoveFromIndexView.ActionDeleg
                                     AppContext appContext,
                                     NotificationManager notificationManager,
                                     GitOutputConsoleFactory gitOutputConsoleFactory,
-                                    ConsolesPanelPresenter consolesPanelPresenter,
-                                    Workspace workspace) {
+                                    ConsolesPanelPresenter consolesPanelPresenter) {
         this.view = view;
         this.gitOutputConsoleFactory = gitOutputConsoleFactory;
         this.consolesPanelPresenter = consolesPanelPresenter;
-        this.workspace = workspace;
         this.view.setDelegate(this);
         this.service = service;
         this.constant = constant;

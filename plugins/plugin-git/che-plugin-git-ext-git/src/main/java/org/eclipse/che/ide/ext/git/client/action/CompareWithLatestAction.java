@@ -23,7 +23,6 @@ import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.notification.NotificationManager;
 import org.eclipse.che.ide.api.resources.File;
 import org.eclipse.che.ide.api.resources.Project;
-import org.eclipse.che.ide.api.workspace.Workspace;
 import org.eclipse.che.ide.ext.git.client.GitLocalizationConstant;
 import org.eclipse.che.ide.ext.git.client.compare.ComparePresenter;
 import org.eclipse.che.ide.ext.git.client.compare.FileStatus.Status;
@@ -54,7 +53,6 @@ public class CompareWithLatestAction extends GitAction {
     private final NotificationManager     notificationManager;
     private final GitServiceClient        service;
     private final GitLocalizationConstant locale;
-    private final Workspace               workspace;
 
     private final static String REVISION = "HEAD";
 
@@ -65,8 +63,7 @@ public class CompareWithLatestAction extends GitAction {
                                    DialogFactory dialogFactory,
                                    NotificationManager notificationManager,
                                    GitServiceClient service,
-                                   GitLocalizationConstant constant,
-                                   Workspace workspace) {
+                                   GitLocalizationConstant constant) {
         super(constant.compareWithLatestTitle(), constant.compareWithLatestTitle(), null, appContext);
         this.comparePresenter = presenter;
         this.changedListPresenter = changedListPresenter;
@@ -74,7 +71,6 @@ public class CompareWithLatestAction extends GitAction {
         this.notificationManager = notificationManager;
         this.service = service;
         this.locale = constant;
-        this.workspace = workspace;
     }
 
     /** {@inheritDoc} */

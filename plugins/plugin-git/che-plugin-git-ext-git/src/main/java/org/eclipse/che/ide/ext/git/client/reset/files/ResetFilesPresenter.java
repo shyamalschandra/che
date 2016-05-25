@@ -23,7 +23,6 @@ import org.eclipse.che.api.promises.client.PromiseError;
 import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.notification.NotificationManager;
 import org.eclipse.che.ide.api.resources.Project;
-import org.eclipse.che.ide.api.workspace.Workspace;
 import org.eclipse.che.ide.dto.DtoFactory;
 import org.eclipse.che.ide.ext.git.client.outputconsole.GitOutputConsole;
 import org.eclipse.che.ide.ext.git.client.outputconsole.GitOutputConsoleFactory;
@@ -54,7 +53,6 @@ public class ResetFilesPresenter implements ResetFilesView.ActionDelegate {
     private final DialogFactory           dialogFactory;
     private final GitOutputConsoleFactory gitOutputConsoleFactory;
     private final ConsolesPanelPresenter  consolesPanelPresenter;
-    private final Workspace               workspace;
     private final ResetFilesView          view;
     private final GitServiceClient        service;
     private final AppContext              appContext;
@@ -74,14 +72,12 @@ public class ResetFilesPresenter implements ResetFilesView.ActionDelegate {
                                DtoFactory dtoFactory,
                                DialogFactory dialogFactory,
                                GitOutputConsoleFactory gitOutputConsoleFactory,
-                               ConsolesPanelPresenter consolesPanelPresenter,
-                               Workspace workspace) {
+                               ConsolesPanelPresenter consolesPanelPresenter) {
         this.view = view;
         this.dtoFactory = dtoFactory;
         this.dialogFactory = dialogFactory;
         this.gitOutputConsoleFactory = gitOutputConsoleFactory;
         this.consolesPanelPresenter = consolesPanelPresenter;
-        this.workspace = workspace;
         this.view.setDelegate(this);
         this.service = service;
         this.appContext = appContext;
@@ -129,7 +125,7 @@ public class ResetFilesPresenter implements ResetFilesView.ActionDelegate {
                 String errorMassage = error.getMessage() != null ? error.getMessage() : constant.statusFailed();
                 GitOutputConsole console = gitOutputConsoleFactory.create(STATUS_COMMAND_NAME);
                 console.printError(errorMassage);
-                consolesPanelPresenter.addCommandOutput(workspace.getId(), console);
+                consolesPanelPresenter.addCommandOutput(appContext.getDevMachine().getId(), console);
                 notificationManager.notify(errorMassage);
             }
         });
@@ -154,7 +150,7 @@ public class ResetFilesPresenter implements ResetFilesView.ActionDelegate {
         if (paths.length == 0) {
             view.close();
             console.print(constant.nothingToReset());
-            consolesPanelPresenter.addCommandOutput(workspace.getId(), console);
+            consolesPanelPresenter.addCommandOutput(appContext.getDevMachine().getId(), console);
             notificationManager.notify(constant.nothingToReset());
             return;
         }
@@ -164,7 +160,7 @@ public class ResetFilesPresenter implements ResetFilesView.ActionDelegate {
             @Override
             public void apply(Void ignored) throws OperationException {
                 console.print(constant.resetFilesSuccessfully());
-                consolesPanelPresenter.addCommandOutput(workspace.getId(), console);
+                consolesPanelPresenter.addCommandOutput(appContext.getDevMachine().getId(), console);
                 notificationManager.notify(constant.resetFilesSuccessfully());
             }
         }).catchError(new Operation<PromiseError>() {
@@ -172,7 +168,7 @@ public class ResetFilesPresenter implements ResetFilesView.ActionDelegate {
             public void apply(PromiseError error) throws OperationException {
                 String errorMassage = error.getMessage() != null ? error.getMessage() : constant.resetFilesFailed();
                 console.printError(errorMassage);
-                consolesPanelPresenter.addCommandOutput(workspace.getId(), console);
+                consolesPanelPresenter.addCommandOutput(appContext.getDevMachine().getId(), console);
                 notificationManager.notify(errorMassage);
             }
         });

@@ -24,7 +24,6 @@ import org.eclipse.che.ide.api.notification.NotificationManager;
 import org.eclipse.che.ide.api.resources.Container;
 import org.eclipse.che.ide.api.resources.File;
 import org.eclipse.che.ide.api.resources.Project;
-import org.eclipse.che.ide.api.workspace.Workspace;
 import org.eclipse.che.ide.ext.git.client.GitLocalizationConstant;
 import org.eclipse.che.ide.ext.git.client.compare.FileStatus.Status;
 import org.eclipse.che.ide.api.dialogs.CancelCallback;
@@ -52,7 +51,6 @@ public class ComparePresenter implements CompareView.ActionDelegate {
     private final GitServiceClient        service;
     private final GitLocalizationConstant locale;
     private final NotificationManager     notificationManager;
-    private final Workspace               workspace;
 
     private File   comparedFile;
     private String revision;
@@ -64,15 +62,13 @@ public class ComparePresenter implements CompareView.ActionDelegate {
                             CompareView view,
                             GitServiceClient service,
                             GitLocalizationConstant locale,
-                            NotificationManager notificationManager,
-                            Workspace workspace) {
+                            NotificationManager notificationManager) {
         this.appContext = appContext;
         this.dialogFactory = dialogFactory;
         this.view = view;
         this.service = service;
         this.locale = locale;
         this.notificationManager = notificationManager;
-        this.workspace = workspace;
         this.view.setDelegate(this);
     }
 

@@ -24,7 +24,6 @@ import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.notification.NotificationManager;
 import org.eclipse.che.ide.api.resources.Project;
 import org.eclipse.che.ide.api.resources.Resource;
-import org.eclipse.che.ide.api.workspace.Workspace;
 import org.eclipse.che.ide.commons.exception.ServerException;
 import org.eclipse.che.ide.ext.git.client.DateTimeFormatter;
 import org.eclipse.che.ide.ext.git.client.GitLocalizationConstant;
@@ -63,7 +62,6 @@ public class CommitPresenter implements CommitView.ActionDelegate {
     private final DateTimeFormatter       dateTimeFormatter;
     private final GitOutputConsoleFactory gitOutputConsoleFactory;
     private final ConsolesPanelPresenter  consolesPanelPresenter;
-    private final Workspace               workspace;
 
     private       Project                 project;
 
@@ -76,15 +74,13 @@ public class CommitPresenter implements CommitView.ActionDelegate {
                            AppContext appContext,
                            DateTimeFormatter dateTimeFormatter,
                            GitOutputConsoleFactory gitOutputConsoleFactory,
-                           ConsolesPanelPresenter consolesPanelPresenter,
-                           Workspace workspace) {
+                           ConsolesPanelPresenter consolesPanelPresenter) {
         this.view = view;
         this.dialogFactory = dialogFactory;
         this.appContext = appContext;
         this.dateTimeFormatter = dateTimeFormatter;
         this.gitOutputConsoleFactory = gitOutputConsoleFactory;
         this.consolesPanelPresenter = consolesPanelPresenter;
-        this.workspace = workspace;
         this.view.setDelegate(this);
         this.service = service;
         this.constant = constant;

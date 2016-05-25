@@ -260,11 +260,14 @@ public interface GitServiceClient {
      *         remote repository's URL
      * @param callback
      */
+    @Deprecated
     void remoteAdd(DevMachine devMachine,
                    ProjectConfigDto project,
                    String name,
                    String url,
                    AsyncRequestCallback<String> callback);
+
+    Promise<Void> remoteAdd(DevMachine devMachine, Path project, String name, String url);
 
     /**
      * Deletes the pointed(by name) remote repository from the list of repositories.

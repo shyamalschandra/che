@@ -128,10 +128,10 @@ public class AppStateManager implements WindowActionHandler,
     }
 
     private void persistWorkspaceState() {
-        appState.setRecentWorkspaceId(appContext.getWorkspace().getId());
+        appState.setRecentWorkspaceId(appContext.getDevMachine().getId());
 
         final WorkspaceState workspaceState = dtoFactory.createDto(WorkspaceState.class);
-        appState.getWorkspaces().put(appContext.getWorkspace().getId(), workspaceState);
+        appState.getWorkspaces().put(appContext.getDevMachine().getId(), workspaceState);
 
         final List<ActionDescriptor> actions = workspaceState.getActions();
         for (PersistenceComponent persistenceComponent : persistenceComponents) {
@@ -153,7 +153,7 @@ public class AppStateManager implements WindowActionHandler,
     }
 
     private void restoreWorkspaceState() {
-        final WorkspaceState workspaceState = appState.getWorkspaces().get(appContext.getWorkspace().getId());
+        final WorkspaceState workspaceState = appState.getWorkspaces().get(appContext.getDevMachine().getId());
         if (workspaceState == null) {
             return;
         }

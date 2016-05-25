@@ -24,7 +24,6 @@ import org.eclipse.che.api.promises.client.PromiseError;
 import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.notification.NotificationManager;
 import org.eclipse.che.ide.api.resources.Project;
-import org.eclipse.che.ide.api.workspace.Workspace;
 import org.eclipse.che.ide.ext.git.client.GitLocalizationConstant;
 import org.eclipse.che.ide.ext.git.client.outputconsole.GitOutputConsole;
 import org.eclipse.che.ide.ext.git.client.outputconsole.GitOutputConsoleFactory;
@@ -52,7 +51,6 @@ public class ResetToCommitPresenter implements ResetToCommitView.ActionDelegate 
     private final GitOutputConsoleFactory gitOutputConsoleFactory;
     private final DialogFactory           dialogFactory;
     private final ConsolesPanelPresenter  consolesPanelPresenter;
-    private final Workspace               workspace;
     private final GitServiceClient        service;
     private final AppContext              appContext;
     private final GitLocalizationConstant constant;
@@ -69,13 +67,11 @@ public class ResetToCommitPresenter implements ResetToCommitView.ActionDelegate 
                                   AppContext appContext,
                                   NotificationManager notificationManager,
                                   GitOutputConsoleFactory gitOutputConsoleFactory,
-                                  ConsolesPanelPresenter consolesPanelPresenter,
-                                  Workspace workspace) {
+                                  ConsolesPanelPresenter consolesPanelPresenter) {
         this.view = view;
         this.dialogFactory = dialogFactory;
         this.gitOutputConsoleFactory = gitOutputConsoleFactory;
         this.consolesPanelPresenter = consolesPanelPresenter;
-        this.workspace = workspace;
         this.view.setDelegate(this);
         this.service = service;
         this.constant = constant;

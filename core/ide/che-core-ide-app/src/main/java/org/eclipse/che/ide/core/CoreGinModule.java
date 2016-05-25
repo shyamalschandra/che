@@ -104,7 +104,6 @@ import org.eclipse.che.ide.api.reference.FqnProvider;
 import org.eclipse.che.ide.api.selection.SelectionAgent;
 import org.eclipse.che.ide.api.theme.Theme;
 import org.eclipse.che.ide.api.theme.ThemeAgent;
-import org.eclipse.che.ide.api.workspace.Workspace;
 import org.eclipse.che.ide.client.StartUpActionsProcessor;
 import org.eclipse.che.ide.context.AppContextImpl;
 import org.eclipse.che.ide.editor.EditorAgentImpl;
@@ -218,7 +217,6 @@ import org.eclipse.che.ide.workspace.WorkBenchControllerFactory;
 import org.eclipse.che.ide.workspace.WorkBenchPartController;
 import org.eclipse.che.ide.workspace.WorkBenchPartControllerImpl;
 import org.eclipse.che.ide.workspace.WorkspaceComponentProvider;
-import org.eclipse.che.ide.workspace.WorkspaceImpl;
 import org.eclipse.che.ide.workspace.WorkspacePresenter;
 import org.eclipse.che.ide.workspace.WorkspaceView;
 import org.eclipse.che.ide.workspace.WorkspaceViewImpl;
@@ -261,7 +259,6 @@ public class CoreGinModule extends AbstractGinModule {
         install(new GinFactoryModuleBuilder().build(ResourceNode.NodeFactory.class));
 
         bind(AppContext.class).to(AppContextImpl.class);
-        bind(Workspace.class).to(WorkspaceImpl.class);
 
         install(new GinFactoryModuleBuilder().build(LoaderFactory.class));
         install(new GinFactoryModuleBuilder().implement(PartStackView.class, PartStackViewImpl.class).build(PartStackViewFactory.class));

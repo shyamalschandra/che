@@ -25,7 +25,6 @@ import org.eclipse.che.api.promises.client.PromiseError;
 import org.eclipse.che.ide.api.notification.NotificationManager;
 import org.eclipse.che.ide.api.resources.File;
 import org.eclipse.che.ide.api.resources.Project;
-import org.eclipse.che.ide.api.workspace.Workspace;
 import org.eclipse.che.ide.ext.git.client.GitLocalizationConstant;
 import org.eclipse.che.ide.ext.git.client.compare.ComparePresenter;
 import org.eclipse.che.ide.api.dialogs.DialogFactory;
@@ -50,7 +49,6 @@ import static org.eclipse.che.ide.util.ExceptionUtils.getErrorCode;
 @Singleton
 public class RevisionListPresenter implements RevisionListView.ActionDelegate {
     private final ComparePresenter        comparePresenter;
-    private final Workspace               workspace;
     private final DialogFactory           dialogFactory;
     private final RevisionListView        view;
     private final GitServiceClient        service;
@@ -69,7 +67,6 @@ public class RevisionListPresenter implements RevisionListView.ActionDelegate {
                                  GitLocalizationConstant locale,
                                  NotificationManager notificationManager,
                                  DialogFactory dialogFactory,
-                                 Workspace workspace,
                                  AppContext appContext) {
         this.view = view;
         this.comparePresenter = comparePresenter;
@@ -78,7 +75,6 @@ public class RevisionListPresenter implements RevisionListView.ActionDelegate {
         this.locale = locale;
         this.appContext = appContext;
         this.notificationManager = notificationManager;
-        this.workspace = workspace;
 
         this.view.setDelegate(this);
     }

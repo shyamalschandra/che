@@ -16,35 +16,48 @@ import com.google.inject.Singleton;
 import com.google.web.bindery.event.shared.EventBus;
 
 import org.eclipse.che.api.factory.shared.dto.Factory;
-import org.eclipse.che.ide.api.machine.DevMachine;
-import org.eclipse.che.ide.api.machine.events.WsAgentStateEvent;
-import org.eclipse.che.ide.api.machine.events.WsAgentStateHandler;
-import org.eclipse.che.api.workspace.shared.dto.ProjectConfigDto;
+import org.eclipse.che.api.promises.client.Operation;
+import org.eclipse.che.api.promises.client.OperationException;
 import org.eclipse.che.api.workspace.shared.dto.WorkspaceDto;
 import org.eclipse.che.ide.api.app.AppContext;
-import org.eclipse.che.ide.api.app.CurrentProject;
 import org.eclipse.che.ide.api.app.CurrentUser;
 import org.eclipse.che.ide.api.app.StartUpAction;
 import org.eclipse.che.ide.api.data.HasDataObject;
 import org.eclipse.che.ide.api.event.SelectionChangedEvent;
 import org.eclipse.che.ide.api.event.SelectionChangedHandler;
-import org.eclipse.che.ide.api.event.project.CurrentProjectChangedEvent;
 import org.eclipse.che.ide.api.event.project.ProjectUpdatedEvent;
 import org.eclipse.che.ide.api.event.project.ProjectUpdatedEvent.ProjectUpdatedHandler;
+import org.eclipse.che.ide.api.machine.DevMachine;
+import org.eclipse.che.ide.api.machine.events.WsAgentStateEvent;
+import org.eclipse.che.ide.api.machine.events.WsAgentStateHandler;
+import org.eclipse.che.ide.api.resources.Container;
 import org.eclipse.che.ide.api.resources.Project;
 import org.eclipse.che.ide.api.resources.Resource;
 import org.eclipse.che.ide.api.resources.ResourceChangedEvent;
 import org.eclipse.che.ide.api.resources.ResourceChangedEvent.ResourceChangedHandler;
 import org.eclipse.che.ide.api.resources.ResourceDelta;
+import org.eclipse.che.ide.api.resources.ResourcePathComparator;
 import org.eclipse.che.ide.api.selection.Selection;
-import org.eclipse.che.ide.api.workspace.Workspace;
+import org.eclipse.che.ide.api.workspace.WorkspaceReadyEvent;
+import org.eclipse.che.ide.resource.Path;
+import org.eclipse.che.ide.resources.impl.ResourceDeltaImpl;
+import org.eclipse.che.ide.resources.impl.ResourceManager;
 import org.eclipse.che.ide.util.Arrays;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
+import static java.util.Arrays.binarySearch;
+import static java.util.Arrays.copyOf;
+import static java.util.Arrays.sort;
+import static org.eclipse.che.ide.api.resources.Resource.PROJECT;
+import static org.eclipse.che.ide.api.resources.ResourceDelta.ADDED;
+import static org.eclipse.che.ide.api.resources.ResourceDelta.MOVED_FROM;
 import static org.eclipse.che.ide.api.resources.ResourceDelta.REMOVED;
+import static org.eclipse.che.ide.api.resources.ResourceDelta.UPDATED;
 
 /**
  * Implementation of {@link AppContext}.
@@ -54,20 +67,20 @@ import static org.eclipse.che.ide.api.resources.ResourceDelta.REMOVED;
  * @author Vlad Zhukovskyi
  */
 @Singleton
-public class AppContextImpl implements AppContext, SelectionChangedHandler, WsAgentStateHandler, ProjectUpdatedHandler,
+public class AppContextImpl implements AppContext,
+                                       SelectionChangedHandler,
+                                       WsAgentStateHandler,
+                                       ProjectUpdatedHandler,
                                        ResourceChangedHandler {
 
-    private final EventBus                  eventBus;
     private final BrowserQueryFieldRenderer browserQueryFieldRenderer;
-    private final Workspace workspace;
     private final List<String>              projectsInImport;
 
-    private WorkspaceDto   usersWorkspaceDto;
-    private CurrentProject      currentProject;
+    private WorkspaceDto        usersWorkspaceDto;
     private CurrentUser         currentUser;
     private Factory             factory;
     private DevMachine          devMachine;
-    private String              projectsRoot;
+    private Path                projectsRoot;
     /**
      * List of actions with parameters which comes from startup URL.
      * Can be processed after IDE initialization as usual after starting ws-agent.
@@ -79,10 +92,10 @@ public class AppContextImpl implements AppContext, SelectionChangedHandler, WsAg
 
     @Inject
     public AppContextImpl(EventBus eventBus, BrowserQueryFieldRenderer browserQueryFieldRenderer,
-                          Workspace workspace) {
+                          ResourceManager.ResourceManagerFactory resourceManagerFactory) {
         this.eventBus = eventBus;
         this.browserQueryFieldRenderer = browserQueryFieldRenderer;
-        this.workspace = workspace;
+        this.resourceManagerFactory = resourceManagerFactory;
 
         projectsInImport = new ArrayList<>();
 
@@ -112,16 +125,10 @@ public class AppContextImpl implements AppContext, SelectionChangedHandler, WsAg
     }
 
     @Override
-    public CurrentProject getCurrentProject() {
-        return currentProject;
-    }
-
-    @Override
     public CurrentUser getCurrentUser() {
         return currentUser;
     }
 
-    @Override
     public void setCurrentUser(CurrentUser currentUser) {
         this.currentUser = currentUser;
     }
@@ -156,7 +163,6 @@ public class AppContextImpl implements AppContext, SelectionChangedHandler, WsAg
         return factory;
     }
 
-    @Override
     public void setFactory(Factory factory) {
         this.factory = factory;
     }
@@ -166,18 +172,95 @@ public class AppContextImpl implements AppContext, SelectionChangedHandler, WsAg
         return devMachine;
     }
 
-    @Override
     public void setDevMachine(DevMachine devMachine) {
         this.devMachine = devMachine;
+
+        resourceManager = resourceManagerFactory.newResourceManager(devMachine);
+        resourceManager.getWorkspaceProjects().then(new Operation<Project[]>() {
+            @Override
+            public void apply(Project[] projects) throws OperationException {
+                AppContextImpl.this.projects = projects;
+                java.util.Arrays.sort(AppContextImpl.this.projects, ResourcePathComparator.getInstance());
+                eventBus.fireEvent(new WorkspaceReadyEvent(projects));
+            }
+        });
     }
 
     @Override
-    public String getProjectsRoot() {
+    public String getWorkspaceName() {
+        return usersWorkspaceDto.getConfig().getName();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void onResourceChanged(ResourceChangedEvent event) {
+        final ResourceDelta delta = event.getDelta();
+        final Resource resource = delta.getResource();
+
+        /* Note: There is important to keep projects array in sorted state, because it is mutable and removing projects from it
+           need array to be sorted. Search specific projects realized with binary search. */
+
+        if (!(resource.getResourceType() == PROJECT && resource.getLocation().segmentCount() == 1)) {
+            return;
+        }
+
+        if (projects == null) {
+            return; //Normal situation, workspace config updated and project has not been loaded fully. Just skip this situation.
+        }
+
+        if (delta.getKind() == ADDED) {
+            Project[] newProjects = copyOf(projects, projects.length + 1);
+            newProjects[projects.length] = (Project)resource;
+            projects = newProjects;
+            sort(projects, ResourcePathComparator.getInstance());
+        } else if (delta.getKind() == REMOVED) {
+            int size = projects.length;
+            int index = java.util.Arrays.binarySearch(projects, resource, ResourcePathComparator.getInstance());
+            int numMoved = projects.length - index - 1;
+            if (numMoved > 0) {
+                System.arraycopy(projects, index + 1, projects, index, numMoved);
+            }
+            projects = copyOf(projects, --size);
+
+            if (currentResource.equals(delta.getResource())) {
+                currentResource = null;
+            }
+
+            for (Resource currentResource : currentResources) {
+                if (currentResource.equals(delta.getResource())) {
+                    currentResources = Arrays.remove(currentResources, currentResource);
+                }
+            }
+        } else if (delta.getKind() == UPDATED) {
+            int index = -1;
+
+            // Project may be moved to another location, so we need to remove previous one and store new project in cache.
+
+            if (delta.getFlags() == MOVED_FROM) {
+                for (int i = 0; i < projects.length; i++) {
+                    if (projects[i].getLocation().equals(delta.getFromPath())) {
+                        index = i;
+                        break;
+                    }
+                }
+            } else {
+                index = binarySearch(projects, resource);
+            }
+
+            if (index != -1) {
+                projects[index] = (Project)resource;
+            }
+
+            sort(projects, ResourcePathComparator.getInstance());
+        }
+    }
+
+    @Override
+    public Path getProjectsRoot() {
         return projectsRoot;
     }
 
-    @Override
-    public void setProjectsRoot(String projectsRoot) {
+    public void setProjectsRoot(Path projectsRoot) {
         this.projectsRoot = projectsRoot;
     }
 
@@ -233,24 +316,48 @@ public class AppContextImpl implements AppContext, SelectionChangedHandler, WsAg
 
     @Override
     public void onWsAgentStopped(WsAgentStateEvent event) {
-        currentProject = null;
+//        currentProject = null;
         browserQueryFieldRenderer.setProjectName("");
+        for (Project project : projects) {
+            eventBus.fireEvent(new ResourceChangedEvent(new ResourceDeltaImpl(project, REMOVED)));
+        }
+
+        projects = null;
+        resourceManager = null;
     }
 
     @Override
     public void onProjectUpdated(ProjectUpdatedEvent event) {
-        final ProjectConfigDto updatedProjectDescriptor = event.getUpdatedProjectDescriptor();
-        final String updatedProjectDescriptorPath = updatedProjectDescriptor.getPath();
+//        final ProjectConfigDto updatedProjectDescriptor = event.getUpdatedProjectDescriptor();
+//        final String updatedProjectDescriptorPath = updatedProjectDescriptor.getPath();
 
-        if (updatedProjectDescriptorPath.equals(currentProject.getProjectConfig().getPath())) {
-            currentProject.setProjectConfig(updatedProjectDescriptor);
-            eventBus.fireEvent(new CurrentProjectChangedEvent(updatedProjectDescriptor));
-        }
+//        if (updatedProjectDescriptorPath.equals(currentProject.getProjectConfig().getPath())) {
+//            currentProject.setProjectConfig(updatedProjectDescriptor);
+//            eventBus.fireEvent(new CurrentProjectChangedEvent(updatedProjectDescriptor));
+//        }
+//
+//        if (updatedProjectDescriptorPath.equals(currentProject.getRootProject().getPath())) {
+//            currentProject.setRootProject(updatedProjectDescriptor);
+//            browserQueryFieldRenderer.setProjectName(updatedProjectDescriptor.getName());
+//        }
+    }
 
-        if (updatedProjectDescriptorPath.equals(currentProject.getRootProject().getPath())) {
-            currentProject.setRootProject(updatedProjectDescriptor);
-            browserQueryFieldRenderer.setProjectName(updatedProjectDescriptor.getName());
-        }
+    private final EventBus                               eventBus;
+    private final ResourceManager.ResourceManagerFactory resourceManagerFactory;
+
+    private ResourceManager resourceManager;
+    private Project[]       projects;
+
+    @Override
+    public Project[] getProjects() {
+        return checkNotNull(projects, "Projects is not initialized");
+    }
+
+    @Override
+    public Container getWorkspaceRoot() {
+        checkState(resourceManager != null, "Workspace configuration has not been received yet");
+
+        return resourceManager.getWorkspaceRoot();
     }
 
     @Override
@@ -275,7 +382,7 @@ public class AppContextImpl implements AppContext, SelectionChangedHandler, WsAg
 
         Project root = null;
 
-        for (Project project : workspace.getProjects()) {
+        for (Project project : projects) {
             if (project.getLocation().isPrefixOf(currentResources[0].getLocation())) {
                 root = project;
             }
@@ -292,22 +399,5 @@ public class AppContextImpl implements AppContext, SelectionChangedHandler, WsAg
         }
 
         return root;
-    }
-
-    @Override
-    public void onResourceChanged(ResourceChangedEvent event) {
-        final ResourceDelta delta = event.getDelta();
-
-        if (delta.getKind() == REMOVED) {
-            if (currentResource.equals(delta.getResource())) {
-                currentResource = null;
-            }
-
-            for (Resource resource : currentResources) {
-                if (resource.equals(delta.getResource())) {
-                    currentResources = Arrays.remove(currentResources, resource);
-                }
-            }
-        }
     }
 }

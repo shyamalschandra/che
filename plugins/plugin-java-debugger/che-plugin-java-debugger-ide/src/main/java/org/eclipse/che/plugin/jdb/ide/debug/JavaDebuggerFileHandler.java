@@ -29,7 +29,6 @@ import org.eclipse.che.ide.api.resources.Project;
 import org.eclipse.che.ide.api.resources.Resource;
 import org.eclipse.che.ide.api.resources.SyntheticFile;
 import org.eclipse.che.ide.api.resources.VirtualFile;
-import org.eclipse.che.ide.api.workspace.Workspace;
 import org.eclipse.che.ide.debug.DebuggerManager;
 import org.eclipse.che.ide.dto.DtoFactory;
 import org.eclipse.che.ide.ext.java.client.navigation.service.JavaNavigationService;
@@ -52,21 +51,19 @@ import static org.eclipse.che.ide.api.event.FileEvent.FileOperation.OPEN;
  */
 public class JavaDebuggerFileHandler implements ActiveFileHandler {
 
-    private final DebuggerManager          debuggerManager;
-    private final EditorAgent              editorAgent;
-    private final DtoFactory               dtoFactory;
-    private final EventBus                 eventBus;
-    private final Workspace workspace;
+    private final DebuggerManager       debuggerManager;
+    private final EditorAgent           editorAgent;
+    private final DtoFactory            dtoFactory;
+    private final EventBus              eventBus;
     private final JavaNavigationService service;
-    private final AppContext appContext;
-    private final PromiseProvider promises;
+    private final AppContext            appContext;
+    private final PromiseProvider       promises;
 
     @Inject
     public JavaDebuggerFileHandler(DebuggerManager debuggerManager,
                                    EditorAgent editorAgent,
                                    DtoFactory dtoFactory,
                                    EventBus eventBus,
-                                   Workspace workspace,
                                    JavaNavigationService service,
                                    AppContext appContext,
                                    PromiseProvider promises) {
@@ -74,7 +71,6 @@ public class JavaDebuggerFileHandler implements ActiveFileHandler {
         this.editorAgent = editorAgent;
         this.dtoFactory = dtoFactory;
         this.eventBus = eventBus;
-        this.workspace = workspace;
         this.service = service;
         this.appContext = appContext;
         this.promises = promises;
@@ -135,7 +131,7 @@ public class JavaDebuggerFileHandler implements ActiveFileHandler {
             return;
         }
 
-        workspace.getWorkspaceRoot().getFile(filePath).then(new Operation<Optional<File>>() {
+        appContext.getWorkspaceRoot().getFile(filePath).then(new Operation<Optional<File>>() {
             @Override
             public void apply(Optional<File> file) throws OperationException {
                 if (file.isPresent()) {
@@ -170,7 +166,8 @@ public class JavaDebuggerFileHandler implements ActiveFileHandler {
         service.getContent(project.getLocation(), className).then(new Operation<ClassContent>() {
             @Override
             public void apply(ClassContent content) throws OperationException {
-                VirtualFile file = new SyntheticFile(className.substring(className.lastIndexOf(".") + 1) + ".class", content.getContent(), promises);
+                VirtualFile file =
+                        new SyntheticFile(className.substring(className.lastIndexOf(".") + 1) + ".class", content.getContent(), promises);
 
                 handleActivateFile(file, callback);
                 eventBus.fireEvent(new FileEvent(file, OPEN));

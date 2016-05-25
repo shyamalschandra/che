@@ -24,7 +24,6 @@ import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.notification.NotificationManager;
 import org.eclipse.che.ide.api.notification.StatusNotification;
 import org.eclipse.che.ide.api.resources.Project;
-import org.eclipse.che.ide.api.workspace.Workspace;
 import org.eclipse.che.ide.dto.DtoFactory;
 import org.eclipse.che.ide.ext.git.client.BranchSearcher;
 import org.eclipse.che.ide.ext.git.client.GitLocalizationConstant;
@@ -59,7 +58,6 @@ public class FetchPresenter implements FetchView.ActionDelegate {
     private final BranchSearcher          branchSearcher;
     private final GitOutputConsoleFactory gitOutputConsoleFactory;
     private final ConsolesPanelPresenter  consolesPanelPresenter;
-    private final Workspace workspace;
     private final FetchView               view;
     private final GitServiceClient        service;
     private final AppContext              appContext;
@@ -76,14 +74,12 @@ public class FetchPresenter implements FetchView.ActionDelegate {
                           NotificationManager notificationManager,
                           BranchSearcher branchSearcher,
                           GitOutputConsoleFactory gitOutputConsoleFactory,
-                          ConsolesPanelPresenter consolesPanelPresenter,
-                          Workspace workspace) {
+                          ConsolesPanelPresenter consolesPanelPresenter) {
         this.dtoFactory = dtoFactory;
         this.view = view;
         this.branchSearcher = branchSearcher;
         this.gitOutputConsoleFactory = gitOutputConsoleFactory;
         this.consolesPanelPresenter = consolesPanelPresenter;
-        this.workspace = workspace;
         this.view.setDelegate(this);
         this.service = service;
         this.appContext = appContext;

@@ -23,7 +23,6 @@ import org.eclipse.che.ide.api.notification.NotificationManager;
 import org.eclipse.che.ide.api.project.MutableProjectConfig;
 import org.eclipse.che.ide.api.project.wizard.ImportWizardRegistry;
 import org.eclipse.che.ide.api.wizard.AbstractWizardPage;
-import org.eclipse.che.ide.api.workspace.Workspace;
 import org.eclipse.che.ide.projectimport.wizard.presenter.ImportProjectWizardView;
 import org.eclipse.che.ide.rest.AsyncRequestCallback;
 import org.eclipse.che.ide.rest.DtoUnmarshallerFactory;
@@ -49,7 +48,6 @@ public class MainPagePresenter extends AbstractWizardPage<MutableProjectConfig> 
 
     private static final String DEFAULT_PROJECT_IMPORTER = "default-importer";
 
-    private final Workspace                     workspace;
     private final MainPageView                  view;
     private final DtoUnmarshallerFactory        dtoUnmarshallerFactory;
     private final NotificationManager           notificationManager;
@@ -63,8 +61,7 @@ public class MainPagePresenter extends AbstractWizardPage<MutableProjectConfig> 
     private ImportProjectWizardView.EnterPressedDelegate enterPressedDelegate;
 
     @Inject
-    public MainPagePresenter(Workspace workspace,
-                             ProjectImportersServiceClient projectImportersService,
+    public MainPagePresenter(ProjectImportersServiceClient projectImportersService,
                              DtoUnmarshallerFactory dtoUnmarshallerFactory,
                              NotificationManager notificationManager,
                              CoreLocalizationConstant locale,
@@ -72,7 +69,6 @@ public class MainPagePresenter extends AbstractWizardPage<MutableProjectConfig> 
                              ImportWizardRegistry importWizardRegistry,
                              AppContext appContext) {
         super();
-        this.workspace = workspace;
         this.view = view;
         this.projectImportersService = projectImportersService;
         this.dtoUnmarshallerFactory = dtoUnmarshallerFactory;

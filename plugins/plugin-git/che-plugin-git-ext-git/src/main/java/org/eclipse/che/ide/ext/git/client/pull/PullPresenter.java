@@ -25,7 +25,6 @@ import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.notification.NotificationManager;
 import org.eclipse.che.ide.api.notification.StatusNotification;
 import org.eclipse.che.ide.api.resources.Project;
-import org.eclipse.che.ide.api.workspace.Workspace;
 import org.eclipse.che.ide.ext.git.client.BranchSearcher;
 import org.eclipse.che.ide.ext.git.client.GitLocalizationConstant;
 import org.eclipse.che.ide.ext.git.client.outputconsole.GitOutputConsole;
@@ -67,7 +66,6 @@ public class PullPresenter implements PullView.ActionDelegate {
     private final BranchSearcher          branchSearcher;
     private final GitOutputConsoleFactory gitOutputConsoleFactory;
     private final ConsolesPanelPresenter  consolesPanelPresenter;
-    private final Workspace               workspace;
 
     private Project project;
 
@@ -80,14 +78,12 @@ public class PullPresenter implements PullView.ActionDelegate {
                          DialogFactory dialogFactory,
                          BranchSearcher branchSearcher,
                          GitOutputConsoleFactory gitOutputConsoleFactory,
-                         ConsolesPanelPresenter consolesPanelPresenter,
-                         Workspace workspace) {
+                         ConsolesPanelPresenter consolesPanelPresenter) {
         this.view = view;
         this.dialogFactory = dialogFactory;
         this.branchSearcher = branchSearcher;
         this.gitOutputConsoleFactory = gitOutputConsoleFactory;
         this.consolesPanelPresenter = consolesPanelPresenter;
-        this.workspace = workspace;
         this.view.setDelegate(this);
         this.service = service;
         this.constant = constant;

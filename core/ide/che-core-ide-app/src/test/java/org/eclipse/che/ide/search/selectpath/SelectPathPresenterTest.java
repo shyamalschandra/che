@@ -12,10 +12,10 @@ package org.eclipse.che.ide.search.selectpath;
 
 import com.google.gwtmockito.GwtMockitoTestRunner;
 
+import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.data.tree.Node;
 import org.eclipse.che.ide.api.data.tree.settings.SettingsProvider;
 import org.eclipse.che.ide.api.resources.Project;
-import org.eclipse.che.ide.api.workspace.Workspace;
 import org.eclipse.che.ide.resources.tree.ResourceNode;
 import org.eclipse.che.ide.search.FullTextSearchView;
 import org.eclipse.che.ide.search.presentation.FindResultPresenter;
@@ -42,18 +42,18 @@ public class SelectPathPresenterTest {
     @Mock
     private FullTextSearchView.ActionDelegate searcher;
     @Mock
-    private Workspace workspace;
+    private AppContext                        appContext;
     @Mock
-    private ResourceNode.NodeFactory nodeFactory;
+    private ResourceNode.NodeFactory          nodeFactory;
     @Mock
-    private SettingsProvider settingsProvider;
+    private SettingsProvider                  settingsProvider;
 
     @InjectMocks
     SelectPathPresenter selectPathPresenter;
 
     @Test
     public void windowShouldBeShown() throws Exception {
-        when(workspace.getProjects()).thenReturn(new Project[0]);
+        when(appContext.getProjects()).thenReturn(new Project[0]);
         selectPathPresenter.show(searcher);
         verify(view).setStructure(Matchers.<List<Node>>any());
         verify(view).show();
@@ -61,7 +61,7 @@ public class SelectPathPresenterTest {
 
     @Test
     public void pathShouldBeSelected() throws Exception {
-        when(workspace.getProjects()).thenReturn(new Project[0]);
+        when(appContext.getProjects()).thenReturn(new Project[0]);
         selectPathPresenter.show(searcher);
         selectPathPresenter.setSelectedPath("path");
 

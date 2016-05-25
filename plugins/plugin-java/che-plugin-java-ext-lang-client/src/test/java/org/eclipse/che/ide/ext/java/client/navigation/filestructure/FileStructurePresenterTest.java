@@ -25,7 +25,6 @@ import org.eclipse.che.ide.api.resources.Container;
 import org.eclipse.che.ide.api.resources.File;
 import org.eclipse.che.ide.api.resources.Project;
 import org.eclipse.che.ide.api.resources.Resource;
-import org.eclipse.che.ide.api.workspace.Workspace;
 import org.eclipse.che.ide.ext.java.client.navigation.service.JavaNavigationService;
 import org.eclipse.che.ide.ext.java.client.resource.SourceFolderMarker;
 import org.eclipse.che.ide.ext.java.shared.dto.Region;
@@ -70,8 +69,6 @@ public class FileStructurePresenterTest {
     private MessageLoader         loader;
     @Mock
     private LoaderFactory         loaderFactory;
-    @Mock
-    private Workspace             workspace;
     @Mock
     private PromiseProvider       promiseProvider;
 
@@ -139,7 +136,6 @@ public class FileStructurePresenterTest {
                                                context,
                                                editorAgent,
                                                loaderFactory,
-                                               workspace,
                                                promiseProvider);
     }
 

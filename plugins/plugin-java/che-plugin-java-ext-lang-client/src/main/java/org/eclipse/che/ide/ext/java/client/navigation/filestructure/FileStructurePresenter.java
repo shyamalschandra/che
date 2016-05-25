@@ -29,7 +29,6 @@ import org.eclipse.che.ide.api.resources.Project;
 import org.eclipse.che.ide.api.resources.Resource;
 import org.eclipse.che.ide.api.resources.SyntheticFile;
 import org.eclipse.che.ide.api.resources.VirtualFile;
-import org.eclipse.che.ide.api.workspace.Workspace;
 import org.eclipse.che.ide.ext.java.client.navigation.service.JavaNavigationService;
 import org.eclipse.che.ide.ext.java.client.resource.SourceFolderMarker;
 import org.eclipse.che.ide.ext.java.client.util.JavaUtil;
@@ -57,7 +56,6 @@ public class FileStructurePresenter implements FileStructure.ActionDelegate {
     private final JavaNavigationService javaNavigationService;
     private final AppContext            context;
     private final EditorAgent           editorAgent;
-    private final Workspace             workspace;
     private final PromiseProvider       promises;
     private final MessageLoader         loader;
 
@@ -71,13 +69,11 @@ public class FileStructurePresenter implements FileStructure.ActionDelegate {
                                   AppContext context,
                                   EditorAgent editorAgent,
                                   LoaderFactory loaderFactory,
-                                  Workspace workspace,
                                   PromiseProvider promises) {
         this.view = view;
         this.javaNavigationService = javaNavigationService;
         this.context = context;
         this.editorAgent = editorAgent;
-        this.workspace = workspace;
         this.promises = promises;
         this.loader = loaderFactory.newLoader();
         this.view.setDelegate(this);
@@ -165,7 +161,7 @@ public class FileStructurePresenter implements FileStructure.ActionDelegate {
                                      }
                                  });
         } else {
-            workspace.getWorkspaceRoot().getFile(member.getRootPath()).then(new Operation<Optional<File>>() {
+            context.getWorkspaceRoot().getFile(member.getRootPath()).then(new Operation<Optional<File>>() {
                 @Override
                 public void apply(Optional<File> file) throws OperationException {
                     if (file.isPresent()) {

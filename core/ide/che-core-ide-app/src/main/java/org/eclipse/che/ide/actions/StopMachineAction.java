@@ -12,12 +12,12 @@ package org.eclipse.che.ide.actions;
 
 import com.google.inject.Inject;
 
+import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.workspace.WorkspaceServiceClient;
 import org.eclipse.che.ide.CoreLocalizationConstant;
 import org.eclipse.che.ide.api.action.Action;
 import org.eclipse.che.ide.api.action.ActionEvent;
 import org.eclipse.che.ide.api.parts.PerspectiveManager;
-import org.eclipse.che.ide.api.workspace.Workspace;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Strings.isNullOrEmpty;
@@ -32,16 +32,16 @@ import static org.eclipse.che.ide.workspace.perspectives.project.ProjectPerspect
 public class StopMachineAction extends Action {
 
     private final WorkspaceServiceClient workspaceService;
-    private final Workspace              workspace;
+    private final AppContext             appContext;
 
     @Inject
     public StopMachineAction(CoreLocalizationConstant locale,
                              WorkspaceServiceClient workspaceService,
-                             Workspace workspace) {
+                             AppContext appContext) {
         super(locale.stopWsTitle(), locale.stopWsDescription(), null, null);
 
         this.workspaceService = workspaceService;
-        this.workspace = workspace;
+        this.appContext = appContext;
     }
 
     @Override
@@ -54,15 +54,15 @@ public class StopMachineAction extends Action {
         }
 
         event.getPresentation().setVisible(true);
-        event.getPresentation().setEnabled(!isNullOrEmpty(workspace.getId()));
+        event.getPresentation().setEnabled(!isNullOrEmpty(appContext.getDevMachine().getId()));
     }
 
     /** {@inheritDoc} */
     @Override
     public void actionPerformed(ActionEvent event) {
-        checkNotNull(workspace.getId(), "Workspace id should not be null");
+        checkNotNull(appContext.getDevMachine().getId(), "Workspace id should not be null");
 
-        workspaceService.stop(workspace.getId());
+        workspaceService.stop(appContext.getDevMachine().getId());
     }
 
 }

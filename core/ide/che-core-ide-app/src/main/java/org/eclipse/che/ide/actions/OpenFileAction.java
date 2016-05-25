@@ -27,14 +27,13 @@ import org.eclipse.che.ide.CoreLocalizationConstant;
 import org.eclipse.che.ide.api.action.Action;
 import org.eclipse.che.ide.api.action.ActionEvent;
 import org.eclipse.che.ide.api.action.PromisableAction;
+import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.editor.EditorPartPresenter;
 import org.eclipse.che.ide.api.event.ActivePartChangedEvent;
 import org.eclipse.che.ide.api.event.ActivePartChangedHandler;
 import org.eclipse.che.ide.api.event.FileEvent;
 import org.eclipse.che.ide.api.notification.NotificationManager;
 import org.eclipse.che.ide.api.resources.File;
-import org.eclipse.che.ide.api.workspace.Workspace;
-import org.eclipse.che.ide.resource.Path;
 import org.eclipse.che.ide.util.loging.Log;
 
 import static org.eclipse.che.api.promises.client.callback.CallbackPromiseHelper.createFromCallback;
@@ -56,7 +55,7 @@ public class OpenFileAction extends Action implements PromisableAction {
     private final EventBus                 eventBus;
     private final CoreLocalizationConstant localization;
     private final NotificationManager      notificationManager;
-    private final Workspace                workspace;
+    private final AppContext               appContext;
 
     private Callback<Void, Throwable> actionCompletedCallback;
 
@@ -64,11 +63,11 @@ public class OpenFileAction extends Action implements PromisableAction {
     public OpenFileAction(EventBus eventBus,
                           CoreLocalizationConstant localization,
                           NotificationManager notificationManager,
-                          Workspace workspace) {
+                          AppContext appContext) {
         this.eventBus = eventBus;
         this.localization = localization;
         this.notificationManager = notificationManager;
-        this.workspace = workspace;
+        this.appContext = appContext;
     }
 
     @Override
@@ -84,7 +83,7 @@ public class OpenFileAction extends Action implements PromisableAction {
             return;
         }
 
-        workspace.getWorkspaceRoot().getFile(Path.valueOf(pathToOpen)).then(new Operation<Optional<File>>() {
+        appContext.getWorkspaceRoot().getFile(pathToOpen).then(new Operation<Optional<File>>() {
             @Override
             public void apply(Optional<File> optionalFile) throws OperationException {
                 if (optionalFile.isPresent()) {
