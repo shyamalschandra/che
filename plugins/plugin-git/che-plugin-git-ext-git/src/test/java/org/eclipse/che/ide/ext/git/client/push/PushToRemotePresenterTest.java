@@ -164,8 +164,7 @@ public class PushToRemotePresenterTest extends BaseTest {
         Method onSuccessRemotes = GwtReflectionUtils.getMethod(value.getClass(), "onSuccess");
         onSuccessRemotes.invoke(value, remoteBranches);
 
-        verify(service).config(eq(devMachine), anyObject(), anyListOf(String.class), anyBoolean(),
-                               asyncRequestCallbackMapCaptor.capture());
+        verify(service).config(eq(devMachine), anyObject(), anyListOf(String.class), asyncRequestCallbackMapCaptor.capture());
         AsyncRequestCallback<Map<String, String>> mapCallback = asyncRequestCallbackMapCaptor.getValue();
         Method onSuccessConfig = GwtReflectionUtils.getMethod(mapCallback.getClass(), "onSuccess");
         onSuccessConfig.invoke(mapCallback, configs);
@@ -191,8 +190,7 @@ public class PushToRemotePresenterTest extends BaseTest {
         Method onSuccessRemotes = GwtReflectionUtils.getMethod(value.getClass(), "onSuccess");
         onSuccessRemotes.invoke(value, remoteBranches);
 
-        verify(service).config(eq(devMachine), anyObject(), anyListOf(String.class), anyBoolean(),
-                               asyncRequestCallbackMapCaptor.capture());
+        verify(service).config(eq(devMachine), anyObject(), anyListOf(String.class), asyncRequestCallbackMapCaptor.capture());
         AsyncRequestCallback<Map<String, String>> mapCallback = asyncRequestCallbackMapCaptor.getValue();
         Method onSuccessConfig = GwtReflectionUtils.getMethod(mapCallback.getClass(), "onSuccess");
         onSuccessConfig.invoke(mapCallback, new HashMap());
@@ -228,8 +226,7 @@ public class PushToRemotePresenterTest extends BaseTest {
         Method onSuccess = GwtReflectionUtils.getMethod(remoteBranches.getClass(), "onSuccess");
         onSuccess.invoke(remoteBranches, new ArrayList<>());
 
-        verify(service).config(eq(devMachine), anyObject(), anyListOf(String.class), anyBoolean(),
-                               asyncRequestCallbackMapCaptor.capture());
+        verify(service).config(eq(devMachine), anyObject(), anyListOf(String.class), asyncRequestCallbackMapCaptor.capture());
         AsyncRequestCallback<Map<String, String>> mapCallback = asyncRequestCallbackMapCaptor.getValue();
         Method onFailureConfig = GwtReflectionUtils.getMethod(mapCallback.getClass(), "onFailure");
         onFailureConfig.invoke(mapCallback, mock(Throwable.class));
@@ -442,8 +439,7 @@ public class PushToRemotePresenterTest extends BaseTest {
         onSuccessBranches = GwtReflectionUtils.getMethod(branchesCallback.getClass(), "onSuccess");
         onSuccessBranches.invoke(branchesCallback, branches);
 
-        verify(service).config(eq(devMachine), anyObject(), anyListOf(String.class), anyBoolean(),
-                               asyncRequestCallbackMapCaptor.capture());
+        verify(service).config(eq(devMachine), anyObject(), anyListOf(String.class), asyncRequestCallbackMapCaptor.capture());
         AsyncRequestCallback<Map<String, String>> value = asyncRequestCallbackMapCaptor.getValue();
         Method config = GwtReflectionUtils.getMethod(value.getClass(), "onSuccess");
         config.invoke(value, new HashMap<String, String>());

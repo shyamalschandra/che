@@ -40,7 +40,7 @@ public class DiffCommand extends GitCommand<String> {
     public String execute() throws GitException {
         reset();
         commandLine.add("diff");
-        if (!(type == null || type.equals(DiffRequest.DiffType.RAW.toString()))) {
+        if (!(type == null || type.equals(DiffRequest.DiffType.RAW.getValue()))) {
             commandLine.add(type);
         }
         if (noRenames) {

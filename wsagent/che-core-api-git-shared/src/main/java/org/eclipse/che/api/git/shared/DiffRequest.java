@@ -56,12 +56,6 @@ public interface DiffRequest extends GitRequest {
         public String getValue() {
             return value;
         }
-
-
-        @Override
-        public String toString() {
-            return value;
-        }
     }
 
     /** @return filter of file to show diff. It may be either list of file names or name of directory to show all files under them */

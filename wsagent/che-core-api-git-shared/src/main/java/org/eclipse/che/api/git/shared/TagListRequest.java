@@ -23,4 +23,6 @@ public interface TagListRequest extends GitRequest {
     String getPattern();
     
     void setPattern(String pattern);
+
+    TagListRequest withPattern(String pattern);
 }

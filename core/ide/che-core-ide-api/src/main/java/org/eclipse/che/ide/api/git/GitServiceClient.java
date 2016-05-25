@@ -455,19 +455,18 @@ public interface GitServiceClient {
      * Performs commit changes from index to repository. The result of the commit is represented by {@link Revision}, which is returned by
      * callback in <code>onSuccess(Revision result)</code>. Sends request over WebSocket.
      *
-     * @param devMachine 
+     * @param devMachine
      *         of current workspace
      * @param projectConfig
      *         project (root of GIT repository)
-     * @param all
-     *         automatically stage files that have been modified and deleted
+     * @param requestedConfig
+     *         list of config keys
      * @param callback
      *         callback for sending asynchronous response
      */
     void config(DevMachine devMachine,
                 ProjectConfigDto projectConfig,
-                @Nullable List<String> entries,
-                boolean all,
+                @Nullable List<String> requestedConfig,
                 AsyncRequestCallback<Map<String, String>> callback);
 
     /**

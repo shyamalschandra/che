@@ -59,8 +59,10 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -73,6 +75,8 @@ import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static org.eclipse.che.dto.server.DtoFactory.newDto;
 
 /** @author andrew00x */
 @Path("git")
@@ -118,11 +122,10 @@ public class GitService {
     }
 
     @Path("branch-delete")
-    @POST
-    @Consumes(MediaType.APPLICATION_JSON)
-    public void branchDelete(BranchDeleteRequest request) throws ApiException {
+    @DELETE
+    public void branchDelete(@QueryParam("name") String name, @QueryParam("force") boolean force) throws ApiException {
         try (GitConnection gitConnection = getGitConnection()) {
-            gitConnection.branchDelete(request);
+            gitConnection.branchDelete(newDto(BranchDeleteRequest.class).withName(name).withForce(force));
         }
     }
 
@@ -136,12 +139,11 @@ public class GitService {
     }
 
     @Path("branch-list")
-    @POST
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces({MediaType.APPLICATION_JSON, MediaType.TEXT_PLAIN})
-    public GenericEntity<List<Branch>> branchList(BranchListRequest request) throws ApiException {
+    @GET
+    @Produces({MediaType.APPLICATION_JSON})
+    public GenericEntity<List<Branch>> branchList(@QueryParam("litMode") String litMode) throws ApiException {
         try (GitConnection gitConnection = getGitConnection()) {
-            return new GenericEntity<List<Branch>>(gitConnection.branchList(request)) {
+            return new GenericEntity<List<Branch>>(gitConnection.branchList(newDto(BranchListRequest.class).withListMode(litMode))) {
             };
         }
     }
@@ -179,31 +181,44 @@ public class GitService {
     }
 
     @Path("diff")
-    @POST
-    @Consumes(MediaType.APPLICATION_JSON)
+    @GET
     @Produces(MediaType.TEXT_PLAIN)
-    public InfoPage diff(DiffRequest request) throws ApiException {
+    public InfoPage diff(@QueryParam("fileFilter") List<String> fileFilter,
+                         @QueryParam("diffType") String diffType,
+                         @QueryParam("noRenames") boolean noRenames,
+                         @QueryParam("renameLimit") int renameLimit,
+                         @QueryParam("commitA") String commitA,
+                         @QueryParam("commitB") String commitB,
+                         @QueryParam("cached") boolean cached) throws ApiException {
         try (GitConnection gitConnection = getGitConnection()) {
-            return gitConnection.diff(request);
+            return gitConnection.diff(newDto(DiffRequest.class).withFileFilter(fileFilter)
+                                                               .withType(DiffRequest.DiffType.valueOf(diffType))
+                                                               .withNoRenames(noRenames)
+                                                               .withRenameLimit(renameLimit)
+                                                               .withCommitA(commitA)
+                                                               .withCommitB(commitB)
+                                                               .withCached(cached));
         }
     }
 
     /**
      * Show file content from specified revision or branch.
      *
-     * @param request
-     *         request that contains file name with its full path and revision or branch
+     * @param file
+     *         file name with its full path
+     * @param version
+     *         revision or branch
      * @return response that contains content of the file
      * @throws ApiException
      *         when some error occurred while retrieving the content of the file
      */
     @Path("show")
-    @POST
-    @Consumes(MediaType.APPLICATION_JSON)
+    @GET
     @Produces({MediaType.APPLICATION_JSON, MediaType.TEXT_PLAIN})
-    public ShowFileContentResponse showFileContent(ShowFileContentRequest request) throws ApiException {
+    public ShowFileContentResponse showFileContent(@QueryParam("file") String file, @QueryParam("version") String version)
+            throws ApiException {
         try (GitConnection gitConnection = getGitConnection()) {
-            return gitConnection.showFileContent(request);
+            return gitConnection.showFileContent(newDto(ShowFileContentRequest.class).withFile(file).withVersion(version));
         }
     }
 
@@ -228,12 +243,11 @@ public class GitService {
     }
 
     @Path("log")
-    @POST
-    @Consumes(MediaType.APPLICATION_JSON)
+    @GET
     @Produces({MediaType.APPLICATION_JSON, MediaType.TEXT_PLAIN})
-    public LogPage log(LogRequest request) throws ApiException {
+    public LogPage log(@QueryParam("fileFilter") List<String> fileFilter) throws ApiException {
         try (GitConnection gitConnection = getGitConnection()) {
-            return gitConnection.log(request);
+            return gitConnection.log(newDto(LogRequest.class).withFileFilter(fileFilter));
         }
     }
 
@@ -294,7 +308,7 @@ public class GitService {
     }
 
     @Path("remote-delete/{name}")
-    @POST
+    @DELETE
     public void remoteDelete(@PathParam("name") String name) throws ApiException {
         try (GitConnection gitConnection = getGitConnection()) {
             gitConnection.remoteDelete(name);
@@ -302,12 +316,13 @@ public class GitService {
     }
 
     @Path("remote-list")
-    @POST
-    @Consumes(MediaType.APPLICATION_JSON)
+    @GET
     @Produces({MediaType.APPLICATION_JSON, MediaType.TEXT_PLAIN})
-    public GenericEntity<List<Remote>> remoteList(RemoteListRequest request) throws ApiException {
+    public GenericEntity<List<Remote>> remoteList(@QueryParam("remoteName") String remoteName, @QueryParam("verbose") boolean verbose)
+            throws ApiException {
         try (GitConnection gitConnection = getGitConnection()) {
-            return new GenericEntity<List<Remote>>(gitConnection.remoteList(request)) {
+            return new GenericEntity<List<Remote>>(
+                    gitConnection.remoteList(newDto(RemoteListRequest.class).withRemote(remoteName).withVerbose(verbose))) {
             };
         }
     }
@@ -331,16 +346,15 @@ public class GitService {
     }
 
     @Path("rm")
-    @POST
-    @Consumes(MediaType.APPLICATION_JSON)
-    public void rm(RmRequest request) throws ApiException {
+    @DELETE
+    public void rm(@QueryParam("items") List<String> items, @QueryParam("cached") boolean cached) throws ApiException {
         try (GitConnection gitConnection = getGitConnection()) {
-            gitConnection.rm(request);
+            gitConnection.rm(newDto(RmRequest.class).withItems(items).withCached(cached));
         }
     }
 
     @Path("status")
-    @POST
+    @GET
     @Produces({MediaType.APPLICATION_JSON, MediaType.TEXT_PLAIN})
     public Status status(@QueryParam("format") StatusFormat format) throws ApiException {
         try (GitConnection gitConnection = getGitConnection()) {
@@ -362,7 +376,7 @@ public class GitService {
     }
 
     @Path("tag-delete")
-    @POST
+    @DELETE
     @Consumes(MediaType.APPLICATION_JSON)
     public void tagDelete(TagDeleteRequest request) throws ApiException {
         try (GitConnection gitConnection = getGitConnection()) {
@@ -372,20 +386,20 @@ public class GitService {
 
 
     @Path("config")
-    @POST
-    @Consumes(MediaType.APPLICATION_JSON)
+    @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Map<String, String> getConfig(ConfigRequest request) throws ApiException {
+    public Map<String, String> getConfig(@QueryParam("requestedConfig") List<String> requestedConfig)
+            throws ApiException {
         Map<String, String> result = new HashMap<>();
         try (GitConnection gitConnection = getGitConnection()) {
             Config config = gitConnection.getConfig();
-            if (request.isGetAll()) {
+            if (requestedConfig == null || requestedConfig.isEmpty()) {
                 for (String row : config.getList()) {
                     String[] keyValues = row.split("=", 2);
                     result.put(keyValues[0], keyValues[1]);
                 }
             } else {
-                for (String entry : request.getConfigEntry()) {
+                for (String entry : requestedConfig) {
                     try {
                         String value = config.get(entry);
                         result.put(entry, value);
@@ -398,13 +412,47 @@ public class GitService {
         return result;
     }
 
-    @Path("tag-list")
-    @POST
+    @Path("config")
+    @PUT
     @Consumes(MediaType.APPLICATION_JSON)
-    @Produces({MediaType.APPLICATION_JSON, MediaType.TEXT_PLAIN})
-    public GenericEntity<List<Tag>> tagList(TagListRequest request) throws ApiException {
+    public void setConfig(ConfigRequest request) throws ApiException {
         try (GitConnection gitConnection = getGitConnection()) {
-            return new GenericEntity<List<Tag>>(gitConnection.tagList(request)) {
+            Config config = gitConnection.getConfig();
+            for (Map.Entry<String, String> configData : request.getConfigEntries().entrySet()) {
+                try {
+                    config.set(configData.getKey(), configData.getValue());
+                } catch (GitException exception) {
+                    final String msg = "Cannot write to config file";
+                    LOG.error(msg, exception);
+                    throw new GitException(msg);
+                }
+            }
+        }
+    }
+
+    @Path("config")
+    @DELETE
+    public void unsetConfig(@QueryParam("requestedConfig") List<String> requestedConfig) throws ApiException {
+        try (GitConnection gitConnection = getGitConnection()) {
+            Config config = gitConnection.getConfig();
+            if (requestedConfig != null && !requestedConfig.isEmpty()) {
+                for (String entry : requestedConfig) {
+                    try {
+                        config.unset(entry);
+                    } catch (GitException exception) {
+                        //value for this config property non found. Do nothing
+                    }
+                }
+            }
+        }
+    }
+
+    @Path("tag-list")
+    @GET
+    @Produces({MediaType.APPLICATION_JSON, MediaType.TEXT_PLAIN})
+    public GenericEntity<List<Tag>> tagList(@QueryParam("pattern") String pattern) throws ApiException {
+        try (GitConnection gitConnection = getGitConnection()) {
+            return new GenericEntity<List<Tag>>(gitConnection.tagList(newDto(TagListRequest.class).withPattern(pattern))) {
             };
         }
     }
@@ -417,7 +465,7 @@ public class GitService {
         }
     }
 
-    @GET
+    @DELETE
     @Path("delete-repository")
     public void deleteRepository(@Context UriInfo uriInfo) throws ApiException {
         final RegisteredProject project = projectRegistry.getProject(projectPath);

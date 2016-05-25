@@ -65,7 +65,7 @@ public class NativeGitDiffPage extends DiffPage {
         outWriter.print(nativeGit.createDiffCommand()
                 .setCommitA(commit)
                 .setCached(true)
-                .setType(request.getType().toString())
+                .setType(request.getType().getValue())
                 .setFileFilter(request.getFileFilter())
                 .setNoRenames(request.isNoRenames())
                 .setRenamesCount(request.getRenameLimit())
@@ -78,7 +78,7 @@ public class NativeGitDiffPage extends DiffPage {
      */
     private void workingTreeToIndex(PrintWriter outWriter) throws GitException {
         outWriter.print(nativeGit.createDiffCommand()
-                .setType(request.getType().toString())
+                .setType(request.getType().getValue())
                 .setFileFilter(request.getFileFilter())
                 .setNoRenames(request.isNoRenames())
                 .setRenamesCount(request.getRenameLimit())
@@ -95,7 +95,7 @@ public class NativeGitDiffPage extends DiffPage {
         outWriter.print(nativeGit.createDiffCommand()
                 .setCommitA(commitA)
                 .setCommitB(commitB)
-                .setType(request.getType().toString())
+                .setType(request.getType().getValue())
                 .setFileFilter(request.getFileFilter())
                 .setNoRenames(request.isNoRenames())
                 .setRenamesCount(request.getRenameLimit())
@@ -110,7 +110,7 @@ public class NativeGitDiffPage extends DiffPage {
     private void commitToWorkingTree(String commit, PrintWriter outWriter) throws GitException {
          outWriter.print(nativeGit.createDiffCommand()
                  .setCommitA(commit)
-                 .setType(request.getType().toString())
+                 .setType(request.getType().getValue())
                  .setFileFilter(request.getFileFilter())
                  .setNoRenames(request.isNoRenames())
                  .setRenamesCount(request.getRenameLimit())
