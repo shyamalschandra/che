@@ -52,7 +52,6 @@ import org.eclipse.che.ide.util.storage.LocalStorageProvider;
 import org.eclipse.che.ide.websocket.MessageBusProvider;
 import org.eclipse.che.ide.websocket.rest.SubscriptionHandler;
 import org.eclipse.che.plugin.debugger.ide.BaseTest;
-import org.eclipse.che.plugin.debugger.ide.fqn.FqnResolver;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -130,8 +129,6 @@ public class DebuggerTest extends BaseTest {
     private LocationDto        locationDto;
     @Mock
     private BreakpointDto      breakpointDto;
-    @Mock
-    private FqnResolver        fgnResolver;
 
     @Captor
     private ArgumentCaptor<WsAgentStateHandler>             extServerStateHandlerCaptor;
@@ -170,12 +167,11 @@ public class DebuggerTest extends BaseTest {
         doReturn(DEBUG_INFO).when(localStorage).getItem(AbstractDebugger.LOCAL_STORAGE_DEBUGGER_SESSION_KEY);
         doReturn(debugSessionDto).when(dtoFactory).createDtoFromJson(anyString(), eq(DebugSessionDto.class));
 
-        doReturn(FQN).when(fgnResolver).resolveFqn(file);
-
         doReturn(PATH).when(file).getPath();
 
         debugger = new TestDebugger(service, dtoFactory, localStorageProvider, messageBusProvider, eventBus, activeFileHandler,
                                     debuggerManager, "id");
+        doReturn(promiseInfo).when(service).getSessionInfo(SESSION_ID);
         doReturn(promiseInfo).when(promiseInfo).then(any(Operation.class));
 
         // setup messageBus

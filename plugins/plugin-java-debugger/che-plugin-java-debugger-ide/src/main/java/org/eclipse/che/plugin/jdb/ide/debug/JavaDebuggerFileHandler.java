@@ -65,6 +65,8 @@ public class JavaDebuggerFileHandler implements ActiveFileHandler {
     private final ProjectServiceClient     projectServiceClient;
     private final AppContext               appContext;
 
+    private HandlerRegistration handler;
+
     @Inject
     public JavaDebuggerFileHandler(EditorAgent editorAgent,
                                    DtoFactory dtoFactory,
@@ -138,23 +140,14 @@ public class JavaDebuggerFileHandler implements ActiveFileHandler {
                                 @Override
                                 public void apply(final JarFileNode jarFileNode) throws OperationException {
                                     AsyncCallback<VirtualFile> downloadSourceCallback = new AsyncCallback<VirtualFile>() {
-                                        HandlerRegistration handler;
-
                                         @Override
-                                        public void onSuccess(VirtualFile result) {
+                                        public void onSuccess(final VirtualFile result) {
                                             if (jarFileNode.isContentGenerated()) {
-                                                handler = eventBus.addHandler(TYPE, new FileContentUpdatedEventHandler() {
-                                                    @Override
-                                                    public void onContentUpdated(FileContentUpdatedEvent fileSourceDownloadedEvent) {
-                                                        handleActivateFile(jarFileNode, callback, location.getLineNumber());
-                                                        handler.removeHandler();
-                                                    }
-                                                });
+                                                handleContentGeneratedResource(result, location, callback);
                                             } else {
                                                 handleActivateFile(jarFileNode, callback, location.getLineNumber());
                                             }
                                         }
-
                                         @Override
                                         public void onFailure(Throwable caught) {
                                             callback.onFailure(caught);
@@ -181,6 +174,23 @@ public class JavaDebuggerFileHandler implements ActiveFileHandler {
             return fqn.substring(0, fqn.indexOf("$$"));
         }
         return fqn;
+    }
+
+    private void handleContentGeneratedResource(final VirtualFile file,
+                                                final Location location,
+                                                final AsyncCallback<VirtualFile> callback) {
+        if (handler != null) {
+            handler.removeHandler();
+        }
+        handler = eventBus.addHandler(TYPE, new FileContentUpdatedEventHandler() {
+            @Override
+            public void onContentUpdated(FileContentUpdatedEvent event) {
+                if (file.equals(event.getFile())) {
+                    handleActivateFile(file, callback, location.getLineNumber());
+                    handler.removeHandler();
+                }
+            }
+        });
     }
 
     public void handleActivateFile(final VirtualFile virtualFile, final AsyncCallback<VirtualFile> callback, final int debugLine) {
