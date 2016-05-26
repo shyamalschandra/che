@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.che.ide.reference;
 
+import com.google.common.base.Optional;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -45,9 +46,18 @@ public class ShowReferencePresenter implements ShowReferenceView.ActionDelegate 
      *         element for which fqn and path will be calculated
      */
     public void show(Resource resource) {
-        final Project project = resource.getRelatedProject().get();
-        final FqnProvider provider = providers.get(project.getType());
+        final Optional<Project> project = resource.getRelatedProject();
 
-        view.show(provider != null ? provider.getFqn(resource) : "", resource.getLocation());
+        if (project.isPresent()) {
+            final FqnProvider provider = providers.get(project.get().getType());
+
+            try {
+                view.show(provider.getFqn(resource), resource.getLocation());
+            } catch (RuntimeException e) {
+                view.show("", resource.getLocation());
+            }
+
+        }
+
     }
 }
