@@ -63,7 +63,6 @@ import org.eclipse.che.ide.workspace.start.StartWorkspacePresenter;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.eclipse.che.api.core.model.workspace.WorkspaceStatus.RUNNING;
 import static org.eclipse.che.ide.api.notification.StatusNotification.DisplayMode.FLOAT_MODE;
 import static org.eclipse.che.ide.api.notification.StatusNotification.DisplayMode.NOT_EMERGE_MODE;
 import static org.eclipse.che.ide.api.notification.StatusNotification.Status.FAIL;
@@ -204,22 +203,28 @@ public abstract class WorkspaceComponent implements Component, WsAgentStateHandl
                         messageBus.removeOnOpenHandler(this);
                         subscribeToWorkspaceStatusWebSocket(workspace);
 
-                        if (!RUNNING.equals(workspace.getStatus())) {
-                            workspaceServiceClient.getSnapshot(workspace.getId()).then(new Operation<List<SnapshotDto>>() {
-                                @Override
-                                public void apply(List<SnapshotDto> snapshots) throws OperationException {
-                                    if (snapshots.isEmpty()) {
-                                        handleWsStart(workspaceServiceClient.startById(workspace.getId(),
-                                                                                       workspace.getConfig().getDefaultEnv()));
-                                    } else {
-                                        showRecoverWorkspaceConfirmDialog(workspace);
+                        WorkspaceStatus workspaceStatus = workspace.getStatus();
+                        switch (workspaceStatus) {
+                            case STARTING:
+                                handleWsStart(workspace);
+                                break;
+                            case RUNNING:
+                                initialLoadingInfo.setOperationStatus(WORKSPACE_BOOTING.getValue(), SUCCESS);
+                                setCurrentWorkspace(workspace);
+                                eventBus.fireEvent(new WorkspaceStartedEvent(workspace));
+                                break;
+                            default:
+                                workspaceServiceClient.getSnapshot(workspace.getId()).then(new Operation<List<SnapshotDto>>() {
+                                    @Override
+                                    public void apply(List<SnapshotDto> snapshots) throws OperationException {
+                                        if (snapshots.isEmpty()) {
+                                            handleWsStart(workspaceServiceClient.startById(workspace.getId(),
+                                                                                           workspace.getConfig().getDefaultEnv()));
+                                        } else {
+                                            showRecoverWorkspaceConfirmDialog(workspace);
+                                        }
                                     }
-                                }
-                            });
-                        } else {
-                            initialLoadingInfo.setOperationStatus(WORKSPACE_BOOTING.getValue(), SUCCESS);
-                            setCurrentWorkspace(workspace);
-                            eventBus.fireEvent(new WorkspaceStartedEvent(workspace));
+                                });
                         }
                     }
                 });
@@ -271,24 +276,7 @@ public abstract class WorkspaceComponent implements Component, WsAgentStateHandl
         promise.then(new Operation<WorkspaceDto>() {
             @Override
             public void apply(WorkspaceDto workspace) throws OperationException {
-                initialLoadingInfo.setOperationStatus(WORKSPACE_BOOTING.getValue(), SUCCESS);
-                setCurrentWorkspace(workspace);
-                EnvironmentDto currentEnvironment = null;
-                for (EnvironmentDto environment : workspace.getConfig().getEnvironments()) {
-                    if (environment.getName().equals(workspace.getConfig().getDefaultEnv())) {
-                        currentEnvironment = environment;
-                        break;
-                    }
-                }
-                List<MachineConfigDto> machineConfigs =
-                        currentEnvironment != null ? currentEnvironment.getMachineConfigs() : new ArrayList<MachineConfigDto>();
-
-                for (MachineConfigDto machineConfig : machineConfigs) {
-                    if (machineConfig.isDev()) {
-                        MachineManager machineManager = machineManagerProvider.get();
-                        machineManager.onDevMachineCreating(machineConfig);
-                    }
-                }
+                handleWsStart(workspace);
             }
         }).catchError(new Operation<PromiseError>() {
             @Override
@@ -297,6 +285,27 @@ public abstract class WorkspaceComponent implements Component, WsAgentStateHandl
                 callback.onFailure(new Exception(arg.getCause()));
             }
         });
+    }
+
+    private void handleWsStart(WorkspaceDto workspace) {
+        initialLoadingInfo.setOperationStatus(WORKSPACE_BOOTING.getValue(), SUCCESS);
+        setCurrentWorkspace(workspace);
+        EnvironmentDto currentEnvironment = null;
+        for (EnvironmentDto environment : workspace.getConfig().getEnvironments()) {
+            if (environment.getName().equals(workspace.getConfig().getDefaultEnv())) {
+                currentEnvironment = environment;
+                break;
+            }
+        }
+        List<MachineConfigDto> machineConfigs =
+                currentEnvironment != null ? currentEnvironment.getMachineConfigs() : new ArrayList<MachineConfigDto>();
+
+        for (MachineConfigDto machineConfig : machineConfigs) {
+            if (machineConfig.isDev()) {
+                MachineManager machineManager = machineManagerProvider.get();
+                machineManager.onDevMachineCreating(machineConfig);
+            }
+        }
     }
 
     private void subscribeToWorkspaceStatusWebSocket(final WorkspaceDto workspace) {
