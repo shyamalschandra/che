@@ -120,7 +120,7 @@ public class ProjectExplorerPresenter extends BasePresenter implements ActionDel
 
     @SuppressWarnings("unchecked")
     protected void onResourceAdded(ResourceDelta delta) {
-        if ((delta.getFlags()) != DERIVED) {
+        if ((delta.getFlags() & DERIVED) == 0) {
             return;
         }
 

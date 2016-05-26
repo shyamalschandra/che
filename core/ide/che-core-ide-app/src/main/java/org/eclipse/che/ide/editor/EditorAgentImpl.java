@@ -60,6 +60,7 @@ import static com.google.common.collect.Lists.newArrayList;
 import static org.eclipse.che.ide.api.parts.PartStackType.EDITING;
 import static org.eclipse.che.ide.api.resources.Resource.FILE;
 import static org.eclipse.che.ide.api.resources.ResourceDelta.ADDED;
+import static org.eclipse.che.ide.api.resources.ResourceDelta.DERIVED;
 import static org.eclipse.che.ide.api.resources.ResourceDelta.MOVED_FROM;
 import static org.eclipse.che.ide.api.resources.ResourceDelta.MOVED_TO;
 import static org.eclipse.che.ide.api.resources.ResourceDelta.REMOVED;
@@ -215,7 +216,7 @@ public class EditorAgentImpl implements EditorAgent,
                         if (newFile.isPresent()) {
                             editor.getEditorInput().setFile(newFile.get());
                             editor.onFileChanged();
-                            eventBus.fireEvent(new FileContentUpdateEvent(newFile.get().getLocation().toString()));
+                            eventBus.fireEvent(new FileContentUpdateEvent(resource.getLocation().toString()));
                         }
                     }
                 });
@@ -231,13 +232,17 @@ public class EditorAgentImpl implements EditorAgent,
 
         for (EditorPartPresenter editor : getOpenedEditors()) {
             final Path location = editor.getEditorInput().getFile().getLocation();
-            if (resource.getLocation().equals(location) || resource.getLocation().isPrefixOf(location)) {
+            if (resource.getLocation().equals(location)) {
                 closeEditorPart(editor);
             }
         }
     }
 
     protected void onResourceUpdated(ResourceDelta delta) {
+        if ((delta.getFlags() & DERIVED) == 0) {
+            return;
+        }
+
         final Resource resource = delta.getResource();
 
         if (resource.getResourceType() != FILE) {
@@ -249,6 +254,7 @@ public class EditorAgentImpl implements EditorAgent,
         if (editor != null) {
             editor.getEditorInput().setFile((File)resource);
             editor.onFileChanged();
+            eventBus.fireEvent(new FileContentUpdateEvent(resource.getLocation().toString()));
         }
     }
 

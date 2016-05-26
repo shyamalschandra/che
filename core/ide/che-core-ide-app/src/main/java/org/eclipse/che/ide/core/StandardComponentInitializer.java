@@ -19,6 +19,7 @@ import org.eclipse.che.ide.Resources;
 import org.eclipse.che.ide.actions.CloseActiveEditor;
 import org.eclipse.che.ide.actions.CollapseAllAction;
 import org.eclipse.che.ide.actions.CompleteAction;
+import org.eclipse.che.ide.actions.RefreshPathAction;
 import org.eclipse.che.ide.part.explorer.project.TreeResourceRevealer;
 import org.eclipse.che.ide.resources.action.RevealResourceAction;
 import org.eclipse.che.ide.resources.action.CopyResourceAction;
@@ -277,6 +278,9 @@ public class StandardComponentInitializer {
     private RevealResourceAction revealResourceAction;
 
     @Inject
+    private RefreshPathAction refreshPathAction;
+
+    @Inject
     @Named("XMLFileType")
     private FileType xmlFile;
 
@@ -518,6 +522,7 @@ public class StandardComponentInitializer {
         // Compose main context menu
         DefaultActionGroup resourceOperation = new DefaultActionGroup(actionManager);
         actionManager.registerAction("resourceOperation", resourceOperation);
+        actionManager.registerAction("refreshPathAction", refreshPathAction);
         resourceOperation.addSeparator();
         resourceOperation.add(showReferenceAction);
         resourceOperation.add(goIntoAction);
@@ -530,6 +535,7 @@ public class StandardComponentInitializer {
         resourceOperation.add(deleteResourceAction);
         resourceOperation.addSeparator();
         resourceOperation.add(downloadResourceAction);
+        resourceOperation.add(refreshPathAction);
         resourceOperation.addSeparator();
 
         DefaultActionGroup mainContextMenuGroup = (DefaultActionGroup)actionManager.getAction(IdeActions.GROUP_MAIN_CONTEXT_MENU);

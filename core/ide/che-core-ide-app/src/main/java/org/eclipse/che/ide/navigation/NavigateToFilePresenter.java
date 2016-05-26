@@ -82,7 +82,7 @@ public class NavigateToFilePresenter implements NavigateToFileView.ActionDelegat
     @Override
     public void onWsAgentStarted(WsAgentStateEvent event) {
         wsMessageBus = messageBusProvider.getMachineMessageBus();
-        SEARCH_URL = "/project/" + appContext.getDevMachine().getId() + "/search";
+        SEARCH_URL = "/project/search";
     }
 
     @Override

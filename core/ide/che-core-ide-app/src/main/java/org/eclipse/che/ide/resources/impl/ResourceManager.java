@@ -292,7 +292,7 @@ public final class ResourceManager {
                         //cache new configs
                         cachedConfigs = updatedConfiguration.toArray(new ProjectConfigDto[updatedConfiguration.size()]);
 
-                        return getRemoteResources(newResource, maxDepth[0], true).then(new Function<Resource[], Project>() {
+                        return getRemoteResources(newResource, maxDepth[0], true, false).then(new Function<Resource[], Project>() {
                             @Override
                             public Project apply(Resource[] ignored) throws FunctionException {
                                 eventBus.fireEvent(new ResourceChangedEvent(new ResourceDeltaImpl(newResource, UPDATED | DERIVED)));
@@ -336,7 +336,7 @@ public final class ResourceManager {
 
                             return promises.resolve((Folder)newResource);
                         } else {
-                            return getRemoteResources(parent, path.segmentCount(), true).then(new Function<Resource[], Folder>() {
+                            return getRemoteResources(parent, path.segmentCount(), true, false).then(new Function<Resource[], Folder>() {
                                 @Override
                                 public Folder apply(Resource[] descendants) throws FunctionException {
 
@@ -518,7 +518,7 @@ public final class ResourceManager {
 
                                              store.dispose(source.getLocation(), true);
 
-                                             return getRemoteResources((Container)movedResource, maxDepth, true)
+                                             return getRemoteResources((Container)movedResource, maxDepth, true, false)
                                                      .then(new Function<Resource[], Resource>() {
                                                          @Override
                                                          public Resource apply(Resource[] ignored) throws FunctionException {
@@ -605,7 +605,7 @@ public final class ResourceManager {
         return ps.readFile(devMachine, file.getLocation());
     }
 
-    protected Promise<Resource[]> getRemoteResources(final Container container, int depth, boolean includeFiles) {
+    protected Promise<Resource[]> getRemoteResources(final Container container, int depth, boolean includeFiles, final boolean derived) {
         checkArgument(depth > -1, "Invalid depth");
 
         if (depth == DEPTH_ZERO) {
@@ -666,7 +666,7 @@ public final class ResourceManager {
                     final Resource[] removed = batchRemove(outdated, reloaded, false);
                     for (Resource resource : removed) {
                         store.dispose(resource.getLocation(), false);
-                        eventBus.fireEvent(new ResourceChangedEvent(new ResourceDeltaImpl(resource, REMOVED)));
+                        eventBus.fireEvent(new ResourceChangedEvent(new ResourceDeltaImpl(resource, derived ? REMOVED | DERIVED : REMOVED)));
                     }
 
                     final Resource[] added = batchRemove(reloaded, outdated, false);
@@ -677,7 +677,7 @@ public final class ResourceManager {
                             resource = interceptor.intercept(resource);
                         }
 
-                        eventBus.fireEvent(new ResourceChangedEvent(new ResourceDeltaImpl(resource, ADDED)));
+                        eventBus.fireEvent(new ResourceChangedEvent(new ResourceDeltaImpl(resource, derived ? ADDED | DERIVED : ADDED)));
                     }
 
                     final Resource[] updated = batchRemove(outdated, reloaded, true);
@@ -689,7 +689,7 @@ public final class ResourceManager {
                             resource = interceptor.intercept(resource);
                         }
 
-                        eventBus.fireEvent(new ResourceChangedEvent(new ResourceDeltaImpl(resource, UPDATED)));
+                        eventBus.fireEvent(new ResourceChangedEvent(new ResourceDeltaImpl(resource, derived ? UPDATED | DERIVED : UPDATED)));
                     }
                 } else {
                     for (Resource resource : reloaded) {
@@ -699,7 +699,7 @@ public final class ResourceManager {
                             resource = interceptor.intercept(resource);
                         }
 
-                        eventBus.fireEvent(new ResourceChangedEvent(new ResourceDeltaImpl(resource, ADDED)));
+                        eventBus.fireEvent(new ResourceChangedEvent(new ResourceDeltaImpl(resource, derived ? ADDED | DERIVED : ADDED)));
                     }
                 }
 
@@ -757,7 +757,7 @@ public final class ResourceManager {
 
     protected Promise<Resource[]> childrenOf(final Container container, boolean forceUpdate) {
         if (forceUpdate) {
-            return getRemoteResources(container, DEPTH_ONE, true);
+            return getRemoteResources(container, DEPTH_ONE, true, false);
         }
 
         final Optional<Resource[]> optChildren = store.get(container.getLocation());
@@ -793,7 +793,7 @@ public final class ResourceManager {
 
         final int seekDepth = absolutePath.segmentCount() - 1;
 
-        return getRemoteResources((Container)project, seekDepth, true).then(new Function<Resource[], Optional<Resource>>() {
+        return getRemoteResources((Container)project, seekDepth, true, false).then(new Function<Resource[], Optional<Resource>>() {
             @Override
             public Optional<Resource> apply(Resource[] resources) throws FunctionException {
                 for (Resource resource : resources) {
@@ -915,7 +915,7 @@ public final class ResourceManager {
                     }
                 }
 
-                return getRemoteResources(container, maxDepth, true);
+                return getRemoteResources(container, maxDepth, true, true);
             }
         });
     }
@@ -1073,7 +1073,7 @@ public final class ResourceManager {
                     }
                 }
 
-                return getRemoteResources(container, maxDepth, true).then(new Function<Resource[], Resource[]>() {
+                return getRemoteResources(container, maxDepth, true, false).then(new Function<Resource[], Resource[]>() {
                     @Override
                     public Resource[] apply(Resource[] resources) throws FunctionException {
 
