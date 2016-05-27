@@ -75,7 +75,7 @@ public class QuickDocPresenter implements QuickDocumentation, QuickDocView.Actio
 
             final String fqn = JavaUtil.resolveFQN((Container)srcFolder.get(), resource);
 
-            view.show(appContext.getDevMachine().getWsAgentBaseUrl() + "/jdt/javadoc/find?fqn=" + fqn + "&projectpath=" +
+            view.show(appContext.getDevMachine().getWsAgentBaseUrl() + "/java/javadoc/find?fqn=" + fqn + "&projectpath=" +
                       project.get().getLocation() + "&offset=" + offset, coordinates.getX(), coordinates.getY());
         }
 
