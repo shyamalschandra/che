@@ -11,16 +11,16 @@
 package org.eclipse.che.api.workspace.server.env.impl.che;
 
 import com.google.common.base.Joiner;
-import com.google.common.reflect.TypeToken;
+import com.google.gson.JsonSyntaxException;
 
 import org.eclipse.che.api.core.BadRequestException;
 import org.eclipse.che.api.core.model.machine.MachineConfig;
 import org.eclipse.che.api.core.model.machine.ServerConf;
 import org.eclipse.che.api.core.model.workspace.Environment;
 import org.eclipse.che.api.machine.server.MachineInstanceProviders;
+import org.eclipse.che.api.machine.shared.dto.MachineConfigDto;
 import org.eclipse.che.api.workspace.server.env.spi.EnvironmentValidator;
-import org.eclipse.che.commons.json.JsonHelper;
-import org.eclipse.che.commons.json.JsonParseException;
+import org.eclipse.che.dto.server.DtoFactory;
 
 import javax.inject.Inject;
 import java.util.List;
@@ -79,14 +79,14 @@ public class CheEnvironmentValidator implements EnvironmentValidator {
     public List<? extends MachineConfig> parse(Environment env) throws IllegalArgumentException {
         List<? extends MachineConfig> machines;
         if (env.getConfig() != null) {
-            // validate new format
+            // parse new format
             try {
-                machines = JsonHelper.fromJson(env.getConfig(), List.class, new TypeToken<List<MachineConfig>>() {}.getType());
-            } catch (JsonParseException e) {
+                machines = DtoFactory.getInstance().createListDtoFromJson(env.getConfig(), MachineConfigDto.class);
+            } catch (JsonSyntaxException e) {
                 throw new IllegalArgumentException("Parsing of environment configuration failed. " + e.getLocalizedMessage());
             }
-//            machines = new ArrayList<>();
         } else {
+            // old format
             machines = env.getMachineConfigs();
         }
         return machines;

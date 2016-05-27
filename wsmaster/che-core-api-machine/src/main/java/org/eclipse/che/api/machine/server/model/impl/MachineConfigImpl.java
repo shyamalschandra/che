@@ -41,8 +41,7 @@ public class MachineConfigImpl implements MachineConfig {
     private List<ServerConfImpl> servers;
     private Map<String, String>  envVariables;
 
-    public MachineConfigImpl() {
-    }
+    public MachineConfigImpl() {}
 
     public MachineConfigImpl(boolean isDev,
                              String name,
@@ -55,15 +54,9 @@ public class MachineConfigImpl implements MachineConfig {
         this.name = name;
         this.type = type;
         this.envVariables = envVariables;
-        if (servers != null) {
-            this.servers = servers.stream()
-                                  .map(ServerConfImpl::new)
-                                  .collect(Collectors.toList());
-        }
-        if (source != null) {
-            this.source = new MachineSourceImpl(source);
-        }
-        this.limits = new LimitsImpl(limits);
+        setServers(servers);
+        setSource(source);
+        setLimits(limits);
 
     }
 
@@ -91,9 +84,19 @@ public class MachineConfigImpl implements MachineConfig {
         return source;
     }
 
+    public void setSource(MachineSource source) {
+        if (source != null) {
+            this.source = new MachineSourceImpl(source);
+        }
+    }
+
     @Override
     public boolean isDev() {
         return isDev;
+    }
+
+    public void setDev(boolean dev) {
+        isDev = dev;
     }
 
     @Override
@@ -101,9 +104,17 @@ public class MachineConfigImpl implements MachineConfig {
         return type;
     }
 
+    public void setType(String type) {
+        this.type = type;
+    }
+
     @Override
     public LimitsImpl getLimits() {
         return limits;
+    }
+
+    public void setLimits(Limits limits) {
+        this.limits = new LimitsImpl(limits);
     }
 
     @Override
@@ -114,6 +125,14 @@ public class MachineConfigImpl implements MachineConfig {
         return servers;
     }
 
+    public void setServers(List<? extends ServerConf> servers) {
+        if (servers != null) {
+            this.servers = servers.stream()
+                                  .map(ServerConfImpl::new)
+                                  .collect(Collectors.toList());
+        }
+    }
+
     @Override
     public Map<String, String> getEnvVariables() {
         if (envVariables == null) {
@@ -122,8 +141,8 @@ public class MachineConfigImpl implements MachineConfig {
         return envVariables;
     }
 
-    public void setLimits(Limits limits) {
-        this.limits = new LimitsImpl(limits);
+    public void setEnvVariables(Map<String, String> envVariables) {
+        this.envVariables = envVariables;
     }
 
     @Override

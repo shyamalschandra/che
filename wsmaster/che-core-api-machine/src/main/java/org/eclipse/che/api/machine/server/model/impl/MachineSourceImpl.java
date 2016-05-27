@@ -26,6 +26,8 @@ public class MachineSourceImpl implements MachineSource {
     private String type;
     private String location;
 
+    public MachineSourceImpl() {}
+
     public MachineSourceImpl(String type, String location) {
         this.type = type;
         this.location = location;
