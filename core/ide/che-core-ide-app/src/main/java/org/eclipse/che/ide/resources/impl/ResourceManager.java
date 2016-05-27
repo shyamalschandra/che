@@ -606,7 +606,7 @@ public final class ResourceManager {
     }
 
     protected Promise<Resource[]> getRemoteResources(final Container container, int depth, boolean includeFiles, final boolean derived) {
-        checkArgument(depth > -1, "Invalid depth");
+        checkArgument(depth > -2, "Invalid depth");
 
         if (depth == DEPTH_ZERO) {
             return promises.resolve(NO_RESOURCES);
