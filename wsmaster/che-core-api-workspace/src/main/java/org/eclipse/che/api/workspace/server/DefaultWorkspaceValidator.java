@@ -15,6 +15,7 @@ import org.eclipse.che.api.core.model.machine.Command;
 import org.eclipse.che.api.core.model.workspace.Environment;
 import org.eclipse.che.api.core.model.workspace.Workspace;
 import org.eclipse.che.api.core.model.workspace.WorkspaceConfig;
+import org.eclipse.che.api.workspace.server.env.impl.che.CheEnvironmentEngine;
 import org.eclipse.che.api.workspace.server.env.spi.EnvironmentValidator;
 
 import javax.inject.Inject;
@@ -66,10 +67,14 @@ public class DefaultWorkspaceValidator implements WorkspaceValidator {
                       "Workspace default environment configuration required");
 
         for (Environment environment : config.getEnvironments()) {
-            EnvironmentValidator environmentValidator = envValidators.get(environment.getType());
+            String envType = environment.getType();
+            if (envType == null) {
+                envType = CheEnvironmentEngine.ENVIRONMENT_TYPE;
+            }
+            EnvironmentValidator environmentValidator = envValidators.get(envType);
             if (environmentValidator == null) {
                 throw new BadRequestException("Environment with type " +
-                                              environment.getType() +
+                                              envType +
                                               " can't be validated. No validation rules found.");
             }
             environmentValidator.validate(environment);

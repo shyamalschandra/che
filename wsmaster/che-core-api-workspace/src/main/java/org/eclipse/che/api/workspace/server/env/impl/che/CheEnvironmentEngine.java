@@ -28,6 +28,7 @@ import org.eclipse.che.api.workspace.server.env.spi.EnvironmentEngine;
 import org.slf4j.Logger;
 
 import javax.annotation.PreDestroy;
+import javax.inject.Inject;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -57,6 +58,7 @@ public class CheEnvironmentEngine implements EnvironmentEngine {
     private final Map<String, List<MachineImpl>>        machines;
     private final ReadWriteLock                         rwLock;
 
+    @Inject
     public CheEnvironmentEngine(MachineManager machineManager, CheEnvironmentValidator cheEnvironmentValidator) {
         this.machineManager = machineManager;
         this.cheEnvironmentValidator = cheEnvironmentValidator;
@@ -87,6 +89,7 @@ public class CheEnvironmentEngine implements EnvironmentEngine {
         rwLock.writeLock().lock();
         try {
             startQueues.put(workspaceId, new ArrayDeque<>(configs));
+            machines.put(workspaceId, new ArrayList<>());
         } finally {
             rwLock.writeLock().unlock();
         }
