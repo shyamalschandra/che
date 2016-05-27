@@ -113,7 +113,7 @@ public class CommandManager {
         final CommandOutputConsole console = commandConsoleFactory.create(configuration, machineId);
         console.listenToOutput(outputChannel);
         consolesPanelPresenter.addCommandOutput(machineId, console);
-        workspaceAgent.setActivePart(consolesPanelPresenter);
+//        workspaceAgent.setActivePart(consolesPanelPresenter);
 
         substituteProperties(configuration.toCommandLine()).then(new Operation<String>() {
             @Override

@@ -59,7 +59,7 @@ public class PomReconcilerTest extends BaseTest {
         String newContent = getPomContent("<ss");
         child.getVirtualFile().updateContent(newContent);
 
-        List<Problem> problems = serverService.reconsilePom("/A/pom.xml");
+        List<Problem> problems = serverService.reconcilePom("/A/pom.xml");
         assertThat(problems).isNotEmpty();
         Problem problem = problems.get(0);
 

@@ -166,9 +166,9 @@ public class MavenServerService {
     }
 
     @GET
-    @Path("pom/reconsile")
+    @Path("pom/reconcile")
     @Produces("application/json")
-    public List<Problem> reconsilePom(@QueryParam("pompath") String pomPath) {
+    public List<Problem> reconcilePom(@QueryParam("pompath") String pomPath) {
         VirtualFileEntry entry = null;
         List<Problem> result = new ArrayList<>();
         try {

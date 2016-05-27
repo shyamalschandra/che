@@ -137,10 +137,13 @@ public class JavaReconcilerStrategy implements ReconcilingStrategy {
                 problemRequester.acceptProblem(problem);
             }
             if (error) {
+                Log.error(getClass(), "***** java ERROR");
                 editor.setErrorState(EditorWithErrors.EditorState.ERROR);
             } else if (warning) {
+                Log.error(getClass(), "***** java WARNING");
                 editor.setErrorState(EditorWithErrors.EditorState.WARNING);
             } else {
+                Log.error(getClass(), "***** java NONE");
                 editor.setErrorState(EditorWithErrors.EditorState.NONE);
             }
         } catch (final Exception e) {
