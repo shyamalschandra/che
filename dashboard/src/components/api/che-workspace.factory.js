@@ -89,6 +89,10 @@ export class CheWorkspace {
     return null;
   }
 
+  getWorkspaceAgents() {
+    return this.workspaceAgents;
+  }
+
   /**
    * Add a listener that need to have the onChangeWorkspaces(workspaces: Array) method
    * @param listener a changing listener
