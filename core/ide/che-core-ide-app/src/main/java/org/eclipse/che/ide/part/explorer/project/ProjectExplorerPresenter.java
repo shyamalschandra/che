@@ -15,6 +15,8 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.web.bindery.event.shared.EventBus;
 
+import org.eclipse.che.api.promises.client.Operation;
+import org.eclipse.che.api.promises.client.OperationException;
 import org.eclipse.che.commons.annotation.Nullable;
 import org.eclipse.che.ide.CoreLocalizationConstant;
 import org.eclipse.che.ide.Resources;
@@ -36,9 +38,9 @@ import org.eclipse.che.ide.api.selection.Selection;
 import org.eclipse.che.ide.part.explorer.project.ProjectExplorerView.ActionDelegate;
 import org.eclipse.che.ide.project.node.SyntheticNodeUpdateEvent;
 import org.eclipse.che.ide.resource.Path;
-import org.eclipse.che.ide.resources.reveal.RevealResourceEvent;
 import org.eclipse.che.ide.resources.tree.ContainerNode;
 import org.eclipse.che.ide.resources.tree.ResourceNode;
+import org.eclipse.che.ide.ui.smartTree.NodeDescriptor;
 import org.eclipse.che.ide.ui.smartTree.Tree;
 import org.eclipse.che.ide.ui.smartTree.event.SelectionChangedEvent;
 import org.eclipse.che.ide.ui.smartTree.event.SelectionChangedEvent.SelectionChangedHandler;
@@ -66,13 +68,13 @@ public class ProjectExplorerPresenter extends BasePresenter implements ActionDel
                                                                        HasView,
                                                                        ResourceChangedHandler,
                                                                        MarkerChangedHandler,
-        SyntheticNodeUpdateEvent.SyntheticNodeUpdateHandler {
+                                                                       SyntheticNodeUpdateEvent.SyntheticNodeUpdateHandler {
     private final ProjectExplorerView      view;
-    private final EventBus                 eventBus;
     private final ResourceNode.NodeFactory nodeFactory;
     private final SettingsProvider         settingsProvider;
     private final CoreLocalizationConstant locale;
     private final Resources                resources;
+    private final TreeResourceRevealer     revealer;
 
     public static final int PART_SIZE = 500;
 
@@ -84,13 +86,14 @@ public class ProjectExplorerPresenter extends BasePresenter implements ActionDel
                                     CoreLocalizationConstant locale,
                                     Resources resources,
                                     ResourceNode.NodeFactory nodeFactory,
-                                    SettingsProvider settingsProvider) {
+                                    SettingsProvider settingsProvider,
+                                    TreeResourceRevealer revealer) {
         this.view = view;
-        this.eventBus = eventBus;
         this.nodeFactory = nodeFactory;
         this.settingsProvider = settingsProvider;
         this.locale = locale;
         this.resources = resources;
+        this.revealer = revealer;
         this.view.setDelegate(this);
 
         eventBus.addHandler(ResourceChangedEvent.getType(), this);
@@ -122,7 +125,7 @@ public class ProjectExplorerPresenter extends BasePresenter implements ActionDel
     }
 
     @SuppressWarnings("unchecked")
-    protected void onResourceAdded(ResourceDelta delta) {
+    private void onResourceAdded(ResourceDelta delta) {
         if ((delta.getFlags() & DERIVED) == 0) {
             return;
         }
@@ -149,11 +152,15 @@ public class ProjectExplorerPresenter extends BasePresenter implements ActionDel
             }
         }
 
-        eventBus.fireEvent(new RevealResourceEvent(resource));
+        if (!nodeSettings.isShowHiddenFiles() && resource.getName().startsWith(".")) {
+            return;
+        }
+
+        revealer.reveal(resource.getLocation());
     }
 
     @SuppressWarnings("unchecked")
-    protected void onResourceRemoved(final ResourceDelta delta) {
+    private void onResourceRemoved(final ResourceDelta delta) {
         final Tree tree = view.getTree();
 
         //look for removed node from existing
@@ -178,7 +185,12 @@ public class ProjectExplorerPresenter extends BasePresenter implements ActionDel
                 }
 
                 if (toReveal != null && toReveal instanceof ResourceNode) {
-                    eventBus.fireEvent(new RevealResourceEvent(((ResourceNode)toReveal).getData()));
+                    revealer.reveal(((ResourceNode)toReveal).getData().getLocation()).then(new Operation<Node>() {
+                        @Override
+                        public void apply(Node node) throws OperationException {
+                            tree.getSelectionModel().select(node, false);
+                        }
+                    });
                 }
 
                 return;
@@ -186,12 +198,12 @@ public class ProjectExplorerPresenter extends BasePresenter implements ActionDel
         }
     }
 
-    protected boolean isNodeServesLocation(Node node, Path location) {
+    private boolean isNodeServesLocation(Node node, Path location) {
         return node instanceof ResourceNode && ((ResourceNode)node).getData().getLocation().equals(location);
     }
 
     @SuppressWarnings("unchecked")
-    protected void onResourceUpdated(ResourceDelta delta) {
+    private void onResourceUpdated(ResourceDelta delta) {
         final Tree tree = view.getTree();
 
         for (Node node : tree.getNodeStorage().getAll()) {
@@ -210,7 +222,16 @@ public class ProjectExplorerPresenter extends BasePresenter implements ActionDel
 
     @Override
     public void onSyntheticNodeUpdate(SyntheticNodeUpdateEvent event) {
-        getTree().getNodeLoader().loadChildren(event.getNode(), true);
+        final Tree tree = getTree();
+        final NodeDescriptor descriptor = tree.getNodeDescriptor(event.getNode());
+
+        if (descriptor == null) {
+            return;
+        }
+
+        if (descriptor.isLoaded()) {
+            tree.getNodeLoader().loadChildren(event.getNode(), false);
+        }
     }
 
     public Tree getTree() {

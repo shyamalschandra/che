@@ -306,7 +306,7 @@ public final class ResourceManager {
         });
     }
 
-    protected Promise<Folder> createFolder(final Container parent, final String name) {
+    Promise<Folder> createFolder(final Container parent, final String name) {
         final Path path = Path.valueOf(name);
 
         return findResource(parent.getLocation().append(path), true).thenPromise(new Function<Optional<Resource>, Promise<Folder>>() {
@@ -361,7 +361,7 @@ public final class ResourceManager {
         });
     }
 
-    protected Promise<File> createFile(final Container parent, final String name, final String content) {
+    Promise<File> createFile(final Container parent, final String name, final String content) {
         checkArgument(checkFileName(name), "Invalid file name");
 
         return findResource(parent.getLocation().append(name), true).thenPromise(new Function<Optional<Resource>, Promise<File>>() {
@@ -393,7 +393,7 @@ public final class ResourceManager {
         });
     }
 
-    protected Promise<Project> createProject(final Project.ProjectRequest createRequest) {
+    Promise<Project> createProject(final Project.ProjectRequest createRequest) {
         checkArgument(checkProjectName(createRequest.getBody().getName()), "Invalid project name");
         checkArgument(typeRegistry.getProjectType(createRequest.getBody().getType()) != null, "Invalid project type");
 
@@ -444,7 +444,7 @@ public final class ResourceManager {
         checkArgument(checkProjectName(importRequest.getBody().getName()), "Invalid project name");
         checkNotNull(importRequest.getBody().getSource(), "Null source configuration occurred");
 
-        final Path path = Path.valueOf(importRequest.getBody().getPath()).append(importRequest.getBody().getName());
+        final Path path = Path.valueOf(importRequest.getBody().getPath());
 
         return findResource(path, true).thenPromise(new Function<Optional<Resource>, Promise<Project>>() {
             @Override
@@ -457,9 +457,9 @@ public final class ResourceManager {
                                                                     .withLocation(sourceStorage.getLocation())
                                                                     .withParameters(sourceStorage.getParameters());
 
-                return ps.importProject(devMachine, path.lastSegment(), sourceStorageDto).thenPromise(new Function<Void, Promise<Project>>() {
+                return ps.importProject(devMachine, path, sourceStorageDto).then(new Function<Void, Project>() {
                     @Override
-                    public Promise<Project> apply(Void ignored) throws FunctionException {
+                    public Project apply(Void ignored) throws FunctionException {
 
                         Resource resource = resourceFactory.newProjectImpl(importRequest.getBody(), ResourceManager.this);
 
@@ -473,7 +473,7 @@ public final class ResourceManager {
 
                         eventBus.fireEvent(new ResourceChangedEvent(new ResourceDeltaImpl(resource, ADDED | DERIVED)));
 
-                        return update(resource.getLocation(), importRequest);
+                        return (Project)resource;
                     }
                 });
             }
@@ -605,7 +605,7 @@ public final class ResourceManager {
         return ps.readFile(devMachine, file.getLocation());
     }
 
-    protected Promise<Resource[]> getRemoteResources(final Container container, int depth, boolean includeFiles, final boolean derived) {
+    Promise<Resource[]> getRemoteResources(final Container container, int depth, boolean includeFiles, final boolean derived) {
         checkArgument(depth > -2, "Invalid depth");
 
         if (depth == DEPTH_ZERO) {
@@ -621,10 +621,10 @@ public final class ResourceManager {
                 class Visitor implements ResourceVisitor {
                     Resource[] resources;
 
-                    int size    = 0; //size of total items
-                    int incStep = 50; //step to increase resource array
+                    private int size    = 0; //size of total items
+                    private int incStep = 50; //step to increase resource array
 
-                    public Visitor() {
+                    private Visitor() {
                         this.resources = NO_RESOURCES;
                     }
 
@@ -708,7 +708,7 @@ public final class ResourceManager {
         });
     }
 
-    protected Promise<Optional<Container>> getContainer(final Path absolutePath) {
+    Promise<Optional<Container>> getContainer(final Path absolutePath) {
         return findResource(absolutePath, false).then(new Function<Optional<Resource>, Optional<Container>>() {
             @Override
             public Optional<Container> apply(Optional<Resource> optional) throws FunctionException {
@@ -740,7 +740,7 @@ public final class ResourceManager {
         });
     }
 
-    protected Optional<Container> parentOf(Resource resource) {
+    Optional<Container> parentOf(Resource resource) {
         final Path parentLocation = resource.getLocation().segmentCount() == 1 ? Path.ROOT : resource.getLocation().parent();
         final Optional<Resource> optionalParent = store.getResource(parentLocation);
 
@@ -755,7 +755,7 @@ public final class ResourceManager {
         return of((Container)parentResource);
     }
 
-    protected Promise<Resource[]> childrenOf(final Container container, boolean forceUpdate) {
+    Promise<Resource[]> childrenOf(final Container container, boolean forceUpdate) {
         if (forceUpdate) {
             return getRemoteResources(container, DEPTH_ONE, true, false);
         }
@@ -769,7 +769,7 @@ public final class ResourceManager {
         }
     }
 
-    protected Promise<Optional<Resource>> findResource(final Path absolutePath, boolean quiet) {
+    private Promise<Optional<Resource>> findResource(final Path absolutePath, boolean quiet) {
 
         //search resource in local cache
         final Optional<Resource> optionalCachedResource = store.getResource(absolutePath);
@@ -808,7 +808,7 @@ public final class ResourceManager {
     }
 
 
-    protected void traverse(TreeElement tree, ResourceVisitor visitor) {
+    private void traverse(TreeElement tree, ResourceVisitor visitor) {
         for (final TreeElement element : tree.getChildren()) {
 
             final Resource resource = newResourceFrom(element.getNode());
@@ -820,7 +820,7 @@ public final class ResourceManager {
         }
     }
 
-    protected Resource newResourceFrom(final ItemReference reference) {
+    private Resource newResourceFrom(final ItemReference reference) {
         final Path path = Path.valueOf(reference.getPath());
 
         switch (reference.getType()) {
@@ -911,11 +911,11 @@ public final class ResourceManager {
                             resource = interceptor.intercept(resource);
                         }
 
-                        eventBus.fireEvent(new ResourceChangedEvent(new ResourceDeltaImpl(resource, UPDATED)));
+                        eventBus.fireEvent(new ResourceChangedEvent(new ResourceDeltaImpl(resource, UPDATED | DERIVED)));
                     }
                 }
 
-                return getRemoteResources(container, maxDepth, true, false);
+                return getRemoteResources(container, maxDepth - 1, true, true);
             }
         });
     }
@@ -974,7 +974,7 @@ public final class ResourceManager {
         });
     }
 
-    protected Promise<Void> onExternalDeltaMoved(final ResourceDelta delta) {
+    private Promise<Void> onExternalDeltaMoved(final ResourceDelta delta) {
         //search resource to remove at first
         return findResource(delta.getFromPath(), true).thenPromise(new Function<Optional<Resource>, Promise<Void>>() {
             @Override
@@ -989,7 +989,7 @@ public final class ResourceManager {
                     @Override
                     public Void apply(final Optional<Resource> resource) throws FunctionException {
 
-                        if (resource.isPresent()) {
+                        if (resource.isPresent() && toRemove.isPresent()) {
                             eventBus.fireEvent(new ResourceChangedEvent(
                                     new ResourceDeltaImpl(resource.get(), toRemove.get(), ADDED | MOVED_FROM | MOVED_TO | DERIVED)));
                         }
@@ -1001,7 +1001,7 @@ public final class ResourceManager {
         });
     }
 
-    protected Promise<Void> onExternalDeltaAdded(final ResourceDelta delta) {
+    private Promise<Void> onExternalDeltaAdded(final ResourceDelta delta) {
         return findResource(delta.getToPath(), true).then(new Function<Optional<Resource>, Void>() {
             @Override
             public Void apply(final Optional<Resource> resource) throws FunctionException {
@@ -1014,7 +1014,7 @@ public final class ResourceManager {
         });
     }
 
-    protected Promise<Void> onExternalDeltaUpdated(final ResourceDelta delta) {
+    private Promise<Void> onExternalDeltaUpdated(final ResourceDelta delta) {
         return findResource(delta.getToPath(), true).then(new Function<Optional<Resource>, Void>() {
             @Override
             public Void apply(Optional<Resource> resource) throws FunctionException {
@@ -1028,7 +1028,7 @@ public final class ResourceManager {
         });
     }
 
-    protected Promise<Void> onExternalDeltaRemoved(final ResourceDelta delta) {
+    private Promise<Void> onExternalDeltaRemoved(final ResourceDelta delta) {
         return findResource(delta.getFromPath(), true).then(new Function<Optional<Resource>, Void>() {
             @Override
             public Void apply(Optional<Resource> resource) throws FunctionException {
@@ -1114,14 +1114,14 @@ public final class ResourceManager {
         });
     }
 
-    protected Promise<SourceEstimation> estimate(Container container, String projectType) {
+    Promise<SourceEstimation> estimate(Container container, String projectType) {
         checkArgument(projectType != null, "Null project type");
         checkArgument(!projectType.isEmpty(), "Empty project type");
 
         return ps.estimate(devMachine, container.getLocation(), projectType);
     }
 
-    protected void notifyMarkerChanged(Resource resource, Marker marker, int status) {
+    void notifyMarkerChanged(Resource resource, Marker marker, int status) {
         eventBus.fireEvent(new MarkerChangedEvent(resource, marker, status));
         eventBus.fireEvent(new ResourceChangedEvent(new ResourceDeltaImpl(resource, UPDATED)));
     }
@@ -1142,7 +1142,7 @@ public final class ResourceManager {
         return ps.resolveSources(devMachine, project.getLocation());
     }
 
-    protected interface ResourceVisitor {
+    interface ResourceVisitor {
         void visit(Resource resource);
     }
 

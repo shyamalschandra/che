@@ -42,8 +42,13 @@ public class MarkDirectoryAsGroup extends DefaultActionGroup {
     public void update(ActionEvent e) {
         final Resource resource = appContext.getResource();
 
+        if (resource == null) {
+            e.getPresentation().setEnabledAndVisible(false);
+            return;
+        }
+
         final Optional<Project> project = resource.getRelatedProject();
 
-        e.getPresentation().setVisible(project.isPresent() && "plainJava".equals(project.get().getType()));
+        e.getPresentation().setEnabledAndVisible(project.isPresent() && project.get().isTypeOf("plainJava"));
     }
 }

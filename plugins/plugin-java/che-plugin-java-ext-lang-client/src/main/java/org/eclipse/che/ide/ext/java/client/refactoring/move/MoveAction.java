@@ -64,7 +64,7 @@ public class MoveAction extends Action {
 
         final Resource[] resources = appContext.getResources();
 
-        if (resources == null || resources.length > 1) {
+        if (resources == null || resources.length != 1) {
             event.getPresentation().setEnabled(false);
             return;
         }

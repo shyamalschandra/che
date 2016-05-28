@@ -68,10 +68,10 @@ public class TreeResourceRevealer {
             if (toSelect != null) {
                 final Node[] copy = copyOf(toSelect, toSelect.length);
 
-//                if (copy.length == 1) {
-//                    tree.getSelectionModel().select(copy[0], false);
-//                    tree.scrollIntoView(copy[0]);
-//                }
+                if (copy.length == 1) {
+                    tree.getSelectionModel().select(copy[0], false);
+                    tree.scrollIntoView(copy[0]);
+                }
 
                 toSelect = null;
             }
