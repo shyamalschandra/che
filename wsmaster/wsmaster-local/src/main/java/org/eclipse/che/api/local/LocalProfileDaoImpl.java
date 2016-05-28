@@ -57,7 +57,7 @@ public class LocalProfileDaoImpl implements ProfileDao {
             attributes.put("firstName", "Che");
             attributes.put("lastName", "Codenvy");
 
-            ProfileImpl profile = new ProfileImpl("che", "che", attributes);
+            ProfileImpl profile = new ProfileImpl("che", "che@eclipse.org", attributes);
             profiles.put(profile.getId(), profile);
         }
     }

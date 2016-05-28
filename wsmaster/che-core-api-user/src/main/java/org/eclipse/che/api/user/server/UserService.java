@@ -16,22 +16,28 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 
+import com.google.common.annotations.Beta;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
 
 import org.eclipse.che.api.core.BadRequestException;
 import org.eclipse.che.api.core.ConflictException;
+import org.eclipse.che.api.core.ForbiddenException;
 import org.eclipse.che.api.core.NotFoundException;
 import org.eclipse.che.api.core.ServerException;
 import org.eclipse.che.api.core.UnauthorizedException;
 import org.eclipse.che.api.core.model.user.User;
 import org.eclipse.che.api.core.rest.Service;
+import org.eclipse.che.api.core.rest.annotations.Description;
 import org.eclipse.che.api.core.rest.annotations.GenerateLink;
+import org.eclipse.che.api.core.rest.annotations.Required;
 import org.eclipse.che.api.user.server.model.impl.UserImpl;
 import org.eclipse.che.api.user.shared.dto.UserDto;
+import org.eclipse.che.api.user.shared.dto.UserInRoleDescriptor;
 import org.eclipse.che.commons.env.EnvironmentContext;
 import org.eclipse.che.dto.server.DtoFactory;
 
+import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.ws.rs.Consumes;
@@ -57,6 +63,7 @@ import static org.eclipse.che.api.user.server.Constants.LINK_REL_CURRENT_USER;
 import static org.eclipse.che.api.user.server.Constants.LINK_REL_CURRENT_USER_PASSWORD;
 import static org.eclipse.che.api.user.server.Constants.LINK_REL_USER;
 import static org.eclipse.che.api.user.server.DtoConverter.asDto;
+import static org.eclipse.che.dto.server.DtoFactory.newDto;
 
 /**
  * User REST API.
@@ -224,14 +231,62 @@ public class UserService extends Service {
         return ImmutableMap.of(USER_SELF_CREATION_ALLOWED, Boolean.toString(userSelfCreationAllowed));
     }
 
+    // TODO this method should be removed by CODENVY-480
+    @GET
+    @Path("/inrole")
+    @GenerateLink(rel = "current_user.role")
+    @RolesAllowed({"temp_user", "user", "system/admin", "system/manager"})
+    @Produces(APPLICATION_JSON)
+    @Beta
+    @ApiOperation(value = "Check role for the authenticated user",
+                  notes = "Check if user has a role in given scope (default is system) and with an optional scope id. " +
+                          "Roles allowed: user, system/admin, system/manager.",
+                  response = UserInRoleDescriptor.class)
+    @ApiResponses({@ApiResponse(code = 200, message = "OK"),
+                   @ApiResponse(code = 403, message = "Unable to check for the given scope"),
+                   @ApiResponse(code = 500, message = "Internal Server Error")})
+    public UserInRoleDescriptor inRole(@Required @Description("role inside a scope")
+                                       @QueryParam("role")
+                                       String role,
+                                       @DefaultValue("system")
+                                       @Description("scope of the role (like system, workspace)")
+                                       @QueryParam("scope")
+                                       String scope,
+                                       @DefaultValue("")
+                                       @Description("id used by the scope, like workspaceId for workspace scope")
+                                       @QueryParam("scopeId")
+                                       String scopeId,
+                                       @Context
+                                       SecurityContext context) throws NotFoundException,
+                                                                       ForbiddenException {
+        // handle scope
+        boolean isInRole;
+        if ("system".equals(scope)) {
+            String roleToCheck;
+            if ("user".equals(role) || "temp_user".equals(role)) {
+                roleToCheck = role;
+            } else {
+                roleToCheck = "system/" + role;
+            }
+
+            // check role
+            isInRole = context.isUserInRole(roleToCheck);
+        } else {
+            throw new ForbiddenException(String.format("Only system scope is handled for now. Provided scope is %s", scope));
+        }
+
+        return newDto(UserInRoleDescriptor.class).withIsInRole(isInRole)
+                                                 .withRoleName(role)
+                                                 .withScope(scope)
+                                                 .withScopeId(scopeId);
+    }
+
     private User fromToken(String token) throws UnauthorizedException, ConflictException {
         final String email = tokenValidator.validateToken(token);
         final int atIdx = email.indexOf('@');
         // Getting all the characters before '@' e.g. user@codenvy.com -> user
         final String name = atIdx == -1 ? email : email.substring(0, atIdx);
-        return DtoFactory.newDto(UserDto.class)
-                         .withEmail(email)
-                         .withName(name);
+        return newDto(UserDto.class).withEmail(email).withName(name);
     }
 
     private static void checkUser(User user) throws BadRequestException {
