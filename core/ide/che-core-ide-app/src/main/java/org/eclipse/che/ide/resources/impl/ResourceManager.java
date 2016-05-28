@@ -915,7 +915,7 @@ public final class ResourceManager {
                     }
                 }
 
-                return getRemoteResources(container, maxDepth, true, true);
+                return getRemoteResources(container, maxDepth, true, false);
             }
         });
     }

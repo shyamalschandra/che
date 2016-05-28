@@ -458,7 +458,7 @@ public class EditCommandsPresenter implements EditCommandsView.ActionDelegate, F
 
     /** Show dialog. */
     public void show() {
-        workspaceId = appContext.getDevMachine().getId();
+        workspaceId = appContext.getWorkspaceId();
         fetchCommands();
         view.show();
     }

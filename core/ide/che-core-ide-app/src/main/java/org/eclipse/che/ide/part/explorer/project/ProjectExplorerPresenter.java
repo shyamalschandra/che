@@ -34,6 +34,7 @@ import org.eclipse.che.ide.api.resources.marker.MarkerChangedEvent;
 import org.eclipse.che.ide.api.resources.marker.MarkerChangedEvent.MarkerChangedHandler;
 import org.eclipse.che.ide.api.selection.Selection;
 import org.eclipse.che.ide.part.explorer.project.ProjectExplorerView.ActionDelegate;
+import org.eclipse.che.ide.project.node.SyntheticNodeUpdateEvent;
 import org.eclipse.che.ide.resource.Path;
 import org.eclipse.che.ide.resources.reveal.RevealResourceEvent;
 import org.eclipse.che.ide.resources.tree.ContainerNode;
@@ -64,7 +65,8 @@ public class ProjectExplorerPresenter extends BasePresenter implements ActionDel
                                                                        ProjectExplorerPart,
                                                                        HasView,
                                                                        ResourceChangedHandler,
-                                                                       MarkerChangedHandler {
+                                                                       MarkerChangedHandler,
+        SyntheticNodeUpdateEvent.SyntheticNodeUpdateHandler {
     private final ProjectExplorerView      view;
     private final EventBus                 eventBus;
     private final ResourceNode.NodeFactory nodeFactory;
@@ -93,6 +95,7 @@ public class ProjectExplorerPresenter extends BasePresenter implements ActionDel
 
         eventBus.addHandler(ResourceChangedEvent.getType(), this);
         eventBus.addHandler(MarkerChangedEvent.getType(), this);
+        eventBus.addHandler(SyntheticNodeUpdateEvent.getType(), this);
 
         view.getTree().getSelectionModel().addSelectionChangedHandler(new SelectionChangedHandler() {
             @Override
@@ -203,6 +206,11 @@ public class ProjectExplorerPresenter extends BasePresenter implements ActionDel
     @Override
     public void onMarkerChanged(MarkerChangedEvent event) {
 
+    }
+
+    @Override
+    public void onSyntheticNodeUpdate(SyntheticNodeUpdateEvent event) {
+        getTree().getNodeLoader().loadChildren(event.getNode(), true);
     }
 
     public Tree getTree() {

@@ -14,16 +14,21 @@ import com.google.common.annotations.Beta;
 import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
 
+import com.google.web.bindery.event.shared.EventBus;
 import org.eclipse.che.api.promises.client.Function;
 import org.eclipse.che.api.promises.client.FunctionException;
 import org.eclipse.che.api.promises.client.Promise;
 import org.eclipse.che.ide.api.data.tree.Node;
 import org.eclipse.che.ide.api.data.tree.settings.NodeSettings;
+import org.eclipse.che.ide.api.resources.ResourceChangedEvent;
+import org.eclipse.che.ide.api.resources.ResourceChangedEvent.ResourceChangedHandler;
+import org.eclipse.che.ide.api.resources.ResourceDelta;
 import org.eclipse.che.ide.ext.java.client.JavaResources;
 import org.eclipse.che.ide.ext.java.client.navigation.service.JavaNavigationService;
 import org.eclipse.che.ide.ext.java.client.tree.JavaNodeFactory;
 import org.eclipse.che.ide.ext.java.shared.Jar;
 import org.eclipse.che.ide.project.node.SyntheticNode;
+import org.eclipse.che.ide.project.node.SyntheticNodeUpdateEvent;
 import org.eclipse.che.ide.resource.Path;
 import org.eclipse.che.ide.ui.smartTree.presentation.NodePresentation;
 
@@ -31,27 +36,33 @@ import javax.validation.constraints.NotNull;
 import java.util.List;
 
 import static com.google.common.collect.Lists.newArrayListWithCapacity;
+import static org.eclipse.che.ide.api.resources.ResourceDelta.UPDATED;
 
 /**
  * @author Vlad Zhukovskiy
  */
 @Beta
-public class LibrariesNode extends SyntheticNode<Path> {
+public class LibrariesNode extends SyntheticNode<Path> implements ResourceChangedHandler {
 
     private final JavaNavigationService service;
     private final JavaNodeFactory       nodeFactory;
     private final JavaResources javaResources;
+    private EventBus eventBus;
 
     @Inject
     public LibrariesNode(@Assisted Path project,
                          @Assisted NodeSettings nodeSettings,
                          JavaNavigationService service,
                          JavaNodeFactory nodeFactory,
-                         JavaResources javaResources) {
+                         JavaResources javaResources,
+                         EventBus eventBus) {
         super(project, nodeSettings);
         this.service = service;
         this.nodeFactory = nodeFactory;
         this.javaResources = javaResources;
+        this.eventBus = eventBus;
+
+        eventBus.addHandler(ResourceChangedEvent.getType(), this);
     }
 
     @Override
@@ -86,5 +97,14 @@ public class LibrariesNode extends SyntheticNode<Path> {
     @Override
     public boolean isLeaf() {
         return false;
+    }
+
+    @Override
+    public void onResourceChanged(ResourceChangedEvent event) {
+        final ResourceDelta delta = event.getDelta();
+
+        if (delta.getKind() == UPDATED && delta.getResource().getLocation().equals(getData())) {
+            eventBus.fireEvent(new SyntheticNodeUpdateEvent(LibrariesNode.this));
+        }
     }
 }
