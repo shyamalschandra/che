@@ -77,7 +77,7 @@ export class CheAPI {
    * The Che Preferences API
    * @returns {ChePreferences|*}
    */
-  getProfile() {
+  getPreferences() {
     return this.chePreferences;
   }
 

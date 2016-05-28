@@ -39,7 +39,7 @@ let initModule = angular.module('userDashboard', ['ngAnimate', 'ngCookies', 'ngT
 initModule.config(['$routeProvider', ($routeProvider) => {
   $routeProvider.accessWhen = (path, route) => {
     route.resolve || (route.resolve = {});
-    route.resolve.app = ['cheBranding', '$q', 'cheProfile', 'cheUser', 'chePreferences', (cheBranding, $q, cheProfile, cheUser) => {
+    route.resolve.app = ['cheBranding', '$q', 'cheUser', 'chePreferences', (cheBranding, $q, cheUser, chePreferences) => {
       var deferred = $q.defer();
 
       cheUser.fetchUser().then(() => {
@@ -65,7 +65,7 @@ initModule.config(['$routeProvider', ($routeProvider) => {
 
   $routeProvider.accessOtherWise = (route) => {
     route.resolve || (route.resolve = {});
-    route.resolve.app = ['$q', 'cheProfile', 'cheUser', 'chePreferences', ($q, cheProfile, cheUser, chePreferences) => {
+    route.resolve.app = ['$q', 'cheUser', 'chePreferences', ($q, cheUser, chePreferences) => {
       var deferred = $q.defer();
 
       cheUser.fetchUser().then(() => {
@@ -91,7 +91,7 @@ initModule.config(['$routeProvider', ($routeProvider) => {
 
 }]);
 
-var DEV = false;
+var DEV = true;
 
 
 // config routes

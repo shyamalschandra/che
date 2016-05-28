@@ -90,7 +90,7 @@ describe('CheProfile', function () {
 
       // check id, email, firstName and lastName in profile attributes
       expect(profile.id).toEqual(profileId);
-      expect(profile.attributes.email).toEqual(email);
+      expect(profile.email).toEqual(email);
       expect(profile.attributes.firstName).toEqual(firstName);
       expect(profile.attributes.lastName).toEqual(lastName);
     }
