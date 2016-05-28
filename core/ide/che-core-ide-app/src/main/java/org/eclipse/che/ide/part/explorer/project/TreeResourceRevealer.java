@@ -35,7 +35,6 @@ import org.eclipse.che.ide.ui.smartTree.Tree;
 import org.eclipse.che.ide.ui.smartTree.event.PostLoadEvent;
 import org.eclipse.che.ide.ui.smartTree.event.PostLoadEvent.PostLoadHandler;
 
-import java.util.Arrays;
 import java.util.List;
 
 import static com.google.common.base.Optional.absent;
@@ -157,7 +156,7 @@ public class TreeResourceRevealer {
 
     }
 
-    protected Promise<ResourceNode> expandToPath(final ResourceNode root, final Path path) {
+    private Promise<ResourceNode> expandToPath(final ResourceNode root, final Path path) {
         return createFromAsyncRequest(new RequestCall<ResourceNode>() {
             @Override
             public void makeCall(final AsyncCallback<ResourceNode> callback) {
@@ -183,7 +182,6 @@ public class TreeResourceRevealer {
             return;
         }
 
-        tree.getNodeLoader().loadChildren(parent);
 
         final HandlerRegistration[] handler = new HandlerRegistration[1];
 
@@ -210,9 +208,11 @@ public class TreeResourceRevealer {
                 callback.onFailure(new IllegalStateException("Not found"));
             }
         });
+
+        tree.getNodeLoader().loadChildren(parent);
     }
 
-    protected Optional<ResourceNode> getRootResourceNode(Path path) {
+    private Optional<ResourceNode> getRootResourceNode(Path path) {
         for (Node root : tree.getRootNodes()) {
             if (!(root instanceof ResourceNode)) {
                 continue;

@@ -14,8 +14,11 @@ import com.google.common.base.Optional;
 import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
 
+import org.eclipse.che.api.promises.client.Function;
+import org.eclipse.che.api.promises.client.FunctionException;
 import org.eclipse.che.api.promises.client.Operation;
 import org.eclipse.che.api.promises.client.OperationException;
+import org.eclipse.che.api.promises.client.Promise;
 import org.eclipse.che.api.promises.client.PromiseError;
 import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.project.MutableProjectConfig;
@@ -90,6 +93,12 @@ public class ProjectWizard extends AbstractWizard<MutableProjectConfig> {
                       .importProject()
                       .withBody(dataObject)
                       .send()
+                      .thenPromise(new Function<Project, Promise<Project>>() {
+                          @Override
+                          public Promise<Project> apply(Project project) throws FunctionException {
+                              return project.update().withBody(dataObject).send();
+                          }
+                      })
                       .then(onComplete(callback))
                       .catchError(onFailure(callback));
         }

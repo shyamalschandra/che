@@ -29,6 +29,7 @@ import org.eclipse.che.ide.ext.java.client.resource.SourceFolderMarker;
 import java.util.HashSet;
 import java.util.Set;
 
+import static org.eclipse.che.ide.api.resources.ResourceDelta.DERIVED;
 import static org.eclipse.che.ide.api.resources.ResourceDelta.REMOVED;
 
 /**
@@ -49,6 +50,10 @@ public class FileWatcher {
             @Override
             public void onResourceChanged(ResourceChangedEvent event) {
                 if (event.getDelta().getKind() != REMOVED) {
+                    return;
+                }
+
+                if ((event.getDelta().getFlags() & DERIVED) == 0) {
                     return;
                 }
 

@@ -10,16 +10,11 @@
  *******************************************************************************/
 package org.eclipse.che.ide.editor;
 
-import com.google.common.base.Optional;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.web.bindery.event.shared.EventBus;
 
-import org.eclipse.che.ide.api.machine.events.WsAgentStateEvent;
-import org.eclipse.che.ide.api.machine.events.WsAgentStateHandler;
-import org.eclipse.che.api.promises.client.Operation;
-import org.eclipse.che.api.promises.client.OperationException;
 import org.eclipse.che.ide.CoreLocalizationConstant;
 import org.eclipse.che.ide.api.editor.EditorAgent;
 import org.eclipse.che.ide.api.editor.EditorInput;
@@ -29,26 +24,21 @@ import org.eclipse.che.ide.api.editor.EditorPartPresenter.EditorPartCloseHandler
 import org.eclipse.che.ide.api.editor.EditorProvider;
 import org.eclipse.che.ide.api.editor.EditorRegistry;
 import org.eclipse.che.ide.api.editor.OpenEditorCallbackImpl;
+import org.eclipse.che.ide.api.editor.texteditor.HasReadOnlyProperty;
 import org.eclipse.che.ide.api.event.ActivePartChangedEvent;
 import org.eclipse.che.ide.api.event.ActivePartChangedHandler;
-import org.eclipse.che.ide.api.event.FileContentUpdateEvent;
 import org.eclipse.che.ide.api.event.FileEvent;
 import org.eclipse.che.ide.api.event.FileEventHandler;
 import org.eclipse.che.ide.api.event.WindowActionEvent;
 import org.eclipse.che.ide.api.event.WindowActionHandler;
 import org.eclipse.che.ide.api.filetypes.FileType;
 import org.eclipse.che.ide.api.filetypes.FileTypeRegistry;
+import org.eclipse.che.ide.api.machine.events.WsAgentStateEvent;
+import org.eclipse.che.ide.api.machine.events.WsAgentStateHandler;
 import org.eclipse.che.ide.api.parts.PartPresenter;
 import org.eclipse.che.ide.api.parts.PropertyListener;
 import org.eclipse.che.ide.api.parts.WorkspaceAgent;
-import org.eclipse.che.ide.api.resources.Container;
-import org.eclipse.che.ide.api.resources.File;
-import org.eclipse.che.ide.api.resources.Resource;
-import org.eclipse.che.ide.api.resources.ResourceChangedEvent;
-import org.eclipse.che.ide.api.resources.ResourceChangedEvent.ResourceChangedHandler;
-import org.eclipse.che.ide.api.resources.ResourceDelta;
 import org.eclipse.che.ide.api.resources.VirtualFile;
-import org.eclipse.che.ide.api.editor.texteditor.HasReadOnlyProperty;
 import org.eclipse.che.ide.resource.Path;
 
 import javax.validation.constraints.NotNull;
@@ -58,13 +48,6 @@ import java.util.List;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.collect.Lists.newArrayList;
 import static org.eclipse.che.ide.api.parts.PartStackType.EDITING;
-import static org.eclipse.che.ide.api.resources.Resource.FILE;
-import static org.eclipse.che.ide.api.resources.ResourceDelta.ADDED;
-import static org.eclipse.che.ide.api.resources.ResourceDelta.DERIVED;
-import static org.eclipse.che.ide.api.resources.ResourceDelta.MOVED_FROM;
-import static org.eclipse.che.ide.api.resources.ResourceDelta.MOVED_TO;
-import static org.eclipse.che.ide.api.resources.ResourceDelta.REMOVED;
-import static org.eclipse.che.ide.api.resources.ResourceDelta.UPDATED;
 
 /**
  * Default implementation of {@link EditorAgent}.
@@ -79,7 +62,6 @@ public class EditorAgentImpl implements EditorAgent,
                                         FileEventHandler,
                                         ActivePartChangedHandler,
                                         WindowActionHandler,
-                                        ResourceChangedHandler,
                                         WsAgentStateHandler {
 
     private final EventBus                 eventBus;
@@ -108,7 +90,6 @@ public class EditorAgentImpl implements EditorAgent,
         eventBus.addHandler(ActivePartChangedEvent.TYPE, this);
         eventBus.addHandler(FileEvent.TYPE, this);
         eventBus.addHandler(WindowActionEvent.TYPE, this);
-        eventBus.addHandler(ResourceChangedEvent.getType(), this);
         eventBus.addHandler(WsAgentStateEvent.TYPE, this);
     }
 
@@ -152,23 +133,6 @@ public class EditorAgentImpl implements EditorAgent,
     }
 
     @Override
-    public void onResourceChanged(ResourceChangedEvent event) {
-        final ResourceDelta delta = event.getDelta();
-        final Resource resource = delta.getResource();
-
-        switch (delta.getKind()) {
-            case ADDED:
-                onResourceCreated(delta);
-                break;
-            case REMOVED:
-                onResourceRemoved(resource);
-                break;
-            case UPDATED:
-                onResourceUpdated(delta);
-        }
-    }
-
-    @Override
     public void onWsAgentStarted(WsAgentStateEvent event) {
         //do nothing
     }
@@ -177,84 +141,6 @@ public class EditorAgentImpl implements EditorAgent,
     public void onWsAgentStopped(WsAgentStateEvent event) {
         for (EditorPartPresenter editor : getOpenedEditors()) {
             closeEditorPart(editor);
-        }
-    }
-
-    protected void onResourceCreated(ResourceDelta delta) {
-        if ((delta.getFlags() & (MOVED_FROM | MOVED_TO)) == 0) {
-            return;
-        }
-
-        final Resource resource = delta.getResource();
-        final Path movedFrom = delta.getFromPath();
-
-        if (resource.getResourceType() == FILE) {
-            final EditorPartPresenter editor = getOpenedEditor(delta.getFromPath());
-            if (editor != null) {
-                editor.getEditorInput().setFile((File)resource);
-                editor.onFileChanged();
-                eventBus.fireEvent(new FileContentUpdateEvent(resource.getLocation().toString()));
-            }
-        } else {
-            List<EditorPartPresenter> outdatedEditors = newArrayList();
-            for (EditorPartPresenter editor : getOpenedEditors()) {
-                if (movedFrom.isPrefixOf(editor.getEditorInput().getFile().getLocation())) {
-                    outdatedEditors.add(editor);
-                }
-            }
-
-            if (outdatedEditors.isEmpty()) {
-                return;
-            }
-
-            for (final EditorPartPresenter editor : outdatedEditors) {
-                final Path rawPath = editor.getEditorInput().getFile().getLocation().removeFirstSegments(movedFrom.segmentCount());
-
-                ((Container)resource).getFile(rawPath).then(new Operation<Optional<File>>() {
-                    @Override
-                    public void apply(Optional<File> newFile) throws OperationException {
-                        if (newFile.isPresent()) {
-                            editor.getEditorInput().setFile(newFile.get());
-                            editor.onFileChanged();
-                            eventBus.fireEvent(new FileContentUpdateEvent(resource.getLocation().toString()));
-                        }
-                    }
-                });
-            }
-        }
-    }
-
-    protected void onResourceRemoved(Resource resource) {
-        if (resource.getResourceType() == FILE) {
-            closeEditorPart(getOpenedEditor(resource.getLocation()));
-            return;
-        }
-
-        for (EditorPartPresenter editor : getOpenedEditors()) {
-            final Path location = editor.getEditorInput().getFile().getLocation();
-            if (resource.getLocation().equals(location)) {
-                closeEditorPart(editor);
-            }
-        }
-    }
-
-    protected void onResourceUpdated(ResourceDelta delta) {
-        if ((delta.getFlags() & DERIVED) == 0) {
-            return;
-        }
-
-        final Resource resource = delta.getResource();
-
-        if (resource.getResourceType() != FILE) {
-            return;
-        }
-
-        final EditorPartPresenter editor = getOpenedEditor(resource.getLocation());
-
-        if (editor != null) {
-            editor.getEditorInput().setFile((File)resource);
-            editor.onFileChanged();
-            eventBus.fireEvent(new FileContentUpdateEvent(resource.getLocation().toString()));
         }
     }
 

@@ -73,6 +73,10 @@ import org.eclipse.che.ide.api.hotkeys.HasHotKeyItems;
 import org.eclipse.che.ide.api.hotkeys.HotKeyItem;
 import org.eclipse.che.ide.api.notification.NotificationManager;
 import org.eclipse.che.ide.api.parts.WorkspaceAgent;
+import org.eclipse.che.ide.api.resources.File;
+import org.eclipse.che.ide.api.resources.Resource;
+import org.eclipse.che.ide.api.resources.ResourceChangedEvent;
+import org.eclipse.che.ide.api.resources.ResourceDelta;
 import org.eclipse.che.ide.api.resources.VirtualFile;
 import org.eclipse.che.ide.api.selection.Selection;
 import org.eclipse.che.ide.resource.Path;
@@ -86,6 +90,11 @@ import java.util.Map;
 
 import static org.eclipse.che.ide.api.notification.StatusNotification.DisplayMode.NOT_EMERGE_MODE;
 import static org.eclipse.che.ide.api.notification.StatusNotification.Status.FAIL;
+import static org.eclipse.che.ide.api.resources.ResourceDelta.ADDED;
+import static org.eclipse.che.ide.api.resources.ResourceDelta.MOVED_FROM;
+import static org.eclipse.che.ide.api.resources.ResourceDelta.MOVED_TO;
+import static org.eclipse.che.ide.api.resources.ResourceDelta.REMOVED;
+import static org.eclipse.che.ide.api.resources.ResourceDelta.UPDATED;
 
 /**
  * Presenter part for the editor implementations.
@@ -267,6 +276,26 @@ public class TextEditorPresenter<T extends EditorWidget> extends AbstractEditorP
     }
 
     private void setupFileContentUpdateHandler() {
+
+        generalEventBus.addHandler(ResourceChangedEvent.getType(), new ResourceChangedEvent.ResourceChangedHandler() {
+            @Override
+            public void onResourceChanged(ResourceChangedEvent event) {
+                final ResourceDelta delta = event.getDelta();
+                final Resource resource = delta.getResource();
+
+                switch (delta.getKind()) {
+                    case ADDED:
+                        onResourceCreated(delta);
+                        break;
+                    case REMOVED:
+                        onResourceRemoved(resource);
+                        break;
+                    case UPDATED:
+                        onResourceUpdated(delta);
+                }
+            }
+        });
+
         this.generalEventBus.addHandler(FileContentUpdateEvent.TYPE, new FileContentUpdateHandler() {
             @Override
             public void onFileContentUpdate(final FileContentUpdateEvent event) {
@@ -275,6 +304,34 @@ public class TextEditorPresenter<T extends EditorWidget> extends AbstractEditorP
                 }
             }
         });
+    }
+
+    private void onResourceCreated(ResourceDelta delta) {
+        if (!delta.getResource().isFile() || (delta.getFlags() & (MOVED_FROM | MOVED_TO)) == 0) {
+            return;
+        }
+
+        final Resource resource = delta.getResource();
+        final Path movedFrom = delta.getFromPath();
+
+        if (document.getFile().getLocation().equals(movedFrom)) {
+            document.setFile((File)resource);
+            input.setFile((File)resource);
+        }
+
+        updateContent();
+    }
+
+    protected void onResourceRemoved(Resource resource) {
+        if (resource.isFile() && document.getFile().getLocation().equals(resource.getLocation())) {
+            close(false);
+        }
+    }
+
+    protected void onResourceUpdated(ResourceDelta delta) {
+        if (delta.getResource().isFile() && document.getFile().getLocation().equals(delta.getResource().getLocation())) {
+            updateContent();
+        }
     }
 
     private void updateContent() {

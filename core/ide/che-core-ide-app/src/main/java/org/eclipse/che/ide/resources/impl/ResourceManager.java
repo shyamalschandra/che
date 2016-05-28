@@ -295,9 +295,14 @@ public final class ResourceManager {
                         return getRemoteResources(newResource, maxDepth[0], true, false).then(new Function<Resource[], Project>() {
                             @Override
                             public Project apply(Resource[] ignored) throws FunctionException {
-                                eventBus.fireEvent(new ResourceChangedEvent(new ResourceDeltaImpl(newResource, UPDATED | DERIVED)));
+                                Resource interceptedResource = newResource;
+                                for (ResourceInterceptor interceptor : resourceInterceptors) {
+                                    interceptedResource = interceptor.intercept(interceptedResource);
+                                }
 
-                                return newResource;
+                                eventBus.fireEvent(new ResourceChangedEvent(new ResourceDeltaImpl(interceptedResource, UPDATED | DERIVED)));
+
+                                return (Project)interceptedResource;
                             }
                         });
                     }
@@ -915,7 +920,7 @@ public final class ResourceManager {
                     }
                 }
 
-                return getRemoteResources(container, maxDepth - 1, true, true);
+                return getRemoteResources(container, maxDepth > 0 ? maxDepth - 1 : maxDepth, true, true);
             }
         });
     }
@@ -990,8 +995,18 @@ public final class ResourceManager {
                     public Void apply(final Optional<Resource> resource) throws FunctionException {
 
                         if (resource.isPresent() && toRemove.isPresent()) {
+                            Resource intercepted = resource.get();
+
+                            if (!store.getResource(intercepted.getLocation()).isPresent()) {
+                                store.register(intercepted.getLocation().parent(), intercepted);
+
+                                for (ResourceInterceptor interceptor : resourceInterceptors) {
+                                    intercepted = interceptor.intercept(intercepted);
+                                }
+                            }
+
                             eventBus.fireEvent(new ResourceChangedEvent(
-                                    new ResourceDeltaImpl(resource.get(), toRemove.get(), ADDED | MOVED_FROM | MOVED_TO | DERIVED)));
+                                    new ResourceDeltaImpl(intercepted, toRemove.get(), ADDED | MOVED_FROM | MOVED_TO | DERIVED)));
                         }
 
                         return null;
@@ -1006,7 +1021,17 @@ public final class ResourceManager {
             @Override
             public Void apply(final Optional<Resource> resource) throws FunctionException {
                 if (resource.isPresent()) {
-                    eventBus.fireEvent(new ResourceChangedEvent(new ResourceDeltaImpl(resource.get(), ADDED | DERIVED)));
+                    Resource intercepted = resource.get();
+
+                    if (!store.getResource(intercepted.getLocation()).isPresent()) {
+                        store.register(intercepted.getLocation().parent(), intercepted);
+
+                        for (ResourceInterceptor interceptor : resourceInterceptors) {
+                            intercepted = interceptor.intercept(intercepted);
+                        }
+                    }
+
+                    eventBus.fireEvent(new ResourceChangedEvent(new ResourceDeltaImpl(intercepted, ADDED | DERIVED)));
                 }
 
                 return null;
@@ -1020,7 +1045,17 @@ public final class ResourceManager {
             public Void apply(Optional<Resource> resource) throws FunctionException {
 
                 if (resource.isPresent()) {
-                    eventBus.fireEvent(new ResourceChangedEvent(new ResourceDeltaImpl(resource.get(), UPDATED | DERIVED)));
+                    Resource intercepted = resource.get();
+
+                    if (!store.getResource(intercepted.getLocation()).isPresent()) {
+                        store.register(intercepted.getLocation().parent(), intercepted);
+
+                        for (ResourceInterceptor interceptor : resourceInterceptors) {
+                            intercepted = interceptor.intercept(intercepted);
+                        }
+                    }
+
+                    eventBus.fireEvent(new ResourceChangedEvent(new ResourceDeltaImpl(intercepted, UPDATED | DERIVED)));
                 }
 
                 return null;

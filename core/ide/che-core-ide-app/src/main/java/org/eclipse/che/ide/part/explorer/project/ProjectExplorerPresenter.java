@@ -76,7 +76,7 @@ public class ProjectExplorerPresenter extends BasePresenter implements ActionDel
     private final Resources                resources;
     private final TreeResourceRevealer     revealer;
 
-    public static final int PART_SIZE = 500;
+    private static final int PART_SIZE = 500;
 
     private boolean hiddenFilesAreShown;
 
@@ -167,14 +167,9 @@ public class ProjectExplorerPresenter extends BasePresenter implements ActionDel
         for (final Node exist : tree.getNodeStorage().getAll()) {
             if (isNodeServesLocation(exist, delta.getResource().getLocation())) {
 
-                if (delta.getResource().getLocation().segmentCount() == 1) {
-                    tree.getNodeStorage().remove(exist);
-                    return;
-                }
+                tree.getNodeStorage().remove(exist);
 
-                Node toReveal;
-
-                toReveal = tree.getNodeStorage().getPreviousSibling(exist);
+                Node toReveal = tree.getNodeStorage().getPreviousSibling(exist);
 
                 if (toReveal == null) {
                     toReveal = tree.getNodeStorage().getNextSibling(exist);

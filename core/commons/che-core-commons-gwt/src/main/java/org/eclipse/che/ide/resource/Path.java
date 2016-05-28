@@ -1202,7 +1202,7 @@ public final class Path {
      * @since 4.0.0-RC13
      */
     public Path parent() {
-        return this.removeLastSegments(1);
+        return segmentCount() == 1 ? Path.ROOT : this.removeLastSegments(1);
     }
 
     /**
