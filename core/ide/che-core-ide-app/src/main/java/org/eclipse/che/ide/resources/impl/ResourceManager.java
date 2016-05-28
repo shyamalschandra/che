@@ -420,7 +420,7 @@ public final class ResourceManager {
                     @Override
                     public Promise<Project> apply(ProjectConfigDto config) throws FunctionException {
                         final Project newResource = resourceFactory.newProjectImpl(config, ResourceManager.this);
-                        store.register(Path.ROOT, newResource);
+                        store.register(newResource.getLocation().parent(), newResource);
 
                         return ps.getProjects(devMachine).then(new Function<List<ProjectConfigDto>, Project>() {
                             @Override
@@ -610,7 +610,7 @@ public final class ResourceManager {
         return ps.readFile(devMachine, file.getLocation());
     }
 
-    Promise<Resource[]> getRemoteResources(final Container container, int depth, boolean includeFiles, final boolean derived) {
+    Promise<Resource[]> getRemoteResources(final Container container, final int depth, boolean includeFiles, final boolean derived) {
         checkArgument(depth > -2, "Invalid depth");
 
         if (depth == DEPTH_ZERO) {
@@ -665,6 +665,19 @@ public final class ResourceManager {
             @Override
             public Resource[] apply(Resource[] reloaded) throws FunctionException {
 
+                if (depth == DEPTH_ONE) {
+                    for (Resource resource : reloaded) {
+                        store.dispose(resource.getLocation(), false);
+                        store.register(resource.getLocation().parent(), resource);
+
+                        for (ResourceInterceptor interceptor : resourceInterceptors) {
+                            resource = interceptor.intercept(resource);
+                        }
+                    }
+
+                    return reloaded;
+                }
+
                 if (descendants.isPresent()) {
                     Resource[] outdated = descendants.get();
 
@@ -678,11 +691,13 @@ public final class ResourceManager {
                     for (Resource resource : added) {
                         store.register(resource.getLocation().parent(), resource);
 
+                        Resource intercepted = resource;
+
                         for (ResourceInterceptor interceptor : resourceInterceptors) {
-                            resource = interceptor.intercept(resource);
+                            intercepted = interceptor.intercept(intercepted);
                         }
 
-                        eventBus.fireEvent(new ResourceChangedEvent(new ResourceDeltaImpl(resource, derived ? ADDED | DERIVED : ADDED)));
+                        eventBus.fireEvent(new ResourceChangedEvent(new ResourceDeltaImpl(intercepted, derived ? ADDED | DERIVED : ADDED)));
                     }
 
                     final Resource[] updated = batchRemove(outdated, reloaded, true);
@@ -690,21 +705,25 @@ public final class ResourceManager {
                         store.dispose(resource.getLocation(), false);
                         store.register(resource.getLocation().parent(), resource);
 
+                        Resource intercepted = resource;
+
                         for (ResourceInterceptor interceptor : resourceInterceptors) {
-                            resource = interceptor.intercept(resource);
+                            intercepted = interceptor.intercept(intercepted);
                         }
 
-                        eventBus.fireEvent(new ResourceChangedEvent(new ResourceDeltaImpl(resource, derived ? UPDATED | DERIVED : UPDATED)));
+                        eventBus.fireEvent(new ResourceChangedEvent(new ResourceDeltaImpl(intercepted, derived ? UPDATED | DERIVED : UPDATED)));
                     }
                 } else {
                     for (Resource resource : reloaded) {
                         store.register(resource.getLocation().parent(), resource);
 
+                        Resource intercepted = resource;
+
                         for (ResourceInterceptor interceptor : resourceInterceptors) {
-                            resource = interceptor.intercept(resource);
+                            intercepted = interceptor.intercept(intercepted);
                         }
 
-                        eventBus.fireEvent(new ResourceChangedEvent(new ResourceDeltaImpl(resource, derived ? ADDED | DERIVED : ADDED)));
+                        eventBus.fireEvent(new ResourceChangedEvent(new ResourceDeltaImpl(intercepted, derived ? ADDED | DERIVED : ADDED)));
                     }
                 }
 

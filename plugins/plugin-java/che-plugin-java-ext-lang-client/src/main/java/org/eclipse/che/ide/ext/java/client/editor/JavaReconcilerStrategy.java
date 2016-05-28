@@ -45,7 +45,6 @@ public class JavaReconcilerStrategy implements ReconcilingStrategy {
     private final HandlerRegistration       handlerRegistration;
     private       SemanticHighlightRenderer highlighter;
     private       JavaReconcileClient       client;
-    private       VirtualFile               file;
     private boolean first = true;
 
     @AssistedInject
@@ -71,7 +70,6 @@ public class JavaReconcilerStrategy implements ReconcilingStrategy {
 
     @Override
     public void setDocument(final Document document) {
-        file = editor.getEditorInput().getFile();
         highlighter.init(editor.getHasTextMarkers(), document);
     }
 
@@ -80,25 +78,34 @@ public class JavaReconcilerStrategy implements ReconcilingStrategy {
         parse();
     }
 
-    public void parse() {
+    void parse() {
         if (first) {
             codeAssistProcessor.disableCodeAssistant();
             first = false;
         }
 
-        if (file instanceof Resource) {
-            final Optional<Project> project = ((Resource)file).getRelatedProject();
+        if (getFile() instanceof Resource) {
+            final Optional<Project> project = ((Resource)getFile()).getRelatedProject();
 
-            client.reconcile(project.get().getLocation().toString(), JavaUtil.resolveFQN(file), new JavaReconcileClient.ReconcileCallback() {
-                @Override
-                public void onReconcile(ReconcileResult result) {
-                    if (result == null) {
-                        return;
-                    }
-                    doReconcile(result.getProblems());
-                    highlighter.reconcile(result.getHighlightedPositions());
-                }
-            });
+            if (!project.isPresent()) {
+                return;
+            }
+
+            try {
+                client.reconcile(project.get().getLocation().toString(), JavaUtil.resolveFQN(getFile()),
+                                 new JavaReconcileClient.ReconcileCallback() {
+                                     @Override
+                                     public void onReconcile(ReconcileResult result) {
+                                         if (result == null) {
+                                             return;
+                                         }
+                                         doReconcile(result.getProblems());
+                                         highlighter.reconcile(result.getHighlightedPositions());
+                                     }
+                                 });
+            } catch (RuntimeException e) {
+                Log.info(getClass(), e.getMessage());
+            }
         }
 
 
@@ -111,7 +118,7 @@ public class JavaReconcilerStrategy implements ReconcilingStrategy {
     }
 
     public VirtualFile getFile() {
-        return file;
+        return editor.getEditorInput().getFile();
     }
 
     private void doReconcile(final List<Problem> problems) {

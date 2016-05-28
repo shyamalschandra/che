@@ -22,6 +22,7 @@ import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import com.google.web.bindery.event.shared.EventBus;
+import com.google.web.bindery.event.shared.HandlerRegistration;
 
 import org.eclipse.che.ide.api.debug.BreakpointManager;
 import org.eclipse.che.ide.api.debug.BreakpointRenderer;
@@ -147,6 +148,7 @@ public class TextEditorPresenter<T extends EditorWidget> extends AbstractEditorP
     private BreakpointRenderer       breakpointRenderer;
     private List<String>             fileTypes;
     private TextPosition             cursorPosition;
+    private HandlerRegistration      resourceChangeHandler;
 
     @AssistedInject
     public TextEditorPresenter(final CodeAssistantFactory codeAssistantFactory,
@@ -277,7 +279,7 @@ public class TextEditorPresenter<T extends EditorWidget> extends AbstractEditorP
 
     private void setupFileContentUpdateHandler() {
 
-        generalEventBus.addHandler(ResourceChangedEvent.getType(), new ResourceChangedEvent.ResourceChangedHandler() {
+        resourceChangeHandler = generalEventBus.addHandler(ResourceChangedEvent.getType(), new ResourceChangedEvent.ResourceChangedHandler() {
             @Override
             public void onResourceChanged(ResourceChangedEvent event) {
                 final ResourceDelta delta = event.getDelta();
@@ -322,13 +324,17 @@ public class TextEditorPresenter<T extends EditorWidget> extends AbstractEditorP
         updateContent();
     }
 
-    protected void onResourceRemoved(Resource resource) {
+    private void onResourceRemoved(Resource resource) {
         if (resource.isFile() && document.getFile().getLocation().equals(resource.getLocation())) {
+            if (resourceChangeHandler != null) {
+                resourceChangeHandler.removeHandler();
+                resourceChangeHandler = null;
+            }
             close(false);
         }
     }
 
-    protected void onResourceUpdated(ResourceDelta delta) {
+    private void onResourceUpdated(ResourceDelta delta) {
         if (delta.getResource().isFile() && document.getFile().getLocation().equals(delta.getResource().getLocation())) {
             updateContent();
         }
@@ -454,6 +460,16 @@ public class TextEditorPresenter<T extends EditorWidget> extends AbstractEditorP
             handleClose();
             callback.onSuccess(null);
         }
+    }
+
+    @Override
+    protected void handleClose() {
+        if (resourceChangeHandler != null) {
+            resourceChangeHandler.removeHandler();
+            resourceChangeHandler = null;
+        }
+
+        super.handleClose();
     }
 
     @Override
