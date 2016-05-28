@@ -17,8 +17,6 @@ import com.google.web.bindery.event.shared.EventBus;
 
 import org.eclipse.che.api.promises.client.Function;
 import org.eclipse.che.api.promises.client.FunctionException;
-import org.eclipse.che.api.promises.client.Operation;
-import org.eclipse.che.api.promises.client.OperationException;
 import org.eclipse.che.api.promises.client.Promise;
 import org.eclipse.che.api.promises.client.PromiseProvider;
 import org.eclipse.che.api.workspace.shared.dto.ProjectConfigDto;
@@ -572,27 +570,7 @@ public class BreakpointManagerImpl implements BreakpointManager,
     }
 
     @Override
-    public void onDebuggerAttached(DebuggerDescriptor debuggerDescriptor, Promise<Void> connect) {
-        connect.then(new Operation<Void>() {
-            @Override
-            public void apply(Void arg) throws OperationException {
-                reAddBreakpointsToServer();
-            }
-        });
-    }
-
-    private void reAddBreakpointsToServer() {
-        Debugger debugger = debuggerManager.getActiveDebugger();
-        if (debugger == null) {
-            return;
-        }
-
-        for (Entry<String, List<Breakpoint>> entry : breakpoints.entrySet()) {
-            for (final Breakpoint breakpoint : entry.getValue()) {
-                debugger.addBreakpoint(breakpoint.getFile(), breakpoint.getLineNumber());
-            }
-        }
-    }
+    public void onDebuggerAttached(DebuggerDescriptor debuggerDescriptor, Promise<Void> connect) { }
 
     @Override
     public void onDebuggerDisconnected() {

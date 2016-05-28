@@ -15,6 +15,7 @@ import com.google.web.bindery.event.shared.EventBus;
 
 import org.eclipse.che.api.debug.shared.model.Location;
 import org.eclipse.che.ide.api.app.AppContext;
+import org.eclipse.che.ide.api.debug.BreakpointManager;
 import org.eclipse.che.ide.api.debug.DebuggerServiceClient;
 import org.eclipse.che.ide.api.filetypes.FileTypeRegistry;
 import org.eclipse.che.ide.api.resources.Project;
@@ -61,6 +62,7 @@ public class JavaDebugger extends AbstractDebugger {
                         JavaDebuggerFileHandler javaDebuggerFileHandler,
                         DebuggerManager debuggerManager,
                         FileTypeRegistry fileTypeRegistry,
+                        BreakpointManager breakpointManager,
                         AppContext appContext) {
         super(service,
               dtoFactory,
@@ -71,6 +73,7 @@ public class JavaDebugger extends AbstractDebugger {
               javaDebuggerFileHandler,
               debuggerManager,
               fileTypeRegistry,
+              breakpointManager,
               ID);
         this.appContext = appContext;
     }

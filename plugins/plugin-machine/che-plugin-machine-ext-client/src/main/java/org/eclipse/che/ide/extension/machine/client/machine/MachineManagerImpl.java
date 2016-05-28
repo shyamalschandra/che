@@ -19,7 +19,6 @@ import org.eclipse.che.ide.api.machine.DevMachine;
 import org.eclipse.che.ide.api.machine.MachineManager;
 import org.eclipse.che.ide.api.machine.MachineServiceClient;
 import org.eclipse.che.ide.api.machine.OutputMessageUnmarshaller;
-import org.eclipse.che.ide.api.machine.WsAgentStateController;
 import org.eclipse.che.ide.api.machine.events.DevMachineStateEvent;
 import org.eclipse.che.api.machine.shared.dto.LimitsDto;
 import org.eclipse.che.api.machine.shared.dto.MachineConfigDto;
@@ -36,7 +35,6 @@ import org.eclipse.che.ide.api.app.AppContext;
 import org.eclipse.che.ide.api.parts.PerspectiveManager;
 import org.eclipse.che.ide.context.AppContextImpl;
 import org.eclipse.che.ide.dto.DtoFactory;
-import org.eclipse.che.ide.extension.machine.client.inject.factories.EntityFactory;
 import org.eclipse.che.ide.extension.machine.client.machine.MachineStatusNotifier.RunningListener;
 import org.eclipse.che.ide.extension.machine.client.machine.console.MachineConsolePresenter;
 import org.eclipse.che.ide.resource.Path;
@@ -68,7 +66,6 @@ import static org.eclipse.che.ide.ui.loaders.initialization.OperationInfo.Status
 @Singleton
 public class MachineManagerImpl implements MachineManager, WorkspaceStoppedHandler {
 
-    private final WsAgentStateController  wsAgentStateController;
     private final DtoUnmarshallerFactory  dtoUnmarshallerFactory;
     private final MachineServiceClient    machineServiceClient;
     private final WorkspaceServiceClient  workspaceServiceClient;
@@ -76,7 +73,6 @@ public class MachineManagerImpl implements MachineManager, WorkspaceStoppedHandl
     private final MachineStatusNotifier   machineStatusNotifier;
     private final InitialLoadingInfo      initialLoadingInfo;
     private final PerspectiveManager      perspectiveManager;
-    private final EntityFactory           entityFactory;
     private final AppContext              appContext;
     private final DtoFactory              dtoFactory;
     private final EventBus                eventBus;
@@ -91,8 +87,7 @@ public class MachineManagerImpl implements MachineManager, WorkspaceStoppedHandl
     private SubscriptionHandler<String>             outputHandler;
 
     @Inject
-    public MachineManagerImpl(WsAgentStateController wsAgentStateController,
-                              DtoUnmarshallerFactory dtoUnmarshallerFactory,
+    public MachineManagerImpl(DtoUnmarshallerFactory dtoUnmarshallerFactory,
                               MachineServiceClient machineServiceClient,
                               WorkspaceServiceClient workspaceServiceClient,
                               MachineConsolePresenter machineConsolePresenter,
@@ -100,11 +95,9 @@ public class MachineManagerImpl implements MachineManager, WorkspaceStoppedHandl
                               final MessageBusProvider messageBusProvider,
                               final InitialLoadingInfo initialLoadingInfo,
                               final PerspectiveManager perspectiveManager,
-                              EntityFactory entityFactory,
                               EventBus eventBus,
                               final AppContext appContext,
                               DtoFactory dtoFactory) {
-        this.wsAgentStateController = wsAgentStateController;
         this.dtoUnmarshallerFactory = dtoUnmarshallerFactory;
         this.machineServiceClient = machineServiceClient;
         this.workspaceServiceClient = workspaceServiceClient;
@@ -112,7 +105,6 @@ public class MachineManagerImpl implements MachineManager, WorkspaceStoppedHandl
         this.machineStatusNotifier = machineStatusNotifier;
         this.initialLoadingInfo = initialLoadingInfo;
         this.perspectiveManager = perspectiveManager;
-        this.entityFactory = entityFactory;
         this.appContext = appContext;
         this.dtoFactory = dtoFactory;
         this.eventBus = eventBus;
@@ -300,22 +292,8 @@ public class MachineManagerImpl implements MachineManager, WorkspaceStoppedHandl
                     ((AppContextImpl)appContext).setDevMachine(devMachine);
                     ((AppContextImpl)appContext).setProjectsRoot(Path.valueOf(machineDto.getRuntime().projectsRoot()));
                 }
-
-                wsAgentStateController.initialize(devMachine);
             }
         });
-    }
-
-    @Override
-    public boolean isDevMachineStatusTracked(MachineDto machine) {
-        final LinkParameter statusChannelLinkParameter =
-                machine.getConfig().getLink(LINK_REL_GET_MACHINE_STATUS_CHANNEL).getParameter("channel");
-        if (statusChannelLinkParameter == null) {
-            return false;
-        }
-
-        String machineStatusChannel = statusChannelLinkParameter.getDefaultValue();
-        return machineStatusChannel != null && messageBus.isHandlerSubscribed(statusHandler, machineStatusChannel);
     }
 
     @Override
@@ -351,7 +329,7 @@ public class MachineManagerImpl implements MachineManager, WorkspaceStoppedHandl
             }
         }
         if (outputChannel != null && statusChannel != null) {
-            wsAgentLogChannel = "workspace:" + appContext.getDevMachine().getId() + ":ext-server:output";
+            wsAgentLogChannel = "workspace:" + appContext.getWorkspaceId() + ":ext-server:output";
             subscribeToChannel(wsAgentLogChannel, outputHandler);
             subscribeToChannel(outputChannel, outputHandler);
             subscribeToChannel(statusChannel, statusHandler);
