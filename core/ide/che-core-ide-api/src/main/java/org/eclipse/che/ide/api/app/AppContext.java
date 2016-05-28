@@ -181,11 +181,9 @@ public interface AppContext {
      */
     Factory getFactory();
 
-    /* Deprecated methods */
-
-    /* No more supported, will be removed soon. */
-    @Deprecated
     String getWorkspaceId();
+
+    /* Deprecated methods */
 
     /* No more supported, will be removed soon. */
     @Deprecated
