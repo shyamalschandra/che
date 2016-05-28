@@ -169,7 +169,7 @@ public class NewJavaSourceFilePresenter implements NewJavaSourceFileView.ActionD
     private String getPackageQualifier(String packageFragment) {
         final Optional<Resource> srcFolder = parent.getParentWithMarker(SourceFolderMarker.ID);
 
-        if (!srcFolder.isPresent() || isNullOrEmpty(packageFragment)) {
+        if (!srcFolder.isPresent() && isNullOrEmpty(packageFragment)) {
             return "\n";
         }
 
