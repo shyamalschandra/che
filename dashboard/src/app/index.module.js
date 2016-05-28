@@ -91,7 +91,7 @@ initModule.config(['$routeProvider', ($routeProvider) => {
 
 }]);
 
-var DEV = true;
+var DEV = false;
 
 
 // config routes
