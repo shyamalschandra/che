@@ -52,16 +52,18 @@ public class JavaDebuggerUtils {
         if (types.isEmpty()) {
             throw new DebuggerException("Type with fully qualified name: " + fqn + " was not found");
         }
+
         IType type = types.get(0);//TODO we need handle few result! It's temporary solution.
         if (type.isBinary()) {
             IClassFile classFile = type.getClassFile();
             int libId = classFile.getAncestor(IPackageFragmentRoot.PACKAGE_FRAGMENT_ROOT).hashCode();
             String projectPath = type.getJavaProject().getPath().toOSString();
-            return new LocationImpl(classFile.getType().getFullyQualifiedName(), location.lineNumber(), true, libId, projectPath);
+            return new LocationImpl(fqn, location.lineNumber(), null, true, libId, projectPath);
         } else {
             ICompilationUnit compilationUnit = type.getCompilationUnit();
             String projectPath = type.getJavaProject().getPath().toOSString();
-            return new LocationImpl(compilationUnit.getPath().toOSString(), location.lineNumber(), false, -1, projectPath);
+            String resourcePath = compilationUnit.getPath().toOSString();
+            return new LocationImpl(fqn, location.lineNumber(), resourcePath, false, -1, projectPath);
         }
     }
 

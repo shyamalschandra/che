@@ -13,6 +13,8 @@ package org.eclipse.che.plugin.jdb.ide.debug;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 
+import org.eclipse.che.api.debug.shared.model.Location;
+import org.eclipse.che.commons.annotation.Nullable;
 import org.eclipse.che.ide.api.debug.BreakpointManager;
 import org.eclipse.che.ide.api.debug.DebuggerServiceClient;
 import org.eclipse.che.ide.api.project.tree.VirtualFile;
@@ -24,6 +26,8 @@ import org.eclipse.che.ide.ext.java.client.project.node.jar.JarFileNode;
 import org.eclipse.che.ide.util.storage.LocalStorageProvider;
 import org.eclipse.che.ide.websocket.MessageBusProvider;
 import org.eclipse.che.plugin.debugger.ide.debug.AbstractDebugger;
+
+import javax.validation.constraints.NotNull;
 import java.util.Map;
 
 import static org.eclipse.che.plugin.jdb.ide.debug.JavaDebugger.ConnectionProperties.HOST;
@@ -59,6 +63,14 @@ public class JavaDebugger extends AbstractDebugger {
               ID);
     }
 
+    @Nullable
+    @Override
+    protected String fqnToPath(@NotNull Location location) {
+        String resourcePath = location.getResourcePath();
+        return  resourcePath != null ? resourcePath : location.getTarget();
+    }
+
+    @Nullable
     @Override
     protected String pathToFqn(VirtualFile file) {
         if (file instanceof JavaFileNode) {

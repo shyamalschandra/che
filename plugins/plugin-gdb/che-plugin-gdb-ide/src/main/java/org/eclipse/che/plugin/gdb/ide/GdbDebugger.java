@@ -13,6 +13,10 @@ package org.eclipse.che.plugin.gdb.ide;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 
+import org.eclipse.che.api.debug.shared.model.Location;
+import org.eclipse.che.commons.annotation.Nullable;
+import org.eclipse.che.ide.api.app.AppContext;
+import org.eclipse.che.ide.api.app.CurrentProject;
 import org.eclipse.che.ide.api.debug.BreakpointManager;
 import org.eclipse.che.ide.api.debug.DebuggerServiceClient;
 import org.eclipse.che.ide.api.project.tree.VirtualFile;
@@ -22,6 +26,8 @@ import org.eclipse.che.ide.dto.DtoFactory;
 import org.eclipse.che.ide.util.storage.LocalStorageProvider;
 import org.eclipse.che.ide.websocket.MessageBusProvider;
 import org.eclipse.che.plugin.debugger.ide.debug.AbstractDebugger;
+
+import javax.validation.constraints.NotNull;
 import java.util.Map;
 
 import static org.eclipse.che.plugin.gdb.ide.GdbDebugger.ConnectionProperties.HOST;
@@ -36,6 +42,8 @@ public class GdbDebugger extends AbstractDebugger {
 
     public static final String ID = "gdb";
 
+    private final AppContext appContext;
+
     @Inject
     public GdbDebugger(DebuggerServiceClient service,
                        DtoFactory dtoFactory,
@@ -44,7 +52,8 @@ public class GdbDebugger extends AbstractDebugger {
                        EventBus eventBus,
                        GdbDebuggerFileHandler activeFileHandler,
                        DebuggerManager debuggerManager,
-                       BreakpointManager breakpointManager) {
+                       BreakpointManager breakpointManager,
+                       AppContext appContext) {
 
         super(service,
               dtoFactory,
@@ -55,8 +64,20 @@ public class GdbDebugger extends AbstractDebugger {
               debuggerManager,
               breakpointManager,
               ID);
+        this.appContext = appContext;
     }
 
+    @Nullable
+    @Override
+    protected String fqnToPath(@NotNull Location location) {
+        CurrentProject currentProject = appContext.getCurrentProject();
+        if (currentProject == null) {
+            return location.getTarget();
+        }
+        return currentProject.getProjectConfig().getPath() + "/" + location.getTarget();
+    }
+
+    @Nullable
     @Override
     protected String pathToFqn(VirtualFile file) {
         return file.getName();

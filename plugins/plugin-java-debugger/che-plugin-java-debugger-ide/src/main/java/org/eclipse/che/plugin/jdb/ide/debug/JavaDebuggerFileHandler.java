@@ -100,7 +100,7 @@ public class JavaDebuggerFileHandler implements ActiveFileHandler {
     }
 
     private void doOpenFile(final Location location, final AsyncCallback<VirtualFile> callback) {
-        projectExplorer.getNodeByPath(new HasStorablePath.StorablePath(location.getTarget())).then(new Operation<Node>() {
+        projectExplorer.getNodeByPath(new HasStorablePath.StorablePath(location.getResourcePath())).then(new Operation<Node>() {
             @Override
             public void apply(final Node node) throws OperationException {
                 if (!(node instanceof FileReferenceNode)) {

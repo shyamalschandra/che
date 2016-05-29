@@ -26,6 +26,7 @@ import org.eclipse.che.api.debug.shared.dto.action.StepIntoActionDto;
 import org.eclipse.che.api.debug.shared.dto.action.StepOutActionDto;
 import org.eclipse.che.api.debug.shared.dto.action.StepOverActionDto;
 import org.eclipse.che.api.debug.shared.model.DebuggerInfo;
+import org.eclipse.che.api.debug.shared.model.Location;
 import org.eclipse.che.api.debug.shared.model.SimpleValue;
 import org.eclipse.che.api.debug.shared.model.StackFrameDump;
 import org.eclipse.che.api.debug.shared.model.Variable;
@@ -35,7 +36,7 @@ import org.eclipse.che.api.promises.client.Operation;
 import org.eclipse.che.api.promises.client.OperationException;
 import org.eclipse.che.api.promises.client.Promise;
 import org.eclipse.che.api.promises.client.PromiseError;
-import org.eclipse.che.ide.api.app.AppContext;
+import org.eclipse.che.commons.annotation.Nullable;
 import org.eclipse.che.ide.api.debug.Breakpoint;
 import org.eclipse.che.ide.api.debug.BreakpointManager;
 import org.eclipse.che.ide.api.debug.DebuggerServiceClient;
@@ -104,8 +105,6 @@ public class DebuggerTest extends BaseTest {
     @Mock
     private EventBus              eventBus;
     @Mock
-    private AppContext            appContext;
-    @Mock
     private ActiveFileHandler     activeFileHandler;
     @Mock
     private DebuggerManager       debuggerManager;
@@ -169,8 +168,8 @@ public class DebuggerTest extends BaseTest {
 
         doReturn(PATH).when(file).getPath();
 
-        debugger = new TestDebugger(service, dtoFactory, localStorageProvider, messageBusProvider, eventBus, activeFileHandler,
-                                    debuggerManager, "id");
+        debugger = new TestDebugger(service, dtoFactory, localStorageProvider, messageBusProvider, eventBus,
+                                    activeFileHandler, debuggerManager, "id");
         doReturn(promiseInfo).when(service).getSessionInfo(SESSION_ID);
         doReturn(promiseInfo).when(promiseInfo).then(any(Operation.class));
 
@@ -566,6 +565,13 @@ public class DebuggerTest extends BaseTest {
                   id);
         }
 
+        @Nullable
+        @Override
+        protected String fqnToPath(Location location) {
+            return PATH;
+        }
+
+        @Nullable
         @Override
         protected String pathToFqn(VirtualFile file) {
             return FQN;

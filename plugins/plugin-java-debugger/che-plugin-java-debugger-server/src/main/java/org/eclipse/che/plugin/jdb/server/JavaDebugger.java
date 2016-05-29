@@ -31,6 +31,7 @@ import com.sun.jdi.request.StepRequest;
 
 import org.eclipse.che.api.debug.shared.dto.BreakpointDto;
 import org.eclipse.che.api.debug.shared.dto.FieldDto;
+import org.eclipse.che.api.debug.shared.dto.LocationDto;
 import org.eclipse.che.api.debug.shared.dto.StackFrameDumpDto;
 import org.eclipse.che.api.debug.shared.dto.VariableDto;
 import org.eclipse.che.api.debug.shared.dto.VariablePathDto;
@@ -77,7 +78,6 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
-import static org.eclipse.che.api.debugger.server.DtoConverter.asDto;
 import static org.eclipse.che.dto.server.DtoFactory.newDto;
 
 /**
@@ -299,9 +299,11 @@ public class JavaDebugger implements EventsHandler, Debugger {
         }
         List<Breakpoint> breakPoints = new ArrayList<>(breakpointRequests.size());
         for (BreakpointRequest breakpointRequest : breakpointRequests) {
-            Location location = debuggerUtil.getLocation(breakpointRequest.location());
+            com.sun.jdi.Location location = breakpointRequest.location();
             // Breakpoint always enabled at the moment. Managing states of breakpoint is not supported for now.
-            breakPoints.add(newDto(BreakpointDto.class).withEnabled(true).withLocation(asDto(location)));
+            breakPoints.add(newDto(BreakpointDto.class).withEnabled(true)
+                                                       .withLocation(newDto(LocationDto.class).withTarget(location.declaringType().name())
+                                                                                              .withLineNumber(location.lineNumber())));
         }
         Collections.sort(breakPoints, BREAKPOINT_COMPARATOR);
         return breakPoints;

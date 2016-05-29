@@ -24,6 +24,9 @@ public interface Location {
      */
     int getLineNumber();
 
+    //todo javaDoc
+    String getResourcePath();
+
     boolean isExternalResource();
 
     int getExternalResourceId();

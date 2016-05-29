@@ -20,24 +20,31 @@ import java.util.Objects;
 public class LocationImpl implements Location {
     private final String  target;
     private final int     lineNumber;
+    private final String  resourcePath;
     private final boolean externalResource;
     private final int     externalResourceId;
     private final String  projectPath;
 
-    public LocationImpl(String target, int lineNumber, boolean externalResource, int externalResourceId, String projectPath) {
+    public LocationImpl(String target,
+                        int lineNumber,
+                        String resourcePath,
+                        boolean externalResource,
+                        int externalResourceId,
+                        String projectPath) {
         this.target = target;
         this.lineNumber = lineNumber;
+        this.resourcePath = resourcePath;
         this.externalResource = externalResource;
         this.externalResourceId = externalResourceId;
         this.projectPath = projectPath;
     }
 
     public LocationImpl(String target, int lineNumber) {
-        this(target, lineNumber, false, 0, null);
+        this(target, lineNumber, null, false, 0, null);
     }
 
     public LocationImpl(String target) {
-        this(target, 0, false, 0, null);
+        this(target, 0, null, false, 0, null);
     }
 
     @Override
@@ -48,6 +55,11 @@ public class LocationImpl implements Location {
     @Override
     public int getLineNumber() {
         return lineNumber;
+    }
+
+    @Override
+    public String getResourcePath() {
+        return resourcePath;
     }
 
     @Override
@@ -75,6 +87,7 @@ public class LocationImpl implements Location {
 
         return (lineNumber != location.lineNumber ||
                 externalResource != location.externalResource ||
+                Objects.equals(resourcePath ,location.resourcePath) ||
                 externalResourceId != location.externalResourceId ||
                 Objects.equals(projectPath, location.projectPath) &&
                 !(target != null ? !target.equals(location.target) : location.target != null));
@@ -86,6 +99,7 @@ public class LocationImpl implements Location {
         int result = target != null ? target.hashCode() : 0;
         result = 31 * result + lineNumber;
         result = 31 * result + externalResourceId;
+        result = 31 * result + Objects.hashCode(resourcePath);
         result = 31 * result + Objects.hashCode(externalResource);
         result = 31 * result + Objects.hashCode(projectPath);
         return result;

@@ -256,7 +256,10 @@ public abstract class AbstractDebugger implements Debugger, DebuggerObservable {
      */
     private void onBreakpointActivated(LocationDto locationDto) {
         for (DebuggerObserver observer : observers) {
-            observer.onBreakpointActivated(locationDto.getTarget(), locationDto.getLineNumber() - 1);
+            String filePath = fqnToPath(locationDto);
+            if (filePath != null) {
+                observer.onBreakpointActivated(filePath, locationDto.getLineNumber() - 1);
+            }
         }
     }
 
@@ -313,6 +316,7 @@ public abstract class AbstractDebugger implements Debugger, DebuggerObservable {
         if (isConnected()) {
             LocationDto locationDto = dtoFactory.createDto(LocationDto.class);
             locationDto.setLineNumber(lineNumber + 1);
+            locationDto.setResourcePath(file.getPath());
 
             String fqn = pathToFqn(file);
             if (fqn == null) {
@@ -440,6 +444,7 @@ public abstract class AbstractDebugger implements Debugger, DebuggerObservable {
         for (Breakpoint b : breakpointManager.getBreakpointList()) {
             LocationDto locationDto = dtoFactory.createDto(LocationDto.class);
             locationDto.setLineNumber(b.getLineNumber() + 1);
+            locationDto.setResourcePath(b.getPath());
 
             String target = pathToFqn(b.getFile());
             if (target != null) {
@@ -713,6 +718,12 @@ public abstract class AbstractDebugger implements Debugger, DebuggerObservable {
     private VariablePathDto asDto(VariablePath variablePath) {
         return dtoFactory.createDto(VariablePathDto.class).withPath(variablePath.getPath());
     }
+
+    /**
+     * Transforms FQN to file path.
+     */
+    @Nullable
+    abstract protected String fqnToPath(@NotNull Location location);
 
     /**
      * Transforms file path to FQN>

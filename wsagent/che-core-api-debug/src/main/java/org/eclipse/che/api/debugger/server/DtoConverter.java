@@ -79,6 +79,7 @@ public final class DtoConverter {
         return newDto(LocationDto.class).withTarget(location.getTarget())
                                         .withLineNumber(location.getLineNumber())
                                         .withExternalResourceId(location.getExternalResourceId())
+                                        .withResourcePath(location.getResourcePath())
                                         .withProjectPath(location.getProjectPath())
                                         .withExternalResource(location.isExternalResource());
     }
