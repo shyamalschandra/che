@@ -33,14 +33,18 @@ public class MachineSourceImpl implements MachineSource {
 
     }
 
+    /**
+     * Please use {@link MachineSourceImpl with type and then setLocation or setContent}
+     * @param type the source type defined by implementation.
+     */
+    @Deprecated
     public MachineSourceImpl(String type, String location) {
-        this(type, location, null);
+        this(type);
+        setLocation(location);
     }
 
-    public MachineSourceImpl(String type, String location, String content) {
+    public MachineSourceImpl(String type) {
         this.type = type;
-        this.location = location;
-        this.content = content;
     }
 
     public MachineSourceImpl(MachineSource machineSource) {
@@ -81,21 +85,7 @@ public class MachineSourceImpl implements MachineSource {
      * @param content
      *         the content instead of an external link like with location
      */
-    @Override
-    public void setContent(String content) {
-        this.content = content;
-    }
-
-    /**
-     * Defines the new content to use for this machine source.
-     * Alternate way is to provide a location
-     *
-     * @param content
-     *         the content instead of an external link like with location
-     * @return the current intance of the object
-     */
-    @Override
-    public MachineSource withContent(String content) {
+    public MachineSourceImpl setContent(String content) {
         this.content = content;
         return this;
     }

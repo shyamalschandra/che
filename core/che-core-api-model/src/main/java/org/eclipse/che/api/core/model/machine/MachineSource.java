@@ -30,19 +30,4 @@ public interface MachineSource {
      */
     String getContent();
 
-    /**
-     * Defines the new content to use for this machine source.
-     * Alternate way is to provide a location
-     * @param content the content instead of an external link like with location
-     */
-    void setContent(String content);
-
-    /**
-     * Defines the new content to use for this machine source.
-     * Alternate way is to provide a location
-     * @param content the content instead of an external link like with location
-     * @return the current intance of the object
-     */
-    MachineSource withContent(String content);
-
 }

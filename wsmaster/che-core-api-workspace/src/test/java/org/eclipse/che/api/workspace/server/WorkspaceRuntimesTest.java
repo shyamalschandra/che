@@ -419,7 +419,7 @@ public class WorkspaceRuntimesTest {
                                                           .setDev(true)
                                                           .setType("docker")
                                                           .setLimits(new LimitsImpl(1024))
-                                                          .setSource(new MachineSourceImpl("git", "location"))
+                                                          .setSource(new MachineSourceImpl("git").setLocation("location"))
                                                           .setName("dev-machine")
                                                           .build();
         final MachineConfigImpl nonDevCfg = MachineConfigImpl.builder()

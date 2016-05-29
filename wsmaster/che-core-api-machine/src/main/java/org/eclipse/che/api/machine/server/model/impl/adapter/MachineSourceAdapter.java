@@ -40,8 +40,6 @@ public class MachineSourceAdapter implements JsonDeserializer<MachineSource>, Js
         final JsonObject jsonObject = new JsonObject();
 
         // we can't rely on MachineSourceImpl as custom InstanceProvider can build their own implementation
-        JsonObject object = new JsonObject();
-
         jsonObject.addProperty("content", machineSource.getContent());
         jsonObject.addProperty("location", machineSource.getLocation());
         jsonObject.addProperty("type", machineSource.getType());

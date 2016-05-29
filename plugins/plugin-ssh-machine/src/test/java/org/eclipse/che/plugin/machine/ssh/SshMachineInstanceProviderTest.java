@@ -97,6 +97,15 @@ public class SshMachineInstanceProviderTest {
         provider.createInstance(machine, LineConsumer.DEV_NULL);
     }
 
+    @Test(expectedExceptions = NullPointerException.class,
+          expectedExceptionsMessageRegExp = "Location in machine source is required")
+    public void shouldThrowExceptionInvalidMachineConfigSource() throws Exception {
+        MachineImpl machine = createMachine(true);
+        machine.getConfig().setSource(new MachineSourceImpl("ssh-config").setContent("hello"));
+
+        provider.createInstance(machine, LineConsumer.DEV_NULL);
+    }
+
     @Test
     public void shouldBeAbleToCreateSshMachineInstanceOnMachineCreationFromRecipe() throws Exception {
         when(sshMachineFactory.createSshClient(any(SshMachineRecipe.class), anyMap())).thenReturn(sshClient);
@@ -121,8 +130,7 @@ public class SshMachineInstanceProviderTest {
                                                                                                     "10011/tcp",
                                                                                                     "http",
                                                                                                     null)))
-                                                       .setSource(new MachineSourceImpl("ssh-config",
-                                                                                        "localhost:10012/recipe"))
+                                                       .setSource(new MachineSourceImpl("ssh-config").setLocation("localhost:10012/recipe"))
                                                        .setType("ssh")
                                                        .build();
         return MachineImpl.builder()

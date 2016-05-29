@@ -63,7 +63,7 @@ public class DockerInstance extends AbstractInstance {
     /**
      * Name of the latest tag used in Docker image.
      */
-    private static final String LATEST_TAG = "latest";
+    public static final String LATEST_TAG = "latest";
 
     private static final AtomicInteger pidSequence           = new AtomicInteger(1);
     private static final String        PID_FILE_TEMPLATE     = "/tmp/docker-exec-%s.pid";
@@ -201,7 +201,7 @@ public class DockerInstance extends AbstractInstance {
             final String repository = generateRepository();
             if(!snapshotUseRegistry) {
                 commitContainer(owner, repository, LATEST_TAG);
-                new DockerMachineSource(repository).setTag(LATEST_TAG);
+                return new DockerMachineSource(repository).withTag(LATEST_TAG);
             }
             final String repositoryName = registry + '/' + repository;
             commitContainer(owner, repositoryName, LATEST_TAG);
@@ -218,7 +218,7 @@ public class DockerInstance extends AbstractInstance {
                                                   }
                                               });
             docker.removeImage(RemoveImageParams.create(repositoryName).withForce(false));
-            return new DockerMachineSource(repository).setRegistry(registry).setDigest(digest).setTag(LATEST_TAG);
+            return new DockerMachineSource(repository).withRegistry(registry).withDigest(digest).withTag(LATEST_TAG);
         } catch (IOException ioEx) {
             throw new MachineException(ioEx);
         } catch (InterruptedException e) {

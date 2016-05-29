@@ -796,7 +796,7 @@ public class MachineManager {
                      machine.getId());
 
             snapshotWithKey = new SnapshotImpl(snapshot);
-            snapshotWithKey.setMachineSource(machine.saveToSnapshot(machine.getOwner()));
+            snapshotWithKey.setMachineSourceImpl(machine.saveToSnapshot(machine.getOwner()));
 
             try {
                 SnapshotImpl oldSnapshot = snapshotDao.getSnapshot(snapshot.getWorkspaceId(),

@@ -87,7 +87,7 @@ public class SnapshotImpl implements Snapshot {
         return type;
     }
 
-    public MachineSource getMachineSource() {
+    public MachineSourceImpl getMachineSource() {
         return machineSource;
     }
 
@@ -126,7 +126,7 @@ public class SnapshotImpl implements Snapshot {
         return this.isDev;
     }
 
-    public void setMachineSource(MachineSource machineSource) {
+    public void setMachineSourceImpl(MachineSource machineSource) {
         this.machineSource = machineSource != null ? new MachineSourceImpl(machineSource) : null;
     }
 

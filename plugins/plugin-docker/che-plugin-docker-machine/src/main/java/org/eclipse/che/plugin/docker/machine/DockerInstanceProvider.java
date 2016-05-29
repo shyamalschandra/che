@@ -44,7 +44,9 @@ import org.eclipse.che.plugin.docker.client.ProgressLineFormatterImpl;
 import org.eclipse.che.plugin.docker.client.ProgressMonitor;
 import org.eclipse.che.plugin.docker.client.json.ContainerConfig;
 import org.eclipse.che.plugin.docker.client.json.HostConfig;
+import org.eclipse.che.plugin.docker.client.params.PullParams;
 import org.eclipse.che.plugin.docker.client.params.RemoveImageParams;
+import org.eclipse.che.plugin.docker.client.params.TagParams;
 import org.eclipse.che.plugin.docker.machine.node.DockerNode;
 import org.eclipse.che.plugin.docker.machine.node.WorkspaceFolderPathProvider;
 import org.slf4j.Logger;
@@ -70,6 +72,7 @@ import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.lang.String.format;
+import static org.eclipse.che.plugin.docker.machine.DockerInstance.LATEST_TAG;
 
 /**
  * Docker implementation of {@link InstanceProvider}
@@ -258,28 +261,32 @@ public class DockerInstanceProvider implements InstanceProvider {
         MachineSource machineSource = machineConfig.getSource();
         String type = machineSource.getType();
 
+        // create container machine name
+        final String userName = EnvironmentContext.getCurrent().getSubject().getUserName();
+        final String machineContainerName = containerNameGenerator.generateContainerName(machine.getWorkspaceId(),
+                                                                                         machine.getId(),
+                                                                                         userName,
+                                                                                         machine.getConfig().getName());
         // get recipe
         // - it's a dockerfile type:
         //    - location defined : download this location and get script as recipe
         //    - content defined  : use this content as recipe script
         // - it's an image:
-        //    - use either location or content as image ([registry:port]/<repository-image>[:tag][@digest])
+        //    - use location of image ([registry:port]/<repository-image>[:tag][@digest])
         final Recipe recipe;
         if (DOCKER_FILE_TYPE.equals(type)) {
             recipe = this.recipeRetriever.getRecipe(machineConfig);
         } else if (DOCKER_IMAGE_TYPE.equals(type)) {
-            return doCreateInstanceImage(machine, creationLogsOutput);
+            if (isNullOrEmpty(machineSource.getLocation())) {
+                throw new InvalidRecipeException(String.format("The type '%s' needs to be used with a location, not with any other parameter. Found '%s'.", type, machineSource));
+            }
+            return doCreateInstanceImage(machine, machineContainerName, creationLogsOutput);
         } else {
             // not supported
             throw new UnsupportedRecipeException("The type '" + type + "' is not supported");
         }
         final Dockerfile dockerfile = parseRecipe(recipe);
 
-        final String userName = EnvironmentContext.getCurrent().getSubject().getUserName();
-        final String machineContainerName = containerNameGenerator.generateContainerName(machine.getWorkspaceId(),
-                                                                                         machine.getId(),
-                                                                                         userName,
-                                                                                         machine.getConfig().getName());
         final String machineImageName = "eclipse-che/" + machineContainerName;
         final long memoryLimit = (long)machine.getConfig().getLimits().getRam() * 1024 * 1024;
 
@@ -291,24 +298,18 @@ public class DockerInstanceProvider implements InstanceProvider {
                               creationLogsOutput);
     }
 
-    protected Instance doCreateInstanceImage(final Machine machine,
+    protected Instance doCreateInstanceImage(final Machine machine, String machineContainerName,
                                         final LineConsumer creationLogsOutput) throws NotFoundException, MachineException {
         final DockerMachineSource dockerMachineSource = new DockerMachineSource(machine.getConfig().getSource());
 
             if (snapshotUseRegistry) {
                 pullImage(dockerMachineSource, creationLogsOutput);
             }
-
-        final String userName = EnvironmentContext.getCurrent().getSubject().getUserName();
-        final String machineContainerName = containerNameGenerator.generateContainerName(machine.getWorkspaceId(),
-                                                                                         machine.getId(),
-                                                                                         userName,
-                                                                                         machine.getConfig().getName());
         final String machineImageName = "eclipse-che/" + machineContainerName;
         final String fullNameOfPulledImage = dockerMachineSource.getFullName();
         try {
             // tag image with generated name to allow sysadmin recognize it
-            docker.tag(fullNameOfPulledImage, machineImageName, null);
+            docker.tag(TagParams.create(fullNameOfPulledImage, machineImageName));
         } catch (IOException e) {
             LOG.error(e.getLocalizedMessage(), e);
             throw new MachineException("Can't create machine from snapshot.");
@@ -394,13 +395,21 @@ public class DockerInstanceProvider implements InstanceProvider {
 
     private void pullImage(DockerMachineSource dockerMachineSource, final LineConsumer creationLogsOutput) throws MachineException {
         if (dockerMachineSource.getRepository() == null) {
-            throw new MachineException("Machine creation failed. Snapshot state is invalid. Please, contact support.");
+            throw new MachineException(String.format("Machine creation failed. Machine source is invalid. No repository is defined. Found %s.", dockerMachineSource));
         }
+
+        final String tag;
+        if (isNullOrEmpty(dockerMachineSource.getTag())) {
+            tag = LATEST_TAG;
+        } else {
+            tag = dockerMachineSource.getTag();
+        }
+        PullParams pullParams = PullParams.create(dockerMachineSource.getRepository())
+                  .withTag(tag)
+                  .withRegistry(dockerMachineSource.getRegistry());
         try {
             final ProgressLineFormatterImpl progressLineFormatter = new ProgressLineFormatterImpl();
-            docker.pull(dockerMachineSource.getRepository(),
-                        dockerMachineSource.getTag(),
-                        dockerMachineSource.getRegistry(),
+            docker.pull(pullParams,
                         currentProgressStatus -> {
                             try {
                                 creationLogsOutput.writeLine(progressLineFormatter.format(currentProgressStatus));

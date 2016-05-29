@@ -90,6 +90,7 @@ public class SshMachineInstanceProvider implements InstanceProvider {
             throws UnsupportedRecipeException, InvalidRecipeException, NotFoundException, MachineException {
         requireNonNull(machine, "Non null machine required");
         requireNonNull(lineConsumer, "Non null logs consumer required");
+        requireNonNull(machine.getConfig().getSource().getLocation(), "Location in machine source is required");
 
         if (machine.getConfig().isDev()) {
             throw new MachineException("Dev machine is not supported for Ssh machine implementation");

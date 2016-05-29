@@ -51,7 +51,7 @@ public class MachineSourceAdapterTest {
         final String CONTENT = "myContent";
 
         // serialize
-        MachineSource machineSource = new MachineSourceImpl(TYPE, LOCATION).withContent(CONTENT);
+        MachineSource machineSource = new MachineSourceImpl(TYPE).setLocation(LOCATION).setContent(CONTENT);
         String json = gson.toJson(machineSource, MachineSource.class);
         assertNotNull(json);
 

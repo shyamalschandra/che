@@ -37,6 +37,7 @@ import org.eclipse.che.plugin.docker.client.json.ContainerCreated;
 import org.eclipse.che.plugin.docker.client.json.HostConfig;
 import org.eclipse.che.plugin.docker.client.params.PullParams;
 import org.eclipse.che.plugin.docker.client.params.RemoveImageParams;
+import org.eclipse.che.plugin.docker.client.params.TagParams;
 import org.eclipse.che.plugin.docker.machine.node.DockerNode;
 import org.eclipse.che.plugin.docker.machine.node.WorkspaceFolderPathProvider;
 import org.mockito.ArgumentCaptor;
@@ -48,7 +49,6 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -67,8 +67,6 @@ import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.anyVararg;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.atMost;
-import static org.mockito.Mockito.calls;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
@@ -203,8 +201,9 @@ public class DockerInstanceProviderTest {
 
         createInstanceFromSnapshot(repo, tag, registry);
 
+        PullParams pullParams = PullParams.create(repo).withRegistry(registry).withTag(tag);
 
-        verify(dockerConnector).pull(eq(repo), eq(tag), eq(registry), any(ProgressMonitor.class));
+        verify(dockerConnector).pull(eq(pullParams), any(ProgressMonitor.class));
     }
 
     @Test
@@ -213,8 +212,11 @@ public class DockerInstanceProviderTest {
         final String tag = "latest";
         dockerInstanceProvider = getDockerInstanceProvider(false);
 
-        dockerInstanceProvider.createInstance(new DockerInstanceKey(repo, tag),
-                                              getMachineBuilder().build(),
+        MachineImpl machine = getMachineBuilder().build();
+        final MachineSourceImpl machineSource = new DockerMachineSource(repo).withTag(tag);
+        machine.getConfig().setSource(machineSource);
+
+        dockerInstanceProvider.createInstance(machine,
                                               LineConsumer.DEV_NULL);
 
         verify(dockerConnector, never()).pull(anyString(),
@@ -227,7 +229,7 @@ public class DockerInstanceProviderTest {
     public void shouldRemoveLocalImageDuringRemovalOfSnapshot() throws Exception {
         final String repo = "repo";
         final String tag = "latest";
-        final DockerInstanceKey instanceKey = new DockerInstanceKey(repo, tag);
+        final DockerMachineSource instanceKey = new DockerMachineSource(repo).withTag(tag);
         dockerInstanceProvider = getDockerInstanceProvider(false);
 
         dockerInstanceProvider.removeInstanceSnapshot(instanceKey);
@@ -245,12 +247,11 @@ public class DockerInstanceProviderTest {
         String repo = "repo1";
         String tag = "tag1";
         String registry = "registry1";
-
+        TagParams tagParams = TagParams.create(registry + "/" + repo + ":" + tag, "eclipse-che/" + generatedContainerId);
 
         createInstanceFromSnapshot(repo, tag, registry);
 
-
-        verify(dockerConnector).tag(eq(registry + "/" + repo + ":" + tag), eq("eclipse-che/" + generatedContainerId), eq(null));
+        verify(dockerConnector).tag(eq(tagParams));
         verify(dockerConnector).removeImage(eq(registry + "/" + repo + ":" + tag), eq(false));
     }
 
@@ -335,7 +336,7 @@ public class DockerInstanceProviderTest {
                                                                                           eq(USER_NAME),
                                                                                           eq(MACHINE_NAME));
 
-        final MachineSourceImpl machineSource = new MachineSourceImpl("type", "location");
+        final MachineSourceImpl machineSource = new MachineSourceImpl("type").setLocation("location");
         final MachineImpl machine =
                 new MachineImpl(new MachineConfigImpl(false,
                                                       MACHINE_NAME,
@@ -373,7 +374,7 @@ public class DockerInstanceProviderTest {
                                                                                           eq(USER_NAME),
                                                                                           eq(MACHINE_NAME));
 
-        final MachineSourceImpl machineSource = new MachineSourceImpl(DOCKER_FILE_TYPE, "location");
+        final MachineSourceImpl machineSource = new MachineSourceImpl(DOCKER_FILE_TYPE).setLocation("location");
         final MachineImpl machine =
                 new MachineImpl(new MachineConfigImpl(false,
                                                       MACHINE_NAME,
@@ -1775,7 +1776,7 @@ public class DockerInstanceProviderTest {
     }
 
     private void createInstanceFromSnapshot(String repo, String tag, String registry) throws NotFoundException, MachineException {
-        createInstanceFromSnapshot(getMachineBuilder().build(), new DockerMachineSource(repo).setTag(tag).setRegistry(registry).setDigest("digest"));
+        createInstanceFromSnapshot(getMachineBuilder().build(), new DockerMachineSource(repo).withTag(tag).withRegistry(registry).withDigest("digest"));
     }
 
     private void createInstanceFromRecipe(Machine machine) throws Exception {
@@ -1807,7 +1808,7 @@ public class DockerInstanceProviderTest {
     }
 
     private void createInstanceFromSnapshot(MachineImpl machine) throws NotFoundException, MachineException {
-        DockerMachineSource machineSource = new DockerMachineSource("repo").setRegistry("registry").setDigest("digest");
+        DockerMachineSource machineSource = new DockerMachineSource("repo").withRegistry("registry").withDigest("digest");
         machine.getConfig().setSource(machineSource);
         dockerInstanceProvider.createInstance(machine,
                                               LineConsumer.DEV_NULL);
@@ -1837,6 +1838,7 @@ public class DockerInstanceProviderTest {
                                               dockerMachineFactory,
                                               dockerInstanceStopDetector,
                                               containerNameGenerator,
+                                              recipeRetriever,
                                               Collections.emptySet(),
                                               Collections.emptySet(),
                                               Collections.emptySet(),
@@ -1855,7 +1857,7 @@ public class DockerInstanceProviderTest {
         return MachineConfigImpl.builder().fromConfig(new MachineConfigImpl(false,
                                                                             MACHINE_NAME,
                                                                             "machineType",
-                                                                            new MachineSourceImpl(DOCKER_FILE_TYPE, null, "FROM codenvy"),
+                                                                            new MachineSourceImpl(DOCKER_FILE_TYPE).setContent("FROM codenvy"),
                                                                             new LimitsImpl(MEMORY_LIMIT_MB),
                                                                             asList(new ServerConfImpl("ref1",
                                                                                                       "8080",

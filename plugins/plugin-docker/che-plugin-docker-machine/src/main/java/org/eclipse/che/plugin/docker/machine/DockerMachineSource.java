@@ -100,9 +100,26 @@ public class DockerMachineSource extends MachineSourceImpl {
      * @param tag as for example latest
      * @return current instance
      */
-    public DockerMachineSource setTag(String tag) {
+    public DockerMachineSource withTag(String tag) {
         this.tag = tag;
         return this;
+    }
+
+    /**
+     * Defines optional tag attribute
+     * @param tag as for example latest
+     * @return current instance
+     */
+    public void setTag(String tag) {
+        this.tag = tag;
+    }
+
+    /**
+     * Defines optional registry attribute
+     * @param registry as for example docker-registry.company.com:5000
+     */
+    public void setRegistry(String registry) {
+        this.registry = registry;
     }
 
     /**
@@ -110,22 +127,28 @@ public class DockerMachineSource extends MachineSourceImpl {
      * @param registry as for example docker-registry.company.com:5000
      * @return current instance
      */
-    public DockerMachineSource setRegistry(String registry) {
+    public DockerMachineSource withRegistry(String registry) {
         this.registry = registry;
         return this;
     }
 
+    /**
+     * Defines optional digest attribute
+     * @param digest as for example sha256@1234
+     */
+    public void setDigest(String digest) {
+        this.digest = digest;
+    }
 
     /**
      * Defines optional digest attribute
      * @param digest as for example sha256@1234
      * @return current instance
      */
-    public DockerMachineSource setDigest(String digest) {
+    public DockerMachineSource withDigest(String digest) {
         this.digest = digest;
         return this;
     }
-
 
     /**
      * @return mandatory repository

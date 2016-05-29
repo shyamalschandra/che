@@ -50,7 +50,7 @@ public class DockerMachineSourceTest {
      */
     @Test(dataProvider = "image-ids")
     public void testConstructors(String location, String registry, String repository, String tag, String digest) {
-        DockerMachineSource source1 = new DockerMachineSource(repository).setTag(tag).setRegistry(registry).setDigest(digest);
+        DockerMachineSource source1 = new DockerMachineSource(repository).withTag(tag).withRegistry(registry).withDigest(digest);
         assertEquals(source1.getLocation(), location);
 
         DockerMachineSource source2 = new DockerMachineSource(source1);
